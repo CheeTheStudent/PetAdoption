@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">PetAdoption</string>
+    <string name="facebook_app_id">395629441982030</string>
+    <string name="facebook_client_token">e4e6349c1cd54e81fb601d58e797c994</string>
+</resources>

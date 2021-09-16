@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, ToastAndroid, StyleSheet } from 'react-native';
-import { Input } from 'react-native-elements';
 import { NavigationContainer } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import { LoginButton, AccessToken } from 'react-native-fbsdk-next';
 import Icon from 'react-native-vector-icons/Ionicons';
 
+import TextInput from './components/TextInput';
 import LongRoundButton from './components/LongRoundButton';
-import { TextStyles } from '../assets/constants/styles';
-import colours from '../assets/colours/colours';
+import { TextStyles, Spacing } from '../assets/styles';
+import { scale, verticalScale } from '../assets/dimensions';
+import colours from '../assets/colours';
 
 const ResetPassword = ({ navigation }) => {
 
@@ -50,16 +51,15 @@ const ResetPassword = ({ navigation }) => {
 
   return (
     <View style={styles.body}>
-      <Text style={styles.title}>Password Reset</Text>
-      <Text style={[TextStyles.h3, styles.text]}>An email will be sent to you to reset your password</Text>
-      <Input
+      <Text style={[TextStyles.h1, styles.title]}>Password Reset</Text>
+      <Text style={[TextStyles.h4, styles.text]}>An email will be sent to you to reset your password</Text>
+      <TextInput
         placeholder="Enter your email"
         returnKeyType="next"
         onChangeText={email => emailChecker(email)}
         defaultValue={email}
         errorMessage={emailError}
-        inputContainerStyle={styles.textInput}
-        errorStyle={styles.textInputError} />
+        inputContainerStyle={styles.inputContainer} />
       <LongRoundButton title="RESET PASSWORD" onPress={handleResetPassword} />
     </View>
   );
@@ -69,34 +69,23 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: 'white',
   },
   title: {
     alignSelf: 'center',
-    fontSize: 24,
-    fontFamily: 'Roboto-Regular',
-    marginBottom: 16,
+    marginBottom: verticalScale(8),
   },
   text: {
     alignSelf: 'center',
-    marginBottom: 32,
+    textAlign: 'center',
+    marginHorizontal: scale(16),
+    marginBottom: verticalScale(24),
   },
-  textInput: {
-    height: 56,
-    marginHorizontal: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderRadius: 4,
-    borderColor: colours.mediumGray,
+  inputContainer: {
+    marginHorizontal: scale(16),
+    marginBottom: verticalScale(16),
   },
-  textInputError: {
-    marginHorizontal: 16,
-  },
-  forgotPasswordText: {
-    alignSelf: 'flex-end',
-    marginRight: 32,
-    marginBottom: 32,
-  }
 });
 
 export default ResetPassword;

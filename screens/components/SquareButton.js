@@ -2,15 +2,16 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 
-import colours from '../../assets/colours/colours';
+import colours from '../../assets/colours';
 
-const SquareButton = ({ title, icon, buttonStyle, onPress, ...rest }) => {
+const SquareButton = ({ title, icon, titleStyle, buttonStyle, containerStyle, onPress, ...rest }) => {
 
   return (
     <Button
       title={title}
+      titleStyle={[styles.buttonText, titleStyle]}
       buttonStyle={[styles.button, buttonStyle]}
-      titleStyle={styles.buttonText}
+      containerStyle={containerStyle}
       icon={icon}
       onPress={onPress}
       {...rest} />
@@ -19,7 +20,7 @@ const SquareButton = ({ title, icon, buttonStyle, onPress, ...rest }) => {
 
 const styles = StyleSheet.create({
   button: {
-    width: 78,
+    // width: 78,
     backgroundColor: 'transparent',
     borderWidth: 1,
     borderColor: colours.mediumGray,

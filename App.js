@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Text } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
 
 import AuthScreen from './screens/Auth';
 import AppNavigation from './screens/AppNavigation';
 import LoginScreen from './screens/Login';
 import SignUpScreen from './screens/SignUp';
 import ResetPasswordScreen from './screens/ResetPassword';
+import OnboardingScreen from './screens/Onboarding';
 import PetProfileScreen from './screens/PetProfile';
 import Testing from './screens/Testing';
 
@@ -20,29 +21,25 @@ const App = () => {
 
   const Stack = createNativeStackNavigator();
 
-  const getData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('onboard');
-      if (value !== null) {
-        setShowOnboard(!Boolean(value));
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  getData();
+  const handleIsNewUser = async () => {
+    if (!auth().currentUser) return;
+    const userUID = auth().currentUser.uid;
+    const userRef = database().ref(`/users/${userUID}`);
 
-  const handleOnboardFinish = async () => {
-    try {
-      setShowOnboard(false);
-      await AsyncStorage.setItem('onboard', 'true');
-    } catch (err) {
-      console.log(err);
-    }
+    userRef.on('value', snapshot => {
+      const data = snapshot.val() ? snapshot.val() : null;
+      if (!data)
+        setShowOnboard(true);
+      else {
+        setShowOnboard(false);
+      }
+    });
   };
 
   const onAuthStateChanged = user => {
     setUser(user);
+    if (!user) setShowOnboard(true);
+    handleIsNewUser();
     if (initializing) setInitializing(false);
   };
 
@@ -66,8 +63,13 @@ const App = () => {
           </>
           :
           <>
-            <Stack.Screen name='AppNavigation' component={AppNavigation} />
-            <Stack.Screen name='PetProfile' component={PetProfileScreen} />
+            {showOnboard ?
+              <Stack.Screen name='Onboarding' component={OnboardingScreen} />
+              :
+              <>
+                <Stack.Screen name='AppNavigation' component={AppNavigation} />
+                <Stack.Screen name='PetProfile' component={PetProfileScreen} />
+              </>}
           </>}
       </Stack.Navigator>
     </NavigationContainer >

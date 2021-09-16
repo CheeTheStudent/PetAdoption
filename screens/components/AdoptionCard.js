@@ -2,8 +2,11 @@ import React from 'react';
 import { View, Text, Image, TouchableWithoutFeedback, Animated, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-import { CARD, ACTION_OFFSET } from '../../assets/constants/dimensions';
-import { TextStyles } from '../../assets/constants/styles';
+import Tag from '../components/Tag';
+import { CARD, ACTION_OFFSET, verticalScale, scale } from '../../assets/dimensions';
+import { TextStyles } from '../../assets/styles';
+import { useEffect } from 'react';
+import { useState } from 'react';
 
 const AdoptionCard = ({ navigation, card, isFirst, swipe, tiltPoint, ...rest }) => {
 
@@ -32,10 +35,10 @@ const AdoptionCard = ({ navigation, card, isFirst, swipe, tiltPoint, ...rest }) 
         <View style={styles.contentContainer} >
           <View style={styles.detailsContainer}>
             <Text style={[TextStyles.h1, styles.name]}>{card.name}</Text>
-            <Text style={[TextStyles.h2, styles.age]}>{card.age}</Text>
+            <Text style={[TextStyles.h3, styles.age]}>{card.age}</Text>
           </View>
           <View style={styles.tagsContainer}>
-            {card.tags ? card.tags.map(tag => <Text style={[TextStyles.h3, styles.tag]}>{tag}</Text>) : <></>}
+            {card.tags ? card.tags.map(tag => <Tag title={tag} type="white" disabled />) : <></>}
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -46,11 +49,14 @@ const AdoptionCard = ({ navigation, card, isFirst, swipe, tiltPoint, ...rest }) 
 const styles = StyleSheet.create({
   card: {
     position: 'absolute',
+    bottom: CARD.HEIGHT * 0.04 + verticalScale(18.5),
     top: CARD.HEIGHT * 0.01,
+    left: CARD.HEIGHT * 0.02,
+    right: CARD.HEIGHT * 0.02,
   },
   image: {
-    width: CARD.WIDTH,
-    height: CARD.HEIGHT,
+    width: '100%',
+    height: '100%',
     borderRadius: CARD.BORDER_RADIUS,
   },
   linearGradient: {
@@ -63,17 +69,17 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     position: 'absolute',
-    bottom: 32,
-    left: 16,
-    right: 16,
+    bottom: verticalScale(32),
+    left: scale(16),
+    right: scale(16),
   },
   detailsContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    marginBottom: 12,
   },
   tagsContainer: {
-    flexDirection: 'row'
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
   name: {
     color: 'white',

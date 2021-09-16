@@ -1,13 +1,15 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Input } from 'react-native-elements';
+import { View, Text, StyleSheet, ToastAndroid } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import { LoginButton, AccessToken } from 'react-native-fbsdk-next';
 import Icon from 'react-native-vector-icons/Ionicons';
 
+import TextInput from './components/TextInput';
 import LongRoundButton from './components/LongRoundButton';
-import colours from '../assets/colours/colours';
+import colours from '../assets/colours';
+import { TextStyles, Spacing } from '../assets/styles';
+import { verticalScale, scale } from '../assets/dimensions';
 
 const Login = ({ navigation }) => {
 
@@ -21,6 +23,10 @@ const Login = ({ navigation }) => {
 
   const handlePasswordToggle = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleFocusNext = () => {
+    passwordInput.current.focus();
   };
 
   const emailChecker = (input: String) => {
@@ -63,7 +69,7 @@ const Login = ({ navigation }) => {
 
     auth()
       .signInWithEmailAndPassword(email, pswd)
-      .then(() => { navigation.navigate("AppNavigation"); })
+      .then(() => { ToastAndroid.show("Logging in..", ToastAndroid.SHORT); })
       .catch(error => {
         if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
           setEmailError("Incorrect email or password");
@@ -78,19 +84,19 @@ const Login = ({ navigation }) => {
 
   return (
     <View style={styles.body}>
-      <Text style={styles.title}>Log In</Text>
-      <Input
+      <Text style={[TextStyles.h1, styles.title]}>Log In</Text>
+      <TextInput
         placeholder="Enter your email"
         returnKeyType="next"
         onChangeText={email => emailChecker(email)}
         defaultValue={email}
         errorMessage={emailError}
-        onSubmitEditing={() => passwordInput.current.focus()}
+        onSubmitEditing={handleFocusNext}
         blurOnSubmit={false}
-        inputContainerStyle={styles.textInput}
-        errorStyle={styles.textInputError} />
-      <Input
-        ref={passwordInput}
+        inputContainerStyle={Spacing.smallHorizontalSpacing}
+        errorStyle={Spacing.smallHorizontalSpacing} />
+      <TextInput
+        compRef={passwordInput}
         placeholder="Enter your password"
         secureTextEntry={showPassword}
         returnKeyType="go"
@@ -98,9 +104,9 @@ const Login = ({ navigation }) => {
         defaultValue={pswd}
         errorMessage={pswdError}
         rightIcon={<Icon name="eye" size={30} color={colours.mediumGray} onPress={handlePasswordToggle} />}
-        inputContainerStyle={styles.textInput}
-        errorStyle={styles.textInputError} />
-      <Text style={styles.forgotPasswordText} onPress={handleResetPassword}>Forgot Password?</Text>
+        inputContainerStyle={Spacing.smallHorizontalSpacing}
+        errorStyle={Spacing.smallHorizontalSpacing} />
+      <Text style={[TextStyles.desc, styles.forgotPasswordText]} onPress={handleResetPassword}>Forgot Password?</Text>
       <LongRoundButton title="LOG IN" onPress={handleSignIn} />
     </View>
   );
@@ -110,29 +116,17 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: 'white',
   },
   title: {
     alignSelf: 'center',
-    fontSize: 24,
-    fontFamily: 'Roboto-Regular',
-    marginBottom: 32,
-  },
-  textInput: {
-    height: 56,
-    marginHorizontal: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderRadius: 4,
-    borderColor: colours.mediumGray,
-  },
-  textInputError: {
-    marginHorizontal: 16,
+    marginBottom: verticalScale(32),
   },
   forgotPasswordText: {
     alignSelf: 'flex-end',
-    marginRight: 32,
-    marginBottom: 32,
+    marginRight: scale(16),
+    marginBottom: verticalScale(32),
   }
 });
 

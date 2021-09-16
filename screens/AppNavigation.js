@@ -7,8 +7,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import HomeScreen from './Home';
 import ProfileScreen from './Profile';
-import colours from '../assets/colours/colours';
-import TextStyles from '../assets/constants/styles';
+import colours from '../assets/colours';
+import TextStyles from '../assets/styles';
 
 const AppNavigation = () => {
 
@@ -18,6 +18,7 @@ const AppNavigation = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        headerStyle: { backgroundColor: 'white', elevation: 0 },
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 

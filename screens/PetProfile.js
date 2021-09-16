@@ -1,18 +1,55 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, View, Text, Image, StyleSheet } from 'react-native';
+import auth from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
 import { Button, Icon } from 'react-native-elements';
 
 import ActionButton from './components/ActionButton';
+import Tag from './components/Tag';
 import SquareButton from './components/SquareButton';
-import { TextStyles, Spacing } from '../assets/constants/styles';
-import { SCREEN } from '../assets/constants/dimensions';
+import { TextStyles, Spacing } from '../assets/styles';
+import { SCREEN, verticalScale, scale } from '../assets/dimensions';
 
 const PetProfile = ({ navigation, route }) => {
 
   const { pet } = route.params;
+  const userUID = auth().currentUser.uid;
+  const userRef = database().ref(`/users/${userUID}`);
+
+  const [userTags, setUserTags] = useState([]);
+
+  useEffect(async () => {
+    userRef.on('value', snapshot => {
+      const data = snapshot.val() ? snapshot.val() : null;
+      data && setUserTags(data.preferredTags);
+    });
+  }, []);
+
+  const renderTag = (tag) => {
+    let included = false;
+    userTags.map(sTag => {
+      if (sTag === tag) {
+        included = true;
+      }
+    });
+    {/* <Tag title={tag} type="white-outline" disabled /> */ }
+    return <Tag title={tag} type={included ? "black" : "white-outline"} disabled />;
+  };
 
   const handleGoBack = () => {
     navigation.goBack();
+  };
+
+  const handleLikePet = () => {
+    navigation.navigate('Home', {
+      swipeAway: "like",
+    });
+  };
+
+  const handleDislikePet = () => {
+    navigation.navigate('Home', {
+      swipeAway: "dislike",
+    });
   };
 
   return (
@@ -25,41 +62,41 @@ const PetProfile = ({ navigation, route }) => {
             <ActionButton name="chevron-up" containerStyle={styles.actionUpButton} onPress={handleGoBack} />
             <View style={styles.container}>
               <View style={styles.basicInfoContainer}>
-                <Text style={[TextStyles.h1, Spacing.superSmallRightSpacing]}>{pet.name}</Text>
-                <Text style={TextStyles.h2}>{pet.age}</Text>
+                <Text style={[TextStyles.h2, Spacing.superSmallRightSpacing]}>{pet.name}</Text>
+                <Text style={TextStyles.h4}>{pet.age}</Text>
               </View>
-              <Text style={[TextStyles.h2, Spacing.superSmallTopSpacing]}>{pet.breed}</Text>
-              <View style={[styles.tagContainer, Spacing.mediumVerticalSpacing]}>
-                {pet.tags ? pet.tags.map(tag => <Text style={[TextStyles.h3, styles.tag]}>{tag}</Text>) : <></>}
+              <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>{pet.breed}</Text>
+              <View style={[styles.tagContainer, Spacing.smallTopSpacing]}>
+                {pet.tags ? pet.tags.map(tag => renderTag(tag)) : <></>}
               </View>
-              <View style={styles.healthContainer}>
+              <View style={[styles.healthContainer, Spacing.smallTopSpacing]}>
                 <View >
-                  <Text style={TextStyles.h2}>Weight</Text>
-                  <Text style={[TextStyles.h2, Spacing.superSmallTopSpacing]}>Height</Text>
-                  <Text style={[TextStyles.h2, Spacing.superSmallTopSpacing]}>Vaccinated</Text>
-                  <Text style={[TextStyles.h2, Spacing.superSmallTopSpacing]}>Neutered</Text>
+                  <Text style={TextStyles.h4}>Weight</Text>
+                  <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>Height</Text>
+                  <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>Vaccinated</Text>
+                  <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>Neutered</Text>
                 </View>
                 <View style={styles.healthValuesContainer}>
-                  <Text style={TextStyles.h2}>1.5kg</Text>
-                  <Text style={[TextStyles.h2, Spacing.superSmallTopSpacing]}>1.5kg</Text>
-                  <Icon name="checkmark-circle" type="ionicon" size={30} color="black" style={Spacing.superSmallTopSpacing} />
-                  <Icon name="checkmark-circle" type="ionicon" size={30} color="black" style={Spacing.superSmallTopSpacing} />
+                  <Text style={TextStyles.h4}>1.5kg</Text>
+                  <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>1.5kg</Text>
+                  <Icon name="checkmark-circle" type="ionicon" size={scale(24)} color="black" style={Spacing.superSmallTopSpacing} />
+                  <Icon name="checkmark-circle" type="ionicon" size={scale(24)} color="black" style={Spacing.superSmallTopSpacing} />
                 </View>
               </View>
-              <Text style={[TextStyles.h2, Spacing.superSmallTopSpacing]}>About</Text>
+              <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>About</Text>
               <Text style={[TextStyles.text, Spacing.superSmallTopSpacing]}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras cras mi scelerisque quis arcu luctus lacus id vestibulum. Sollicitudin vestibulum mi elit nulla sed. Faucibus pretium convallis quam enim sed tincidunt adipiscing in enim. Aliquam metus in convallis sodales ornare nisl.</Text>
-              <Text style={[TextStyles.h2, Spacing.superSmallTopSpacing]}>Owner</Text>
+              <Text style={[TextStyles.h3, Spacing.superSmallTopSpacing]}>Owner</Text>
               <View style={[styles.ownerContainer, Spacing.superSmallTopSpacing, Spacing.superSmallBottomSpacing]}>
                 <Image source={require('../assets/images/dog.png')} style={[styles.ownerImage, Spacing.smallRightSpacing]} />
                 <View style={[styles.shelterInfoContainer, Spacing.superSmallRightSpacing]}>
-                  <Text style={[TextStyles.h2, Spacing.superSmallBottomSpacing]} numberOfLines={1}>Jung Shelter Gwanju ung Shelter Gwanju</Text>
+                  <Text style={[TextStyles.h4, Spacing.superSmallBottomSpacing]} numberOfLines={1}>Jung Shelter Gwanju Jung Shelter Gwanju</Text>
                   <Text style={TextStyles.text}>Shelter</Text>
                 </View>
                 <SquareButton title="View" />
               </View>
               <View style={[styles.actionButtonsContainer, Spacing.superSmallTopSpacing]}>
-                < SquareButton buttonStyle={styles.buttonStyle} containerStyle={styles.buttonContainerStyle} icon={<Icon name="thumb-down" type="material-community" color="black" />} />
-                <SquareButton buttonStyle={styles.buttonStyle} containerStyle={styles.buttonContainerStyle} icon={<Icon name="thumb-up" type="material-community" color="black" />} />
+                < SquareButton onPress={handleDislikePet} buttonStyle={styles.buttonStyle} containerStyle={styles.dislikeButtonContainerStyle} icon={<Icon name="thumb-down" type="material-community" color="black" />} />
+                <SquareButton onPress={handleLikePet} buttonStyle={styles.buttonStyle} containerStyle={styles.likeButtonContainerStyle} icon={<Icon name="thumb-up" type="material-community" color="black" />} />
               </View>
               <SquareButton title="MESSAGE" buttonStyle={styles.buttonStyle} containerStyle={[styles.buttonContainerStyle, Spacing.superSmallTopSpacing]} />
             </View>
@@ -78,35 +115,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
   },
+  image: {
+    height: SCREEN.HEIGHT * 0.4,
+    width: SCREEN.WIDTH,
+  },
   container: {
-    flex: 0.6,
-    padding: 24,
+    paddingVertical: verticalScale(24),
+    paddingHorizontal: scale(24),
   },
   basicInfoContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
   },
-  image: {
-    height: SCREEN.HEIGHT / 2,
-    width: SCREEN.WIDTH,
-  },
   actionUpButton: {
     position: 'absolute',
-    top: SCREEN.HEIGHT / 2 - 25,
+    top: SCREEN.HEIGHT * 0.4 - 25,
     left: SCREEN.WIDTH / 2 - 25
   },
   tagContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-  },
-  tag: {
-    marginRight: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    backgroundColor: 'white',
-    borderRadius: 25,
-    borderWidth: 1,
-    borderColor: 'black',
   },
   healthContainer: {
     flexDirection: 'row',
@@ -134,9 +162,13 @@ const styles = StyleSheet.create({
     width: 'auto',
     padding: 12,
   },
-  buttonContainerStyle: {
-    flexGrow: 1,
+  dislikeButtonContainerStyle: {
+    flex: 1,
+    marginRight: scale(8),
+  },
+  likeButtonContainerStyle: {
+    flex: 1,
   }
 });
 
-export default PetProfile;
+export default PetProfile;;

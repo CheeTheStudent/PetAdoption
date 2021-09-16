@@ -2,17 +2,19 @@ import React, { useLayoutEffect, useEffect, useState, useRef, useCallback } from
 import { View, Text, Button, ImageBackground, Image, StyleSheet, Animated, PanResponder } from 'react-native';
 import { Icon } from 'react-native-elements';
 // import Swiper from 'react-native-deck-swiper';
-import firebaseDB from '@react-native-firebase/database';
+import database from '@react-native-firebase/database';
 
 import AdoptionCard from './components/AdoptionCard';
 import ActionButton from './components/ActionButton';
-import colours from '../assets/colours/colours';
-import { CARD, ACTION_OFFSET, SCREEN } from '../assets/constants/dimensions';
-import { TextStyles } from '../assets/constants/styles';
+import colours from '../assets/colours';
+import { CARD, ACTION_OFFSET, SCREEN, scale, verticalScale } from '../assets/dimensions';
+import { TextStyles } from '../assets/styles';
 
-const Home = ({ navigation }) => {
+const Home = ({ navigation, route }) => {
 
-  const petRef = firebaseDB().ref('pets');
+  const swipeAway = route.params?.swipeAway;
+
+  const petRef = database().ref('pets');
   const [pets, setPets] = useState([]);
   const swipe = useRef(new Animated.ValueXY()).current;
   const tiltPoint = useRef(new Animated.Value(1)).current;
@@ -38,6 +40,19 @@ const Home = ({ navigation }) => {
       setPets(pets);
     });
   }, []);
+
+  useEffect(() => {
+    if (swipeAway) {
+      if (swipeAway === "like") {
+        swipeAnimation(1, 100);
+      } else if (swipeAway === "dislike") {
+        swipeAnimation(-1, 100);
+      }
+      navigation.setParams({
+        swipeAway: false,
+      });
+    }
+  }, [swipeAway]);
 
   const panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: () => true,
@@ -111,12 +126,11 @@ const Home = ({ navigation }) => {
 const styles = StyleSheet.create({
   body: {
     flex: 1,
-    alignItems: 'center',
     backgroundColor: 'white',
   },
   headerStyle: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
+    paddingHorizontal: scale(16),
   },
   iconStyle: {
     margin: 4,
@@ -134,18 +148,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'absolute',
     justifyContent: 'space-evenly',
-    top: CARD.HEIGHT - CARD.HEIGHT * 0.02,
-  },
-  iconButton: {
-    height: 50,
-    width: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 25,
-    backgroundColor: 'white',
-    shadowColor: 'black',
-    elevation: 10,
-  },
+    bottom: CARD.HEIGHT * 0.04,
+  }
 });
 
 export default Home;

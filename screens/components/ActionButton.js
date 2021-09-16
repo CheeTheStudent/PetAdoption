@@ -2,8 +2,8 @@ import React from 'react';
 import { View, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import { Icon } from 'react-native-elements';
 
-import { CARD, SCREEN } from '../../assets/constants/dimensions';
-import colours from '../../assets/colours/colours';
+import { CARD, SCREEN, verticalScale, scale } from '../../assets/dimensions';
+import colours from '../../assets/colours';
 
 const ActionButton = ({ name, containerStyle, iconStyle, onPress }) => {
 
@@ -24,8 +24,8 @@ const styles = StyleSheet.create({
     top: CARD.HEIGHT - CARD.HEIGHT * 0.02,
   },
   iconButton: {
-    height: 50,
-    width: 50,
+    height: verticalScale(37),
+    aspectRatio: 1,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 25,

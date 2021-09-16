@@ -4,8 +4,11 @@ import { Input, Button, CheckBox } from 'react-native-elements';
 import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import { TextStyles } from '../assets/constants/styles';
-import colours from '../assets/colours/colours';
+import TextInput from './components/TextInput';
+import LongRoundButton from './components/LongRoundButton';
+import { TextStyles, Spacing } from '../assets/styles';
+import colours from '../assets/colours';
+import { verticalScale, scale } from '../assets/dimensions';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -114,8 +117,8 @@ const SignUp = ({ navigation }) => {
 
   return (
     <View style={styles.body}>
-      <Text style={styles.title}>Create an Account</Text>
-      <Input
+      <Text style={[TextStyles.h1, styles.title]}>Create an Account</Text>
+      <TextInput
         placeholder="Enter your email"
         returnKeyLabel="next"
         onChangeText={email => emailChecker(email)}
@@ -123,10 +126,9 @@ const SignUp = ({ navigation }) => {
         errorMessage={emailError}
         onSubmitEditing={() => passwordInput.current.focus()}
         blurOnSubmit={false}
-        inputContainerStyle={styles.textInput}
-        errorStyle={styles.textInputError} />
-      <Input
-        ref={passwordInput}
+        inputContainerStyle={Spacing.smallHorizontalSpacing} />
+      <TextInput
+        compRef={passwordInput}
         placeholder="Enter your password"
         secureTextEntry={showPassword}
         returnKeyLabel="next"
@@ -136,10 +138,9 @@ const SignUp = ({ navigation }) => {
         rightIcon={<Icon name="eye" size={30} color={colours.mediumGray} onPress={handlePasswordToggle} />}
         onSubmitEditing={() => rePasswordInput.current.focus()}
         blurOnSubmit={false}
-        inputContainerStyle={styles.textInput}
-        errorStyle={styles.textInputError} />
-      <Input
-        ref={rePasswordInput}
+        inputContainerStyle={Spacing.smallHorizontalSpacing} />
+      <TextInput
+        compRef={rePasswordInput}
         placeholder="Re-type password"
         secureTextEntry={showRePassword}
         returnKeyLabel="go"
@@ -147,8 +148,7 @@ const SignUp = ({ navigation }) => {
         defaultValue={rePswd}
         errorMessage={rePswdError}
         rightIcon={<Icon name="eye" size={30} color={colours.mediumGray} onPress={handleRePasswordToggle} />}
-        inputContainerStyle={styles.textInput}
-        errorStyle={styles.textInputError} />
+        inputContainerStyle={Spacing.smallHorizontalSpacing} />
       <View style={styles.policyContainer}>
         <Text>I have read the </Text>
         <Text style={styles.privacyPolicyText} onPress={handlePolicyLink}>Privacy Policy</Text>
@@ -162,7 +162,7 @@ const SignUp = ({ navigation }) => {
           containerStyle={styles.checkBox}
         />
       </View>
-      <Button title="CREATE ACCOUNT" buttonStyle={styles.button} titleStyle={styles.buttonText} containerStyle={styles.buttonContainer} onPress={handleSignUp} />
+      <LongRoundButton title="CREATE ACCOUNT" onPress={handleSignUp} />
     </View>
   );
 };
@@ -171,30 +171,22 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: 'white',
   },
   title: {
     alignSelf: 'center',
-    fontSize: 24,
-    fontFamily: 'Roboto-Regular',
     marginBottom: 32,
-  },
-  textInput: {
-    height: 56,
-    marginHorizontal: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderRadius: 4,
-    borderColor: colours.mediumGray,
   },
   textInputError: {
     marginHorizontal: 16,
   },
   policyContainer: {
     flexDirection: 'row',
+    alignSelf: 'flex-start',
     alignItems: 'center',
-    marginLeft: 32,
-    marginBottom: 32,
+    marginLeft: scale(16),
+    marginBottom: verticalScale(32),
   },
   privacyPolicyText: {
     fontWeight: 'bold',
@@ -205,26 +197,7 @@ const styles = StyleSheet.create({
   privacyPolicyError: {
     fontWeight: 'bold',
     color: 'red',
-  },
-  button: {
-    height: 48,
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: colours.mediumGray,
-    borderRadius: 21,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonText: {
-    fontSize: 12,
-    fontFamily: 'Roboto-Medium',
-    color: colours.black,
-  },
-  buttonContainer: {
-    marginHorizontal: 32,
-    borderRadius: 30,
   }
-
 });
 
 export default SignUp;

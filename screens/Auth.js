@@ -3,28 +3,33 @@ import { View, Text, StatusBar, Image, ActivityIndicator, ToastAndroid, StyleShe
 import { Button, SocialIcon } from 'react-native-elements';
 import AppIntroSlider from 'react-native-app-intro-slider';
 import { AccessToken, LoginManager } from 'react-native-fbsdk-next';
-import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
+import { GoogleSignin, statusCodes } from 'react-native-google-signin';
 import auth from '@react-native-firebase/auth';
 
 import LongRoundButton from './components/LongRoundButton';
-import colours from '../assets/colours/colours';
-import { SCREEN } from '../assets/constants/dimensions';
+import colours from '../assets/colours';
+import { TextStyles } from '../assets/styles';
+import { SCREEN, scale, verticalScale, moderateScale } from '../assets/dimensions';
+
+import Dog from '../assets/images/auth1.svg';
+import Home from '../assets/images/auth2.svg';
+import Walk from '../assets/images/auth3.svg';
 
 const data = [
   {
     title: 'Save A Life',
-    text: 'Description.\nSay something cool',
-    image: require('../assets/images/onboard1.png'),
+    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vitae ultricies pulvinar in turpis.',
+    image: <Dog width={scale(200)} height={verticalScale(158)} />,
   },
   {
     title: 'Help A Cause',
-    text: 'Other cool stuff',
-    image: require('../assets/images/onboard2.png'),
+    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vitae ultricies pulvinar in turpis.',
+    image: <Home width={scale(110)} height={verticalScale(158)} />,
   },
   {
     title: 'Throw A Ball',
-    text: "I'm already out of descriptions\n\nLorem ipsum bla bla bla",
-    image: require('../assets/images/onboard3.png'),
+    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vitae ultricies pulvinar in turpis.",
+    image: <Walk width={scale(256)} height={verticalScale(166)} />,
   },
 ];
 
@@ -45,10 +50,10 @@ const Auth = ({ navigation }) => {
   const renderItem = ({ item }) => {
     return (
       <View style={styles.slide}>
-        <Image source={item.image} style={styles.image} />
+        {item.image}
         <View>
           <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.text}>{item.text}</Text>
+          <Text style={[TextStyles.text, styles.text]}>{item.text}</Text>
         </View>
       </View>
     );
@@ -111,15 +116,16 @@ const Auth = ({ navigation }) => {
         <AppIntroSlider
           keyExtractor={keyExtractor}
           renderItem={renderItem}
+          showNextButton={false}
           dotStyle={styles.dotStyle}
           activeDotStyle={styles.activeDotStyle}
           data={data}
         />
       </View>
       <View style={{ flex: 1 }} >
-        <LongRoundButton title="LOGIN WITH EMAIL" onPress={handleEmailLogin} />
-        <SocialIcon title="LOGIN WITH FACEBOOOK" button type="facebook" onPress={handleFacebookLogin} style={styles.socialButton} fontStyle={styles.buttonText} />
-        <SocialIcon title="LOGIN WITH GOOGLE" button type="google" onPress={handleGoogleLogin} style={styles.socialButton} fontStyle={styles.buttonText} />
+        <LongRoundButton title="LOGIN WITH EMAIL" onPress={handleEmailLogin} containerStyle={styles.emailButton} />
+        <SocialIcon title="LOGIN WITH FACEBOOOK" button type="facebook" iconSize={moderateScale(20)} onPress={handleFacebookLogin} style={styles.socialButton} fontStyle={styles.buttonText} />
+        <SocialIcon title="LOGIN WITH GOOGLE" button type="google" iconSize={moderateScale(20)} onPress={handleGoogleLogin} style={styles.socialButton} fontStyle={styles.buttonText} />
         <Text style={styles.text}>Don't have an account? <Text style={styles.signUpText} onPress={handleSignUp}>Signup</Text></Text>
       </View>
     </View>
@@ -132,22 +138,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  image: {
-    marginVertical: 60,
-  },
   title: {
+    marginTop: verticalScale(56),
     textAlign: 'center',
-    fontSize: 30,
+    fontSize: moderateScale(24),
     fontFamily: 'Roboto-Regular',
     color: colours.black,
   },
   text: {
-    marginTop: 16,
+    marginTop: verticalScale(16),
+    marginBottom: verticalScale(24),
+    marginHorizontal: scale(70),
     textAlign: 'center',
-    fontSize: 16,
-    fontFamily: 'Roboto-Regular',
     color: colours.darkGray,
   },
+
   dotStyle: {
     backgroundColor: colours.white,
     borderColor: colours.mediumGray,
@@ -158,19 +163,23 @@ const styles = StyleSheet.create({
     borderColor: colours.mediumGray,
     borderWidth: 1,
   },
+  emailButton: {
+    marginBottom: verticalScale(8),
+    marginHorizontal: scale(32),
+  },
   socialButton: {
-    height: 56,
+    height: verticalScale(42),
     borderRadius: 30,
     marginTop: 0,
-    marginHorizontal: 32,
+    marginHorizontal: scale(32),
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: moderateScale(12),
     fontFamily: 'Roboto-Medium',
-    fontWeight: 'normal'
+    fontWeight: 'normal',
   },
   signUpText: {
-    fontSize: 16,
+    fontSize: moderateScale(12),
     fontWeight: 'bold',
   },
   loading: {

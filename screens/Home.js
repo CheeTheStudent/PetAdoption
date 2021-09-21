@@ -34,6 +34,8 @@ const Home = ({ navigation, route }) => {
   }, [navigation]);
 
   useEffect(() => {
+    // Try this to limit cards on homepage
+    // const query = petRef.orderByChild('species').equalTo('dog').limitToFirst(20);
     petRef.on('value', snapshot => {
       const data = snapshot.val() ? snapshot.val() : {};
       const pets = data.filter(x => x !== null);

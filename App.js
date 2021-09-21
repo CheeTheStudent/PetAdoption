@@ -12,6 +12,7 @@ import SignUpScreen from './screens/SignUp';
 import ResetPasswordScreen from './screens/ResetPassword';
 import OnboardingScreen from './screens/Onboarding';
 import PetProfileScreen from './screens/PetProfile';
+import OwnerProfileScreen from './screens/OwnerProfile';
 import Testing from './screens/Testing';
 
 const App = () => {
@@ -69,6 +70,7 @@ const App = () => {
               <>
                 <Stack.Screen name='AppNavigation' component={AppNavigation} />
                 <Stack.Screen name='PetProfile' component={PetProfileScreen} />
+                <Stack.Screen name='OwnerProfile' component={OwnerProfileScreen} options={{ headerShown: true }} />
               </>}
           </>}
       </Stack.Navigator>

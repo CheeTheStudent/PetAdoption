@@ -40,6 +40,9 @@ export const Spacing = StyleSheet.create({
   superSmallRightSpacing: {
     marginRight: scale(8),
   },
+  superSmallLeftSpacing: {
+    marginLeft: scale(8),
+  },
   superSmallTopSpacing: {
     marginTop: verticalScale(8),
   },
@@ -63,5 +66,8 @@ export const Spacing = StyleSheet.create({
   },
   mediumTopSpacing: {
     marginTop: verticalScale(24),
+  },
+  mediumBottomSpacing: {
+    marginBottom: verticalScale(24),
   }
 }); 

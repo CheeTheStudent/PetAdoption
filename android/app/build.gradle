@@ -199,6 +199,8 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-database'
 
+    implementation project(':react-native-maps')
+
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'
     }

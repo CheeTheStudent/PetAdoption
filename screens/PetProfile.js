@@ -92,7 +92,7 @@ const PetProfile = ({ navigation, route }) => {
                   <Text style={[TextStyles.h4, Spacing.superSmallBottomSpacing]} numberOfLines={1}>Jung Shelter Gwanju Jung Shelter Gwanju</Text>
                   <Text style={TextStyles.text}>Shelter</Text>
                 </View>
-                <SquareButton title="View" />
+                <SquareButton title="View" onPress={() => navigation.navigate("OwnerProfile")} />
               </View>
               <View style={[styles.actionButtonsContainer, Spacing.superSmallTopSpacing]}>
                 < SquareButton onPress={handleDislikePet} buttonStyle={styles.buttonStyle} containerStyle={styles.dislikeButtonContainerStyle} icon={<Icon name="thumb-down" type="material-community" color="black" />} />

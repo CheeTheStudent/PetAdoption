@@ -1,36 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
+
+import MediaPicker from './components/MediaPicker';
 
 const Testing = () => {
 
-  const pan = useState(new Animated.ValueXY())[0];
+  const [chosenMedia, setChosenMedia] = useState();
 
-  const panResponder = useState(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        pan.setOffset({
-          x: pan.x._value,
-          y: pan.y._value
-        });
-      },
-      onPanResponderMove: Animated.event([null, {
-        dx: pan.x, dy: pan.y
-      }]),
-      onPanResponderRelease: () => {
-        pan.flattenOffset();
-      }
-    })
-  )[0];
+  const handleChosenMedia = (media) => {
+    console.log(media);
+  };
 
   return (
     <View style={styles.body}>
-      <Animated.View style={[{
-        width: 100,
-        height: 100,
-        borderRadius: 100 / 2,
-        backgroundColor: 'red'
-      }, pan.getLayout()]} {...panResponder.panHandlers} />
+      <MediaPicker setChosenMedia={handleChosenMedia} />
     </View>
   );
 };

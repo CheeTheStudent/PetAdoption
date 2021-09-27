@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Tab, TabView } from 'react-native-elements';
+import { Tab, TabView, Icon } from 'react-native-elements';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/Ionicons';
 
 import HomeScreen from './Home';
 import ProfileScreen from './Profile';
+import ManageScreen from './Manage';
 import colours from '../assets/colours';
 import TextStyles from '../assets/styles';
 
@@ -21,20 +21,24 @@ const AppNavigation = () => {
         headerStyle: { backgroundColor: 'white', elevation: 0 },
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
+          let iconType = 'ionicon';
 
           if (route.name === 'Home') {
             iconName = focused
-              ? 'heart'
-              : 'heart-outline';
+              ? 'home-heart'
+              : 'home-outline';
+            iconType = 'material-community';
           } else if (route.name === 'Help') {
             iconName = focused ? 'hand-left' : 'hand-left-outline';
           } else if (route.name === 'Community') {
             iconName = focused ? 'newspaper' : 'newspaper-outline';
+          } else if (route.name === 'Manage') {
+            iconName = focused ? 'paw' : 'paw-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           }
 
-          return <Icon name={iconName} size={size} color={color} />;
+          return <Icon name={iconName} type={iconType} size={size} color={color} />;
         },
         tabBarActiveTintColor: 'black',
         tabBarInactiveTintColor: 'gray',
@@ -51,6 +55,7 @@ const AppNavigation = () => {
       <Tab.Screen name='Home' component={HomeScreen} options={{ tabBarLabel: 'Adoption' }} />
       <Tab.Screen name='Help' component={HomeScreen} options={{ tabBarLabel: 'Help' }} />
       <Tab.Screen name='Community' component={HomeScreen} options={{ tabBarLabel: 'Community' }} />
+      <Tab.Screen name='Manage' component={ManageScreen} options={{ tabBarLabel: 'Manage' }} />
       <Tab.Screen name='Profile' component={ProfileScreen} options={{ tabBarLabel: 'Profile' }} />
     </Tab.Navigator>
   );

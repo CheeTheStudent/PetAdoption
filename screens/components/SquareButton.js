@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 
 import colours from '../../assets/colours';
+import { moderateScale } from '../../assets/dimensions';
 
 const SquareButton = ({ title, icon, titleStyle, buttonStyle, containerStyle, onPress, ...rest }) => {
 
@@ -26,7 +27,7 @@ const styles = StyleSheet.create({
     borderColor: colours.mediumGray,
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: moderateScale(14),
     fontFamily: 'Roboto-Medium',
     color: colours.black,
   },

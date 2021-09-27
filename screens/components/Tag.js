@@ -6,20 +6,24 @@ import colours from '../../assets/colours';
 import { TextStyles } from '../../assets/styles';
 import { moderateScale, scale, verticalScale } from '../../assets/dimensions';
 
-const Tag = ({ title, type, disabled, onSelected }) => {
+const Tag = ({ title, type, disabled, onSelected, onSingleSelected }) => {
 
   const [pressed, setPressed] = useState(false);
 
   const handleOnPress = ({ target }) => {
-    setPressed(!pressed);
-    onSelected(title, !pressed);
+    if (onSelected) {
+      setPressed(!pressed);
+      onSelected(title, !pressed);
+    } else if (onSingleSelected) {
+      onSingleSelected(title);
+    }
   };
 
   const buttonStyle = (type) => {
     switch (type) {
       case 'white': return { backgroundColor: colours.white };
-      case 'white-outline': return { backgroundColor: colours.white, borderWidth: 1, borderColor: colours.black };
-      case 'black': return { backgroundColor: colours.black, borderWidth: 1, borderColor: colours.white };
+      case 'white-outline': return { backgroundColor: colours.white, borderColor: colours.black };
+      case 'black': return { backgroundColor: colours.black, borderColor: colours.white };
       default: return { backgroundColor: colours.lightGray };
     }
   };
@@ -38,9 +42,9 @@ const Tag = ({ title, type, disabled, onSelected }) => {
       title={title}
       disabled={disabled}
       titleStyle={[TextStyles.h4, pressed ? styles.textPressed : textStyle(type)]}
-      buttonStyle={[pressed ? styles.buttonPressed : buttonStyle(type), styles.button]}
+      buttonStyle={[styles.button, pressed ? styles.buttonPressed : buttonStyle(type)]}
       containerStyle={styles.container}
-      disabledStyle={[buttonStyle(type), styles.button]}
+      disabledStyle={[styles.button, buttonStyle(type)]}
       disabledTitleStyle={textStyle(type)}
       onPress={handleOnPress} />
   );
@@ -53,6 +57,8 @@ const styles = StyleSheet.create({
   button: {
     paddingVertical: verticalScale(6),
     paddingHorizontal: scale(12),
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   buttonPressed: {
     backgroundColor: 'black',

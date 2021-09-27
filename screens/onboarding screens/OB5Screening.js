@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   },
   container: {
     marginTop: verticalScale(56),
-    paddingHorizontal: scale(24),
+    paddingHorizontal: scale(16),
   },
   pickerContainer: {
     marginTop: verticalScale(8),

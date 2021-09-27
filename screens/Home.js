@@ -1,7 +1,6 @@
 import React, { useLayoutEffect, useEffect, useState, useRef, useCallback } from 'react';
 import { View, Text, Button, ImageBackground, Image, StyleSheet, Animated, PanResponder } from 'react-native';
 import { Icon } from 'react-native-elements';
-// import Swiper from 'react-native-deck-swiper';
 import database from '@react-native-firebase/database';
 
 import AdoptionCard from './components/AdoptionCard';
@@ -16,6 +15,7 @@ const Home = ({ navigation, route }) => {
 
   const petRef = database().ref('pets');
   const [pets, setPets] = useState([]);
+  const [queries, setQueries] = useState();
   const swipe = useRef(new Animated.ValueXY()).current;
   const tiltPoint = useRef(new Animated.Value(1)).current;
 
@@ -26,7 +26,7 @@ const Home = ({ navigation, route }) => {
       headerRight: () => (
         <View style={styles.headerStyle}>
           <Icon name="notifications" type="Ionicons" size={24} color={colours.black} style={styles.iconStyle} />
-          <Icon name="search" type="Ionicons" size={24} color={colours.black} style={styles.iconStyle} />
+          <Icon name="search" type="Ionicons" size={24} color={colours.black} onPress={handleOpenFilter} style={styles.iconStyle} />
         </View>
       ),
       headerLeft: () => <></>,
@@ -35,13 +35,30 @@ const Home = ({ navigation, route }) => {
 
   useEffect(() => {
     // Try this to limit cards on homepage
-    // const query = petRef.orderByChild('species').equalTo('dog').limitToFirst(20);
-    petRef.on('value', snapshot => {
+    let petQuery = petRef;
+
+    if (queries && queries.length > 0) {
+      const query = queries[0];
+      if (query.field === "age") {
+        petQuery = petRef.orderByChild('ageYear').startAt(query.startAge).endAt(query.endAge).limitToFirst(20);
+      } else if (query.field === "name") {
+        petQuery = petRef.orderByChild(query.field).startAt(query.property).endAt(`${query.property}\uf8ff`).limitToFirst(20);
+      } else {
+        petQuery = petRef.orderByChild(query.field).equalTo(query.property).limitToFirst(20);
+      }
+    }
+    petQuery.on('value', snapshot => {
       const data = snapshot.val() ? snapshot.val() : {};
-      const pets = data.filter(x => x !== null);
-      setPets(pets);
+      let pets = [];
+      Object.entries(data).map(value => pets.push({ id: value[0], ...value[1] }));
+      if (queries && queries.length > 1)
+        filterResults(pets);
+      else
+        setPets(pets);
     });
-  }, []);
+
+    return () => petRef.off();
+  }, [queries]);
 
   useEffect(() => {
     if (swipeAway) {
@@ -55,6 +72,27 @@ const Home = ({ navigation, route }) => {
       });
     }
   }, [swipeAway]);
+
+  const filterResults = data => {
+    let filteredPets = data;
+    queries.map((query, index) => {
+      const { field, property, startAge, endAge } = query;
+      if (index != 0) {
+        if (field === "age") {
+          if (index == 1)
+            filteredPets = filteredPets.filter(el => el.ageYear >= startAge && el.ageYear <= endAge);
+          else
+            filteredPets = filteredPets.filter(el => el.ageYear >= startAge && el.ageYear <= endAge);
+        } else {
+          if (index == 1)
+            filteredPets = filteredPets.filter(el => el[field] === property);
+          else
+            filteredPets = filteredPets.filter(el => el[field] === property);
+        }
+      }
+    });
+    setPets(filteredPets);
+  };
 
   const panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: () => true,
@@ -98,6 +136,12 @@ const Home = ({ navigation, route }) => {
     swipe.setValue({ x: 0, y: 0 });
   }, [swipe]);
 
+  const handleOpenFilter = () => {
+    navigation.navigate('FilterModal', {
+      setQueries: setQueries,
+    });
+  };
+
   const handleOpenProfile = () => {
     navigation.navigate('PetProfile', {
       pet: pets[0],
@@ -106,13 +150,13 @@ const Home = ({ navigation, route }) => {
 
   return (
     <View style={styles.body}>
-      {pets.length > 0 ? (
+      {pets && pets.length > 0 ? (
         <>
           {pets.map((pet, index) => {
             const isFirst = index === 0;
             const dragHandlers = isFirst ? panResponder.panHandlers : {};
 
-            return (<AdoptionCard card={pet} isFirst={isFirst} swipe={swipe} tiltPoint={tiltPoint} {...dragHandlers} navigation={navigation} />);
+            return (<AdoptionCard key={pet.id} pet={pet} isFirst={isFirst} swipe={swipe} tiltPoint={tiltPoint} {...dragHandlers} navigation={navigation} />);
           }).reverse()}
           <View style={styles.iconButtonsContainer}>
             <ActionButton name="thumb-down" onPress={() => swipeAnimation(-1, 100)} />

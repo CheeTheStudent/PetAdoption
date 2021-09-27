@@ -13,7 +13,10 @@ import ResetPasswordScreen from './screens/ResetPassword';
 import OnboardingScreen from './screens/Onboarding';
 import PetProfileScreen from './screens/PetProfile';
 import OwnerProfileScreen from './screens/OwnerProfile';
+import PetFormScreen from './screens/PetForm';
 import Testing from './screens/Testing';
+import GalleryViewModal from './screens/components/GalleryView';
+import FilterModal from './screens/components/Filter';
 
 const App = () => {
   const [showOnboard, setShowOnboard] = useState(true);
@@ -71,6 +74,11 @@ const App = () => {
                 <Stack.Screen name='AppNavigation' component={AppNavigation} />
                 <Stack.Screen name='PetProfile' component={PetProfileScreen} />
                 <Stack.Screen name='OwnerProfile' component={OwnerProfileScreen} options={{ headerShown: true }} />
+                <Stack.Screen name='PetForm' component={PetFormScreen} />
+                <Stack.Group screenOptions={{ presentation: 'modal' }}>
+                  <Stack.Screen name="GalleryModal" component={GalleryViewModal} />
+                  <Stack.Screen name="FilterModal" component={FilterModal} />
+                </Stack.Group>
               </>}
           </>}
       </Stack.Navigator>

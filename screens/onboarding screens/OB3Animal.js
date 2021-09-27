@@ -104,7 +104,6 @@ const OB3Animal = ({ navigation }) => {
           <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: verticalScale(16) }}>{renderBox(animals[0])}{renderBox(animals[1])}</View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: verticalScale(16) }}>{renderBox(animals[2])}{renderBox(animals[3])}</View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>{renderBox(animals[4])}{renderBox(animals[5])}</View>
-
         </View>
       </View>
       <LongRoundButton title="NEXT" onPress={handleNext} disabled={disabled} containerStyle={styles.button} />
@@ -126,7 +125,6 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    // alignContent: 'flex-end',
     elevation: moderateScale(3),
     backgroundColor: 'white',
   },

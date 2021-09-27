@@ -1,5 +1,4 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Welcome from './onboarding screens/OB1Welcome';
@@ -25,12 +24,5 @@ const Onboarding = () => {
     </Stack.Navigator >
   );
 };
-
-const styles = StyleSheet.create({
-  body: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-});
 
 export default Onboarding;

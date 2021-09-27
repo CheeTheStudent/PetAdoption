@@ -30,7 +30,6 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '82%',
     borderRadius: 30,
-    // marginHorizontal: moderateScale(32),
   },
   buttonText: {
     fontSize: 16,

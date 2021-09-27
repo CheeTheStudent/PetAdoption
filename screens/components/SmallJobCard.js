@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, StyleSheet } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 
 import { scale, verticalScale, moderateScale } from '../../assets/dimensions';
 import { Spacing, TextStyles } from '../../assets/styles';

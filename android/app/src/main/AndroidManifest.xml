@@ -32,7 +32,8 @@
           android:name="com.facebook.FacebookContentProvider"
           android:exported="true" />
       <meta-data
-        android:name="com.google.android.geo.API_KEY"
-        android:value="@bimil/google_geo_api"/>
+        android:name="com.google.android.maps.v2.API_KEY"
+        android:value="@bimil/google_geo_api"/> 
+         <uses-library android:name="org.apache.http.legacy" android:required="false"/>
     </application>
 </manifest>

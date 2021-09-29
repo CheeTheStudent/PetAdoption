@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, FlatList, TouchableHighlight, Linking, StyleSheet } from 'react-native';
 import { Divider, Icon, SocialIcon } from 'react-native-elements';
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 
 import LongRoundButton from '../components/LongRoundButton';
 import SmallPetCard from '../components/SmallPetCard';
@@ -14,13 +14,15 @@ const daysOfTheWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "
 
 const O1Home = ({ navigation, owner }) => {
 
+  const { name, petsAdopted, openingHours, location, phoneNum, email, facebookId, twitterId } = owner;
+
   const renderHorizontalList = type => {
     return <FlatList
       horizontal={true}
       data={[{ title: 'Title Text', key: 'item1' }, {}]}
       renderItem={({ item, index }) => (
         type == "pets" ? <SmallPetCard name="Ron" age="12 months" /> :
-          <SmallJobCard title="Volunteer" desc="Bloop bleep beep" />
+          <SmallJobCard title="Volunteer" desc="Bloop bleep beep" small />
       )}
       style={Spacing.superSmallTopSpacing}
     />;
@@ -47,7 +49,7 @@ const O1Home = ({ navigation, owner }) => {
         <View style={styles.header}>
           <Image source={require('../../assets/images/banner.png')} style={styles.banner} />
           <Image source={require('../../assets/images/dog.png')} style={styles.profilePicture} />
-          <Text style={[TextStyles.h2, styles.ownerName, Spacing.superSmallTopSpacing]}>{owner.name}</Text>
+          <Text style={[TextStyles.h2, styles.ownerName, Spacing.superSmallTopSpacing]}>{name}</Text>
         </View>
         <View style={[Spacing.smallTopSpacing, { flexDirection: 'row' }]}>
           <View style={styles.statsBox}>
@@ -56,7 +58,7 @@ const O1Home = ({ navigation, owner }) => {
           </View>
           <Divider orientation="vertical" width={1} />
           <View style={styles.statsBox}>
-            <Text style={TextStyles.h2}>{owner.petsAdopted}</Text>
+            <Text style={TextStyles.h2}>{petsAdopted}</Text>
             <Text style={TextStyles.h4}>Successfully Adopted</Text>
           </View>
         </View>
@@ -73,55 +75,66 @@ const O1Home = ({ navigation, owner }) => {
             <Text style={[TextStyles.desc, { alignSelf: 'flex-end' }]} onPress={() => navigation.jumpTo("Jobs", { owner: owner })}>See All</Text>
           </View>
           {renderHorizontalList("jobs")}
-          <Text style={[TextStyles.h4, Spacing.smallTopSpacing]}>Opening Hours</Text>
-          <View style={[Spacing.smallTopSpacing, { flexDirection: 'row' }]}>
-            <View>
-              {daysOfTheWeek.map(day =>
-                <Text style={TextStyles.text, { fontWeight: 'bold' }}>{day}</Text>)}
-            </View>
-            <View style={[Spacing.superSmallLeftSpacing, { justifyContent: 'space-between' }]}>
-              {Object.entries(owner.openingHours).map(([day, hours]) =>
-                <Text style={TextStyles.text}>{hours}</Text>)}
-            </View>
-          </View>
-          <Text style={[TextStyles.h4, Spacing.smallTopSpacing]}>Location</Text>
-          <Text style={[TextStyles.text, Spacing.superSmallTopSpacing]}>{owner.address}</Text>
-          <MapView
-            initialRegion={{
-              latitude: 5.437694608336231,
-              longitude: 100.30948629999854,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
-            pitchEnabled={false}
-            rotateEnabled={false}
-            zoomEnabled={false}
-            scrollEnabled={false}
-            onPress={openMaps}
-            style={styles.map}
-          />
-          <Text style={[TextStyles.h4, Spacing.smallTopSpacing]}>Contact</Text>
-
-          <View style={styles.contactRow}>
-            <Icon name="phone" type="material-community" size={moderateScale(24)} color={colours.black} style={Spacing.superSmallRightSpacing} />
-            <Text style={TextStyles.text}>{owner.phoneNum}</Text>
-          </View>
-          <View style={styles.contactRow}>
-            <Icon name="email" type="material-community" size={moderateScale(24)} color={colours.black} style={Spacing.superSmallRightSpacing} />
-            <Text style={TextStyles.text}>{owner.email}</Text>
-          </View>
-          <View style={styles.contactRow}>
-            <SocialIcon type="facebook" iconSize={moderateScale(20)} style={styles.socialIcon} />
-            <Text style={TextStyles.text}>{owner.facebookId}</Text>
-          </View>
-          <View style={styles.contactRow}>
-            <SocialIcon type="twitter" iconSize={moderateScale(20)} style={styles.socialIcon} />
-            <Text style={TextStyles.text}>{owner.twitterId}</Text>
-          </View>
+          {openingHours ? <>
+            <Text style={[TextStyles.h4, Spacing.smallTopSpacing]}>Opening Hours</Text>
+            <View style={[Spacing.smallTopSpacing, { flexDirection: 'row' }]}>
+              <View>
+                {daysOfTheWeek.map(day =>
+                  <Text style={TextStyles.text, { fontWeight: 'bold' }}>{day}</Text>)}
+              </View>
+              <View style={[Spacing.superSmallLeftSpacing, { justifyContent: 'space-between' }]}>
+                {Object.entries(openingHours).map(([day, hours]) =>
+                  <Text style={TextStyles.text}>{hours}</Text>)}
+              </View>
+            </View></> : null}
+          {location ? <>
+            <Text style={[TextStyles.h4, Spacing.smallTopSpacing]}>Location</Text>
+            <Text style={[TextStyles.text, Spacing.superSmallTopSpacing]}>{location.address}</Text>
+            <MapView
+              initialRegion={{
+                latitude: location.latitude,
+                longitude: location.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}
+              pitchEnabled={false}
+              rotateEnabled={false}
+              zoomEnabled={false}
+              scrollEnabled={false}
+              onPress={openMaps}
+              style={styles.map}>
+              <Marker
+                coordinate={{
+                  latitude: location.latitude,
+                  longitude: location.longitude
+                }} />
+            </MapView></> : null}
+          {phoneNum || email || facebookId || twitterId ?
+            < Text style={[TextStyles.h4, Spacing.smallTopSpacing]}>Contact</Text> : null}
+          {phoneNum ?
+            <View style={styles.contactRow}>
+              <Icon name="phone" type="material-community" size={moderateScale(24)} color={colours.black} style={Spacing.superSmallRightSpacing} />
+              <Text style={TextStyles.text}>{phoneNum}</Text>
+            </View> : null}
+          {email ?
+            <View style={styles.contactRow}>
+              <Icon name="email" type="material-community" size={moderateScale(24)} color={colours.black} style={Spacing.superSmallRightSpacing} />
+              <Text style={TextStyles.text}>{email}</Text>
+            </View> : null}
+          {facebookId ?
+            <View style={styles.contactRow}>
+              <SocialIcon type="facebook" iconSize={moderateScale(20)} style={styles.socialIcon} />
+              <Text style={TextStyles.text}>{facebookId}</Text>
+            </View> : null}
+          {twitterId ?
+            <View style={styles.contactRow}>
+              <SocialIcon type="twitter" iconSize={moderateScale(20)} style={styles.socialIcon} />
+              <Text style={TextStyles.text}>{twitterId}</Text>
+            </View> : null}
         </View>
         <LongRoundButton title="MESSAGE" containerStyle={styles.messageButton} />
       </View>
-    </ScrollView>
+    </ScrollView >
   );
 };
 
@@ -161,6 +174,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   map: {
+    flex: 1,
     height: SCREEN.HEIGHT * 0.2,
     marginTop: verticalScale(8),
   },

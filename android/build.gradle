@@ -8,7 +8,8 @@ buildscript {
         targetSdkVersion = 29
         ndkVersion = "20.1.5948944"
         googlePlayServicesAuthVersion = "17.0.0"
-        androidMapsUtilsVersion = "2.2.6"
+        playServicesVersion = "17.0.0"
+        androidMapsUtilsVersion = "2.2.3"
     }
     repositories {
         google()
@@ -24,6 +25,7 @@ buildscript {
 
 allprojects {
     repositories {
+        google()
         mavenLocal()
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
@@ -33,8 +35,6 @@ allprojects {
             // Android JSC is installed from npm
             url("$rootDir/../node_modules/jsc-android/dist")
         }
-
-        google()
         jcenter()
         maven { url 'https://maven.google.com' }
         maven { url 'https://www.jitpack.io' }

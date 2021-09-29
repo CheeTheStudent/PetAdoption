@@ -23,10 +23,10 @@ const PF2Medical = ({ navigation, route }) => {
 
     const updatedPetInfo = {
       ...petInfo,
-      weight: weight,
-      height: height,
+      weight,
+      height,
       vaccinated: vaccine,
-      spayed: spayed,
+      spayed,
       illnessDescription: desc,
     };
 

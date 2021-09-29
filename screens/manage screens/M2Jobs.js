@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 import OptionsMenu from "react-native-option-menu";
 
@@ -8,25 +8,24 @@ import colours from '../../assets/colours';
 import { scale, verticalScale, moderateScale } from '../../assets/dimensions';
 import { Spacing, TextStyles } from '../../assets/styles';
 
-const M2Jobs = () => {
+const M2Jobs = ({ navigation, jobs }) => {
 
   return (
     <>
-      <ScrollView style={styles.body}>
+      <View style={styles.body}>
         <FlatList
-          data={[{}, {}, {}, {}, {}, {}, {}]}
+          data={jobs}
           renderItem={({ item, index }) => (
             <OptionsMenu
-              customButton={<JobCard />}
-              destructiveIndex={1}
+              customButton={<JobCard job={item} />}
               options={["View", "Edit Job", "Delete Job", "Cancel"]}
               actions={[() => console.log(index)]}
             />
           )}
-          style={Spacing.mediumBottomSpacing}
+          contentContainerStyle={{ paddingBottom: verticalScale(16) }}
         />
-      </ScrollView>
-      <TouchableOpacity style={styles.fab} >
+      </View>
+      <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('JobForm', { rootNavigation: navigation })} >
         <Icon name='plus' type='material-community' size={30} color='white' />
       </TouchableOpacity>
     </>
@@ -38,7 +37,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
     paddingHorizontal: scale(16),
-    paddingVertical: verticalScale(16),
+    paddingTop: verticalScale(8),
   },
   fab: {
     width: verticalScale(50),

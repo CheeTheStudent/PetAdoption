@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ScrollView, View, Text, TouchableOpacity, Image, ImageBackground, FlatList, StyleSheet } from 'react-native';
-import { Input, Icon } from 'react-native-elements';
+import { Icon } from 'react-native-elements';
 import { Picker } from '@react-native-picker/picker';
 import NumericInput from 'react-native-numeric-input';
 
@@ -8,6 +8,7 @@ import LongRoundButton from '../components/LongRoundButton';
 import SquareButton from '../components/SquareButton';
 import Textinput from '../components/TextInput';
 import MultiLineInput from '../components/MultiLineInput';
+import MediaPicker from '../components/MediaPicker';
 import { scale, verticalScale, moderateScale } from '../../assets/dimensions';
 import { TextStyles, Spacing } from '../../assets/styles';
 import colours from '../../assets/colours';
@@ -19,7 +20,6 @@ import Rabbit from '../../assets/images/rabbit.svg';
 import Mouse from '../../assets/images/mouse.svg';
 import Turtle from '../../assets/images/turtle.svg';
 import Bird from '../../assets/images/bird.svg';
-import MediaPicker from '../components/MediaPicker';
 
 const animals = [
   {
@@ -143,14 +143,14 @@ const PF1Basic = ({ navigation }) => {
       return;
 
     const petBasicInfo = {
-      name: name,
-      ageYear: ageYear,
-      ageMonth: ageMonth,
-      gender: gender,
-      species: species,
-      breed: breed,
-      location: location,
-      desc: desc,
+      name,
+      ageYear,
+      ageMonth,
+      gender,
+      species,
+      breed,
+      location,
+      desc,
       media: chosenMedia,
     };
 

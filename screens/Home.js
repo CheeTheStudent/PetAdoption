@@ -34,20 +34,19 @@ const Home = ({ navigation, route }) => {
   }, [navigation]);
 
   useEffect(() => {
-    // Try this to limit cards on homepage
     let petQuery = petRef;
 
     if (queries && queries.length > 0) {
       const query = queries[0];
       if (query.field === "age") {
-        petQuery = petRef.orderByChild('ageYear').startAt(query.startAge).endAt(query.endAge).limitToFirst(20);
+        petQuery = petRef.orderByChild('ageYear').startAt(query.startAge).endAt(query.endAge);
       } else if (query.field === "name") {
-        petQuery = petRef.orderByChild(query.field).startAt(query.property).endAt(`${query.property}\uf8ff`).limitToFirst(20);
+        petQuery = petRef.orderByChild(query.field).startAt(query.property).endAt(`${query.property}\uf8ff`);
       } else {
-        petQuery = petRef.orderByChild(query.field).equalTo(query.property).limitToFirst(20);
+        petQuery = petRef.orderByChild(query.field).equalTo(query.property);
       }
     }
-    petQuery.on('value', snapshot => {
+    petQuery.limitToFirst(20).on('value', snapshot => {
       const data = snapshot.val() ? snapshot.val() : {};
       let pets = [];
       Object.entries(data).map(value => pets.push({ id: value[0], ...value[1] }));

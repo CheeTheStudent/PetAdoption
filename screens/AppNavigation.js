@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import HomeScreen from './Home';
 import ProfileScreen from './Profile';
+import HelpScreen from './Help';
 import ManageScreen from './Manage';
 import colours from '../assets/colours';
 import TextStyles from '../assets/styles';
@@ -53,7 +54,7 @@ const AppNavigation = () => {
         }
       })}>
       <Tab.Screen name='Home' component={HomeScreen} options={{ tabBarLabel: 'Adoption' }} />
-      <Tab.Screen name='Help' component={HomeScreen} options={{ tabBarLabel: 'Help' }} />
+      <Tab.Screen name='Help' component={HelpScreen} options={{ tabBarLabel: 'Help' }} />
       <Tab.Screen name='Community' component={HomeScreen} options={{ tabBarLabel: 'Community' }} />
       <Tab.Screen name='Manage' component={ManageScreen} options={{ tabBarLabel: 'Manage' }} />
       <Tab.Screen name='Profile' component={ProfileScreen} options={{ tabBarLabel: 'Profile' }} />

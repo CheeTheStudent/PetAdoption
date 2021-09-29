@@ -15,18 +15,19 @@ const GooglePlacesInput = ({ onLocationSelected }) => {
       placeholder='Search'
       fetchDetails={true}
       returnKeyType={'search'}
-      nearbyPlacesAPI='GoogleReverseGeocoding'
-      currentLocation={true}
-      currentLocationLabel="Current location"
+      nearbyPlacesAPI='GooglePlacesSearch'
+      // currentLocation={true}
+      // currentLocationLabel="Current location"
       query={{
         key: googleAPIkey,
         language: 'en',
         components: 'country:my',
       }}
-      GoogleReverseGeocodingQuery={{
-        key: googleAPIkey,
-        language: 'en',
-      }}
+      // GoogleReverseGeocodingQuery={{
+      //   key: googleAPIkey,
+      //   language: 'en',
+      // }}
+      onFail={err => console.log(err)}
       onPress={handleOnPress}
     />
   );

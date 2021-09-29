@@ -12,8 +12,10 @@ import SignUpScreen from './screens/SignUp';
 import ResetPasswordScreen from './screens/ResetPassword';
 import OnboardingScreen from './screens/Onboarding';
 import PetProfileScreen from './screens/PetProfile';
+import JobScreen from './screens/Job';
 import OwnerProfileScreen from './screens/OwnerProfile';
 import PetFormScreen from './screens/PetForm';
+import JobFormScreen from './screens/JobForm';
 import Testing from './screens/Testing';
 import GalleryViewModal from './screens/components/GalleryView';
 import FilterModal from './screens/components/Filter';
@@ -73,12 +75,15 @@ const App = () => {
               <>
                 <Stack.Screen name='AppNavigation' component={AppNavigation} />
                 <Stack.Screen name='PetProfile' component={PetProfileScreen} />
+                <Stack.Screen name='Job' component={JobScreen} />
                 <Stack.Screen name='OwnerProfile' component={OwnerProfileScreen} options={{ headerShown: true }} />
                 <Stack.Screen name='PetForm' component={PetFormScreen} />
+                <Stack.Screen name='JobForm' component={JobFormScreen} options={{ headerShown: true }} />
                 <Stack.Group screenOptions={{ presentation: 'modal' }}>
                   <Stack.Screen name="GalleryModal" component={GalleryViewModal} />
                   <Stack.Screen name="FilterModal" component={FilterModal} />
                 </Stack.Group>
+                <Stack.Screen name='Testing' component={Testing} />
               </>}
           </>}
       </Stack.Navigator>

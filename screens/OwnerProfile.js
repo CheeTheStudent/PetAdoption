@@ -11,8 +11,9 @@ import { TextStyles } from '../assets/styles';
 
 const OwnerProfile = ({ navigation, route }) => {
 
-  // const { owner } = route.params;
-  const userRef = database().ref('users/qeI2Xvzew4RhFZA7wyXyTojxBr43');
+  const { ownerId } = route.params;
+
+  const userRef = database().ref(`users/${ownerId}`);
   const [owner, setOwner] = useState();
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +23,6 @@ const OwnerProfile = ({ navigation, route }) => {
     navigation.setOptions({
       title: 'Pet Adoption',
       headerTitleStyle: TextStyles.h2,
-      // headerLeft: () => <></>,
     });
   }, [navigation]);
 

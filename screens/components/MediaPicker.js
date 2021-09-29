@@ -10,7 +10,7 @@ import { scale, verticalScale, moderateScale } from '../../assets/dimensions';
 import { Spacing } from '../../assets/styles';
 import colours from '../../assets/colours';
 
-const MediaPicker = ({ singleMedia, profilePicture, buttons, setChosenMedia }) => {
+const MediaPicker = ({ singleMedia, imageOnly, profilePicture, buttons, setChosenMedia }) => {
 
   const READ_PERMISSION = PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
 
@@ -39,7 +39,7 @@ const MediaPicker = ({ singleMedia, profilePicture, buttons, setChosenMedia }) =
     if (status) {
       CameraRoll.getPhotos({
         first: 10,
-        assetType: 'All',
+        assetType: imageOnly ? 'Photos' : 'All',
       })
         .then(results => {
           let images = ['first', ...results.edges, 'last'];
@@ -56,7 +56,7 @@ const MediaPicker = ({ singleMedia, profilePicture, buttons, setChosenMedia }) =
   }, [hasPermission]);
 
   const handleTakePhoto = () => {
-    toggleModal();
+    setModalVisible(false);
     ImagePicker.openCamera({
       mediaType: 'any',
     }).then(image => {
@@ -65,7 +65,7 @@ const MediaPicker = ({ singleMedia, profilePicture, buttons, setChosenMedia }) =
   };
 
   const handleTakeVideo = () => {
-    toggleModal();
+    setModalVisible(false);
     ImagePicker.openCamera({
       mediaType: 'video',
     }).then(video => {
@@ -75,7 +75,8 @@ const MediaPicker = ({ singleMedia, profilePicture, buttons, setChosenMedia }) =
 
   const handleGalleryPicker = () => {
     ImagePicker.openPicker({
-      multiple: true,
+      multiple: !singleMedia,
+      mediaType: imageOnly ? 'photo' : 'any,'
     }).then(images => {
       if (images.length == 1 && images[0].mime === 'image/jpeg')
         handleCropImage(images[0]);
@@ -132,7 +133,7 @@ const MediaPicker = ({ singleMedia, profilePicture, buttons, setChosenMedia }) =
             style={Spacing.smallTopSpacing}
             renderItem={({ item, index }) => {
               if (item === 'first') {
-                return <TouchableOpacity style={[styles.cameraButton, Spacing.superSmallRightSpacing]} onPress={toggleModal}>
+                return <TouchableOpacity style={[styles.cameraButton, Spacing.superSmallRightSpacing]} onPress={imageOnly ? handleTakePhoto : toggleModal}>
                   <Icon name="camera-outline" type="material-community" size={moderateScale(30)} />
                 </TouchableOpacity>;
               } else if (item === 'last') {

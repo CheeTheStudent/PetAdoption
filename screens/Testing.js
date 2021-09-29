@@ -1,19 +1,28 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
+import MapView from 'react-native-maps';
 
-import MediaPicker from './components/MediaPicker';
+import GooglePlacesInput from './components/GooglePlacesInput';
 
 const Testing = () => {
 
-  const [chosenMedia, setChosenMedia] = useState();
-
-  const handleChosenMedia = (media) => {
-    console.log(media);
-  };
 
   return (
     <View style={styles.body}>
-      <MediaPicker setChosenMedia={handleChosenMedia} />
+      <GooglePlacesInput />
+      <MapView
+        initialRegion={{
+          latitude: 5.456917987777273,
+          longitude: 100.3077286,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+        pitchEnabled={false}
+        rotateEnabled={false}
+        zoomEnabled={false}
+        scrollEnabled={false}
+        style={styles.map}
+      />
     </View>
   );
 };
@@ -23,6 +32,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
+  map: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  }
 });
 
 export default Testing;

@@ -9,18 +9,17 @@ import { Spacing, TextStyles } from '../../assets/styles';
 import colours from '../../assets/colours';
 import { useEffect } from 'react';
 
-const tempData = [{}, {}, {}, {}, {}, {}, {}];
-
-const M1Pets = ({ navigation, setManageScreenNavigationOptions }) => {
+const M1Pets = ({ navigation, setManageScreenNavigationOptions, pets }) => {
 
   const [isLongPress, setIsLongPress] = useState(false);
-  const initialSwitches = new Array(tempData.length).fill(false);
+  const initialSwitches = new Array(pets.length).fill(false);
   const [switches, setSwitches] = useState(initialSwitches);
   const [selected, setSelected] = useState(0);
 
   const originalHeader = {
     title: 'Manage',
     headerTitleStyle: TextStyles.h2,
+    headerTitleAlign: 'center',
     headerTitle: {},
   };
 
@@ -82,29 +81,38 @@ const M1Pets = ({ navigation, setManageScreenNavigationOptions }) => {
     }, [])
   );
 
-  return (
-    <>
-      <ScrollView style={styles.body}>
-        <FlatList
-          numColumns={2}
-          data={tempData}
-          renderItem={({ item, index }) => (
-            <TouchableOpacity onLongPress={() => handleLongPress(index)} onPress={() => isLongPress && handleSwitchToggle(index)}>
-              <Image source={require('../../assets/images/dog.png')} style={styles.image} />
-              <Text style={[TextStyles.h4, Spacing.superSmallLeftSpacing, { marginTop: verticalScale(4) }]}>Ron</Text>
-              <Text style={[TextStyles.desc, Spacing.superSmallLeftSpacing]}>12 months old</Text>
-              {switches[index] && <View style={styles.whiteOverlay} />}
-            </TouchableOpacity>
-          )}
-          columnWrapperStyle={styles.rowContainer}
-          style={Spacing.mediumBottomSpacing}
-        />
-      </ScrollView>
-      <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('PetForm', { root: navigation })} >
-        <Icon name='plus' type='material-community' size={30} color='white' />
-      </TouchableOpacity>
-    </>
-  );
+  const calcPetAge = (ageYear, ageMonth) => {
+    let ageLabel = "";
+    if (ageYear == 0) {
+      ageLabel = ageMonth + " months";
+    } else if (ageMonth == 0) {
+      ageLabel = ageYear + " years";
+    } else if (ageYear > 0 && ageMonth > 0) {
+      ageLabel = ageYear + " years " + ageMonth + " months";
+    } else {
+      ageLabel = "Age Unspecified";
+    }
+    return ageLabel;
+  };
+
+  return <View style={styles.body}>
+    <FlatList
+      numColumns={2}
+      data={pets}
+      renderItem={({ item, index }) => (
+        <TouchableOpacity onLongPress={() => handleLongPress(index)} onPress={() => isLongPress && handleSwitchToggle(index)}>
+          <Image source={{ uri: item.media[0] }} style={styles.image} />
+          <Text style={[TextStyles.h4, Spacing.superSmallLeftSpacing, { marginTop: verticalScale(4) }]}>{item.name}</Text>
+          <Text style={[TextStyles.desc, Spacing.superSmallLeftSpacing]}>{calcPetAge(item.ageYear, item.ageMonth)}</Text>
+          {switches[index] && <View style={styles.whiteOverlay} />}
+        </TouchableOpacity>
+      )}
+      columnWrapperStyle={styles.rowContainer}
+      contentContainerStyle={{ paddingBottom: verticalScale(16) }} />
+    <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('PetForm', { root: navigation })} >
+      <Icon name='plus' type='material-community' size={30} color='white' />
+    </TouchableOpacity>
+  </View>;
 };
 
 const styles = StyleSheet.create({
@@ -112,7 +120,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
     paddingHorizontal: scale(16),
-    paddingVertical: verticalScale(16),
   },
   manageHeader: {
     width: '100%',
@@ -122,7 +129,7 @@ const styles = StyleSheet.create({
   },
   rowContainer: {
     justifyContent: 'space-between',
-    marginBottom: verticalScale(16),
+    marginTop: verticalScale(16),
   },
   image: {
     width: scale(156),

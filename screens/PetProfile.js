@@ -152,7 +152,7 @@ const PetProfile = ({ navigation, route }) => {
                     <Text style={[TextStyles.h3]} numberOfLines={1}>{owner.name}</Text>
                     <Text style={TextStyles.desc}>{owner.role}</Text>
                   </View>
-                  <SquareButton title="VIEW" onPress={() => navigation.navigate("OwnerProfile")} titleStyle={styles.buttonText} buttonStyle={styles.viewOwnerButton} containerStyle={styles.viewOwnerButtonCon} />
+                  <SquareButton title="VIEW" onPress={() => navigation.navigate("OwnerProfile", { ownerId })} titleStyle={styles.buttonText} buttonStyle={styles.viewOwnerButton} containerStyle={styles.viewOwnerButtonCon} />
                 </View>}
               <View style={[styles.actionButtonsContainer, Spacing.superSmallTopSpacing]}>
                 < SquareButton onPress={handleDislikePet} buttonStyle={styles.buttonStyle} containerStyle={styles.dislikeButtonContainerStyle} icon={<Icon name="thumb-down" type="material-community" color="black" />} />

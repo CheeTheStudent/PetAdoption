@@ -1,30 +1,19 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, StyleSheet} from 'react-native';
 import MapView from 'react-native-maps';
 
-import GooglePlacesInput from './components/GooglePlacesInput';
+import FirebaseMessage from '../utils/FirebaseMessage';
 
 const Testing = () => {
+  const firebaseMessage = FirebaseMessage();
+  useEffect(() => {
+    firebaseMessage.getConvos(convoData => console.log('got it'));
+    // return () => {
+    //   firebaseMessage.off();
+    // };
+  }, []);
 
-
-  return (
-    <View style={styles.body}>
-      <GooglePlacesInput />
-      <MapView
-        initialRegion={{
-          latitude: 5.456917987777273,
-          longitude: 100.3077286,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}
-        pitchEnabled={false}
-        rotateEnabled={false}
-        zoomEnabled={false}
-        scrollEnabled={false}
-        style={styles.map}
-      />
-    </View>
-  );
+  return <View style={styles.body}></View>;
 };
 
 const styles = StyleSheet.create({
@@ -38,7 +27,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-  }
+  },
 });
 
 export default Testing;

@@ -1,24 +1,18 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, StyleSheet} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Tag from '../components/Tag';
 import LongRoundButton from '../components/LongRoundButton';
-import { scale, verticalScale, moderateScale } from '../../assets/dimensions';
-import { TextStyles, Spacing } from '../../assets/styles';
+import {scale, verticalScale, moderateScale} from '../../assets/dimensions';
+import {TextStyles, Spacing} from '../../assets/styles';
 import colours from '../../assets/colours';
 
-const personalities = [
-  "Playful", "Curious", "Obedient", "Active", "Sociable", "Loving", "Alert", "Lazy", "Gentle",
-];
+const personalities = ['Playful', 'Curious', 'Obedient', 'Active', 'Sociable', 'Loving', 'Alert', 'Lazy', 'Gentle'];
 
-const appearances = [
-  "Cute", "Elegant", "Handsome", "Pretty", "Beautiful", "Colourful", "Big", "Medium", "Small",
-];
+const appearances = ['Cute', 'Elegant', 'Handsome', 'Pretty', 'Beautiful', 'Colourful', 'Big', 'Medium', 'Small'];
 
-
-const OB4Tags = ({ navigation }) => {
-
+const OB4Tags = ({navigation}) => {
   const [selectedPersonalities, setSelectedPersonalities] = useState([]);
   const [selectedAppearances, setSelectedAppearances] = useState([]);
 
@@ -41,16 +35,15 @@ const OB4Tags = ({ navigation }) => {
   };
 
   const handleNext = async () => {
-
-    const user = { preferredTags: selectedPersonalities.concat(selectedAppearances) };
+    const user = {preferredTags: selectedPersonalities.concat(selectedAppearances)};
 
     try {
-      await AsyncStorage.mergeItem('user', JSON.stringify(user));
+      await AsyncStorage.mergeItem('onboardUser', JSON.stringify(user));
     } catch (error) {
       console.log(error);
     }
 
-    navigation.navigate("OB5Screening");
+    navigation.navigate('OB5Screening');
   };
 
   return (
@@ -71,7 +64,7 @@ const OB4Tags = ({ navigation }) => {
           })}
         </View>
       </View>
-      <LongRoundButton title="NEXT" onPress={handleNext} containerStyle={styles.button} />
+      <LongRoundButton title='NEXT' onPress={handleNext} containerStyle={styles.button} />
     </View>
   );
 };

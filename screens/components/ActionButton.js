@@ -1,18 +1,18 @@
 import React from 'react';
-import { View, StyleSheet, TouchableWithoutFeedback } from 'react-native';
-import { Icon } from 'react-native-elements';
+import {View, StyleSheet, TouchableWithoutFeedback} from 'react-native';
+import {Icon} from 'react-native-elements';
 
-import { CARD, SCREEN, verticalScale, scale } from '../../assets/dimensions';
+import {CARD, SCREEN, verticalScale, scale} from '../../assets/dimensions';
 import colours from '../../assets/colours';
 
-const ActionButton = ({ name, containerStyle, iconStyle, onPress }) => {
-
+const ActionButton = ({name, containerStyle, iconStyle, onPress}) => {
   return (
     <TouchableWithoutFeedback onPress={onPress}>
       <View style={[styles.iconButton, containerStyle]}>
-        <Icon name={name} type="material-community" color={colours.black} {...iconStyle} />
+        <Icon name={name} type='material-community' color={colours.black} {...iconStyle} />
       </View>
-    </TouchableWithoutFeedback>);
+    </TouchableWithoutFeedback>
+  );
 };
 
 const styles = StyleSheet.create({

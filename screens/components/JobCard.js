@@ -1,22 +1,25 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Image } from 'react-native-elements';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {Image} from 'react-native-elements';
 
 import colours from '../../assets/colours';
-import { scale, verticalScale, moderateScale } from '../../assets/dimensions';
-import { Spacing, TextStyles } from '../../assets/styles';
+import {scale, verticalScale, moderateScale} from '../../assets/dimensions';
+import {Spacing, TextStyles} from '../../assets/styles';
 
-const JobCard = ({ job, onPress }) => {
-
-  const { title, shelterName, desc, image } = job;
+const JobCard = ({job, onPress}) => {
+  const {title, shelterName, desc, image} = job;
 
   return (
     <TouchableOpacity onPress={onPress} disabled={!onPress} style={styles.card}>
-      <Image source={image ? { uri: image } : require('../../assets/images/dog.png')} style={styles.image} />
-      <View style={{ flex: 1 }}>
-        <Text style={[TextStyles.h3, { marginTop: verticalScale(4) }]}>{title}</Text>
-        <Text ellipsizeMode="tail" style={TextStyles.text}>{shelterName}</Text>
-        <Text ellipsizeMode="tail" numberOfLines={5} style={[TextStyles.desc]}>{desc}</Text>
+      <Image source={image ? {uri: image} : require('../../assets/images/placeholder.png')} style={styles.image} />
+      <View style={{flex: 1}}>
+        <Text style={[TextStyles.h3, {marginTop: verticalScale(4)}]}>{title}</Text>
+        <Text ellipsizeMode='tail' style={TextStyles.text}>
+          {shelterName}
+        </Text>
+        <Text ellipsizeMode='tail' numberOfLines={5} style={[TextStyles.desc]}>
+          {desc}
+        </Text>
       </View>
     </TouchableOpacity>
   );

@@ -1,19 +1,17 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import React, {useState, useEffect, useLayoutEffect} from 'react';
+import {View, Text, FlatList, StyleSheet} from 'react-native';
 import database from '@react-native-firebase/database';
-import { Picker } from '@react-native-picker/picker';
+import {Picker} from '@react-native-picker/picker';
 
 import JobCard from './components/JobCard';
-import { SCREEN, verticalScale, scale } from '../assets/dimensions';
-import { TextStyles, Spacing } from '../assets/styles';
+import {SCREEN, verticalScale, scale} from '../assets/dimensions';
+import {TextStyles, Spacing} from '../assets/styles';
 import colours from '../assets/colours';
 
 const jobTypes = ['Job Type', 'All', 'Full-time', 'Part-time'];
-const locations = ['Location', 'All', 'Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembilan', 'Pahang',
-  'Penang', 'Perak', 'Perlis', 'Sabah', 'Sarawak', 'Selangor', 'Terengganu'];
+const locations = ['Location', 'All', 'Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembilan', 'Pahang', 'Penang', 'Perak', 'Perlis', 'Sabah', 'Sarawak', 'Selangor', 'Terengganu'];
 
-const Help = ({ navigation }) => {
-
+const Help = ({navigation}) => {
   const jobRef = database().ref('jobs');
 
   const [jobs, setJobs] = useState([]);
@@ -23,35 +21,30 @@ const Help = ({ navigation }) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       title: 'Volunteer & Jobs',
-      headerTitleStyle: TextStyles.h2,
-      headerTitleAlign: 'center',
     });
   }, []);
 
   useEffect(() => {
     let jobQuery = jobRef;
 
-    if (type && type !== "All") {
+    if (type && type !== 'All') {
       jobQuery = jobRef.orderByChild('type').equalTo(type);
-    } else if (location && location !== "All") {
+    } else if (location && location !== 'All') {
       jobQuery = jobRef.orderByChild('location/state').equalTo('Penang');
     }
 
     jobQuery.limitToLast(20).once('value', snapshot => {
       const data = snapshot.val() ? snapshot.val() : {};
       let jobs = [];
-      Object.entries(data).map(value => jobs.push({ id: value[0], ...value[1] }));
-      if (type && location)
-        filterResults(jobs);
-      else
-        setJobs(jobs);
+      Object.entries(data).map(value => jobs.push({id: value[0], ...value[1]}));
+      if (type && location) filterResults(jobs);
+      else setJobs(jobs);
     });
-
   }, [type, location]);
 
   const filterResults = data => {
     let filteredJobs = data;
-    if (type !== "All" && location !== "All") {
+    if (type !== 'All' && location !== 'All') {
       filteredJobs = filteredJobs.filter(el => el?.location?.state === location);
     }
     setJobs(filteredJobs);
@@ -61,36 +54,22 @@ const Help = ({ navigation }) => {
     <View style={styles.body}>
       <View style={styles.rowContainer}>
         <View style={[styles.pickerContainer, Spacing.superSmallRightSpacing]}>
-          <Picker
-            selectedValue={type}
-            onValueChange={(value, index) => setType(value)}>
+          <Picker selectedValue={type} onValueChange={(value, index) => setType(value)}>
             {jobTypes.map((type, index) =>
-              index == 0 ?
-                <Picker.Item key={type} label={type} enabled={false} value="" />
-                : <Picker.Item key={type} label={type} value={type} style={styles.pickerItem} />
+              index == 0 ? <Picker.Item key={type} label={type} enabled={false} value='' /> : <Picker.Item key={type} label={type} value={type} style={styles.pickerItem} />,
             )}
           </Picker>
         </View>
         <View style={[styles.pickerContainer, styles.salaryItems]}>
-          <Picker
-            selectedValue={location}
-            onValueChange={(value, index) => setLocation(value)}>
+          <Picker selectedValue={location} onValueChange={(value, index) => setLocation(value)}>
             {locations.map((type, index) =>
-              index == 0
-                ? <Picker.Item key={type} label={type} enabled={false} value="" />
-                : <Picker.Item key={type} label={type} value={type} style={styles.pickerItem} />
+              index == 0 ? <Picker.Item key={type} label={type} enabled={false} value='' /> : <Picker.Item key={type} label={type} value={type} style={styles.pickerItem} />,
             )}
           </Picker>
         </View>
       </View>
-      <FlatList
-        data={jobs}
-        renderItem={({ item, index }) =>
-          <JobCard key={item.id} job={item} onPress={() => navigation.navigate("Job", { job: item })} />
-        }
-        style={Spacing.superSmallTopSpacing}
-      />
-    </View >
+      <FlatList data={jobs} renderItem={({item, index}) => <JobCard key={item.id} job={item} onPress={() => navigation.navigate('Job', {job: item})} />} style={styles.listContainer} />
+    </View>
   );
 };
 
@@ -98,10 +77,11 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     backgroundColor: 'white',
-    paddingHorizontal: scale(16),
+    paddingTop: verticalScale(8),
   },
   rowContainer: {
     flexDirection: 'row',
+    marginHorizontal: scale(16),
   },
   pickerContainer: {
     flex: 1,
@@ -118,6 +98,10 @@ const styles = StyleSheet.create({
   },
   pickerItem: {
     color: colours.darkGray,
+  },
+  listContainer: {
+    marginTop: verticalScale(8),
+    paddingHorizontal: scale(16),
   },
 });
 

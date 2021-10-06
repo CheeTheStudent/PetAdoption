@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native';
+import {StyleSheet} from 'react-native';
 
-import { moderateScale, verticalScale, scale } from './dimensions';
+import {moderateScale, verticalScale, scale} from './dimensions';
 import colours from './colours';
 
 export const TextStyles = StyleSheet.create({
@@ -49,6 +49,9 @@ export const Spacing = StyleSheet.create({
   superSmallBottomSpacing: {
     marginBottom: verticalScale(8),
   },
+  superSmallHorizontalSpacing: {
+    marginHorizontal: verticalScale(8),
+  },
   smallTopSpacing: {
     marginTop: scale(16),
   },
@@ -61,6 +64,9 @@ export const Spacing = StyleSheet.create({
   smallRightSpacing: {
     marginRight: scale(16),
   },
+  smallLeftSpacing: {
+    marginLeft: scale(16),
+  },
   mediumVerticalSpacing: {
     marginVertical: verticalScale(24),
   },
@@ -69,5 +75,5 @@ export const Spacing = StyleSheet.create({
   },
   mediumBottomSpacing: {
     marginBottom: verticalScale(24),
-  }
-}); 
+  },
+});

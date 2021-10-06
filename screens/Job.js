@@ -1,41 +1,60 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Linking } from 'react-native';
-import { Image, Icon } from 'react-native-elements';
+import React, {useState, useEffect} from 'react';
+import {View, Text, TouchableOpacity, ScrollView, StyleSheet, Linking} from 'react-native';
+import {Image, Icon} from 'react-native-elements';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, {Marker} from 'react-native-maps';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import FirebaseMessage from '../utils/FirebaseMessage';
 
 import SquareButton from './components/SquareButton';
 import LongRoundButton from './components/LongRoundButton';
-import { TextStyles, Spacing } from '../assets/styles';
-import { SCREEN, verticalScale, scale, moderateScale } from '../assets/dimensions';
+import {TextStyles, Spacing} from '../assets/styles';
+import {SCREEN, verticalScale, scale, moderateScale} from '../assets/dimensions';
 import colours from '../assets/colours';
 
-const Job = ({ navigation, route }) => {
-
-  const { job } = route.params;
-  const { title, type, shelterName, desc, salary, salaryType, location, image, ownerId } = job;
+const Job = ({navigation, route}) => {
+  const {job} = route.params;
+  const {id: jobId, title, type, shelterName, desc, salary, salaryType, location, image, ownerId} = job;
+  const userUID = auth().currentUser.uid;
   const ownerRef = database().ref(`/users/${ownerId}`);
+  const firebaseMessage = FirebaseMessage();
 
   const [owner, setOwner] = useState();
+  const [user, setUser] = useState();
 
-  useEffect(() => {
+  useEffect(async () => {
+    const userData = await AsyncStorage.getItem('user');
+    const user = JSON.parse(userData);
+    setUser(user);
+
     ownerRef.once('value', snapshot => {
       const data = snapshot.val() ? snapshot.val() : null;
       data && setOwner(data);
     });
   }, []);
 
-
   const openMaps = () => {
-    const url = "geo: 5.437694608336231, 100.30948629999854";
+    const url = 'geo: 5.437694608336231, 100.30948629999854';
     Linking.canOpenURL(url).then(supported => {
       if (supported) {
         Linking.openURL(url);
       } else {
-        console.log('Don\'t know how to open URI: ' + url);
+        console.log("Don't know how to open URI: " + url);
       }
     });
+  };
+
+  const handleSendMessage = async () => {
+    const convoInfo = {
+      sender: {id: userUID, name: user.name, image: user.profilePic},
+      receiver: {id: ownerId, name: owner.name, image: owner.profilePic},
+      interest: jobId,
+      interestType: 'jobs',
+      requestAccepted: owner.private ? false : true,
+    };
+    const convoId = await firebaseMessage.createConvo(convoInfo);
+    navigation.navigate('Chat', {convo: {id: convoId, ...convoInfo}});
   };
 
   const handleGoBack = () => {
@@ -45,8 +64,8 @@ const Job = ({ navigation, route }) => {
   return (
     <View style={styles.body}>
       <ScrollView>
-        <Image source={{ uri: image }} style={styles.image} />
-        <TouchableOpacity style={styles.fab} onPress={handleGoBack} >
+        <Image source={{uri: image}} style={styles.image} />
+        <TouchableOpacity style={styles.fab} onPress={handleGoBack}>
           <Icon name='arrow-back' type='material' size={moderateScale(24)} color='black' />
         </TouchableOpacity>
         <View style={styles.container}>
@@ -56,13 +75,18 @@ const Job = ({ navigation, route }) => {
           </View>
           <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>About</Text>
           <Text style={[TextStyles.desc, Spacing.superSmallTopSpacing]}>{desc}</Text>
-          {salary ?
-            <><Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Salary</Text>
-              <Text style={[TextStyles.desc, Spacing.superSmallTopSpacing]}>RM{salary} {salaryType}</Text></> : null}
-
-          {owner ?
+          {salary ? (
             <>
-              {location ?
+              <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Salary</Text>
+              <Text style={[TextStyles.desc, Spacing.superSmallTopSpacing]}>
+                RM{salary} {salaryType}
+              </Text>
+            </>
+          ) : null}
+
+          {owner ? (
+            <>
+              {location ? (
                 <>
                   <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Location</Text>
                   <Text style={[TextStyles.desc, Spacing.superSmallTopSpacing]}>{location.address}</Text>
@@ -82,20 +106,32 @@ const Job = ({ navigation, route }) => {
                     <Marker
                       coordinate={{
                         latitude: location.latitude,
-                        longitude: location.longitude
-                      }} />
-                  </MapView></> : null}
+                        longitude: location.longitude,
+                      }}
+                    />
+                  </MapView>
+                </>
+              ) : null}
               <View style={[styles.rowContainer, Spacing.smallTopSpacing]}>
                 <Image source={require('../assets/images/dog.png')} style={[styles.ownerImage, Spacing.smallRightSpacing]} />
                 <View style={[styles.shelterInfoContainer, Spacing.superSmallRightSpacing]}>
-                  <Text style={[TextStyles.h3]} numberOfLines={1}>{owner.name}</Text>
+                  <Text style={[TextStyles.h3]} numberOfLines={1}>
+                    {owner.name}
+                  </Text>
                   <Text style={TextStyles.desc}>{owner.role}</Text>
                 </View>
-                <SquareButton title="VIEW" onPress={() => navigation.navigate("OwnerProfile")} titleStyle={styles.buttonText} buttonStyle={styles.viewOwnerButton} containerStyle={styles.viewOwnerButtonCon} />
+                <SquareButton
+                  title='VIEW'
+                  onPress={() => navigation.navigate('OwnerProfile', {ownerId, ownerName: owner.name})}
+                  titleStyle={styles.buttonText}
+                  buttonStyle={styles.viewOwnerButton}
+                  containerStyle={styles.viewOwnerButtonCon}
+                />
               </View>
-            </> : null}
+            </>
+          ) : null}
         </View>
-        <LongRoundButton title="APPLY" containerStyle={styles.button} />
+        <LongRoundButton title='APPLY' onPress={handleSendMessage} containerStyle={styles.button} />
       </ScrollView>
     </View>
   );

@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import { View, FlatList, Image, ActivityIndicator, TouchableOpacity, StyleSheet } from 'react-native';
-import { Icon } from 'react-native-elements';
+import React, {useState} from 'react';
+import {View, FlatList, Image, ActivityIndicator, TouchableOpacity, StyleSheet} from 'react-native';
+import {Icon} from 'react-native-elements';
 import Video from 'react-native-video';
 
-import { SCREEN, scale, verticalScale } from '../../assets/dimensions';
+import {SCREEN, scale, verticalScale} from '../../assets/dimensions';
 import colours from '../../assets/colours';
 
-const GalleryView = ({ navigation, route }) => {
-
-  const { media } = route.params;
+const GalleryView = ({navigation, route}) => {
+  const {media} = route.params;
 
   const [loading, setLoading] = useState(false);
 
@@ -24,30 +23,31 @@ const GalleryView = ({ navigation, route }) => {
 
   return (
     <View style={styles.body}>
-      {loading && <ActivityIndicator color={colours.black} style={styles.absoluteCenter} />}
+      {!loading && <ActivityIndicator color={colours.black} style={styles.absoluteCenter} />}
       <FlatList
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         data={media}
-        renderItem={({ item, index }) =>
+        renderItem={({item, index}) => (
           <View key={index} style={styles.item}>
-            {isVideo(item) ?
-              <Video source={{ uri: item }}
-                resizeMode="cover"
+            {isVideo(item) ? (
+              <Video
+                source={{uri: item}}
+                resizeMode='cover'
                 controls
                 muted={true}
                 onLoadStart={() => setLoading(true)}
                 onLoad={() => setLoading(false)}
-                style={{ flex: 1, backgroundColor: colours.darkGray }} />
-              : <Image
-                source={{ uri: item }}
-                style={{ flex: 1 }}
-              />}
+                style={{flex: 1, backgroundColor: colours.darkGray}}
+              />
+            ) : (
+              <Image source={{uri: item}} style={{flex: 1}} />
+            )}
           </View>
-        }
+        )}
       />
-      <TouchableOpacity onPress={goBack} style={styles.fab} >
+      <TouchableOpacity onPress={goBack} style={styles.fab}>
         <Icon name='arrow-left' type='material-community' size={25} color='black' />
       </TouchableOpacity>
     </View>
@@ -56,7 +56,7 @@ const GalleryView = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   body: {
-    flex: 1
+    flex: 1,
   },
   item: {
     width: SCREEN.WIDTH,
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     top: verticalScale(16),
     left: scale(16),
     elevation: 30,
-  }
+  },
 });
 
 export default GalleryView;

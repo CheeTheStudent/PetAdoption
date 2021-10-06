@@ -1,14 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 
 import LongRoundButton from '../components/LongRoundButton';
-import { TextStyles } from '../../assets/styles';
-import { scale, verticalScale } from '../../assets/dimensions';
+import {TextStyles} from '../../assets/styles';
+import {scale, verticalScale} from '../../assets/dimensions';
 
-const OB1Welcome = ({ navigation }) => {
-
+const OB1Welcome = ({navigation}) => {
   const handleNext = () => {
-    navigation.navigate("OB2Introduce");
+    navigation.navigate('OB2Introduce');
   };
 
   return (
@@ -17,7 +16,7 @@ const OB1Welcome = ({ navigation }) => {
         <Text style={TextStyles.h1}>Welcome to Puppers!</Text>
         <Text style={[TextStyles.h3, styles.desc]}>Are you ready to step into the world of fluffly cute animals? Let’s go!</Text>
       </View>
-      <LongRoundButton title="GET STARTED" onPress={handleNext} containerStyle={styles.button} />
+      <LongRoundButton title='GET STARTED' onPress={handleNext} containerStyle={styles.button} />
     </View>
   );
 };
@@ -41,7 +40,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: verticalScale(32),
     alignSelf: 'center',
-  }
+  },
 });
 
 export default OB1Welcome;

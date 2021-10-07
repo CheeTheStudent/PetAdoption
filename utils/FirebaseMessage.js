@@ -1,7 +1,7 @@
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
-import {useEffect} from 'react';
 import {Alert} from 'react-native';
+import OneSignalNotif from './OneSignalNotif';
 
 const SYSTEM_MESSAGE = [
   {
@@ -12,6 +12,7 @@ const SYSTEM_MESSAGE = [
 ];
 
 const FirebaseMessage = convoId => {
+  const oneSignalNotif = OneSignalNotif();
   const userUID = auth().currentUser.uid;
 
   const userRef = database().ref(`users/${userUID}/convos`);
@@ -182,6 +183,11 @@ const FirebaseMessage = convoId => {
         const messageId = await threadsRef.child(threadId).push(message);
         threadsRef.child(`${threadId}/${messageId.key}`).update({sent: true, pending: false});
         convosRef.child(threadId).update({lastMessage: {...message, sent: true}});
+
+        const convoData = await convosRef.child(threadId).once('value');
+        const data = convoData.val() ? convoData.val() : {};
+        const receiverId = message.user._id === data.receiver.id ? data.sender.id : data.receiver.id;
+        oneSignalNotif.sendChatNotification(receiverId, message, threadId, data);
       }
     });
   };

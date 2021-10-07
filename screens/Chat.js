@@ -108,8 +108,8 @@ const Chat = ({navigation, route}) => {
             }}
           />
           {isLastMessage || !sameDayMessage ? (
-            <View style={{flexDirection: 'row', alignItems: 'center', marginTop: verticalScale(4)}}>
-              <Text style={[TextStyles.desc]}>{momentCur.format('LT')}</Text>
+            <View style={styles.belowBubbleContainer}>
+              <Text style={TextStyles.desc}>{momentCur.format('LT')}</Text>
               {currentUserMessage ? (
                 currentUserMessage && current.received ? (
                   <Icon name='check-all' type='material-community' size={moderateScale(14)} color='black' style={styles.tick} />
@@ -217,6 +217,11 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontSize: moderateScale(14),
+  },
+  belowBubbleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: verticalScale(4),
   },
   tick: {
     marginLeft: scale(4),

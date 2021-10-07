@@ -1,13 +1,14 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, createRef} from 'react';
 import {Text} from 'react-native';
-// import 'react-native-gesture-handler';
-import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
+import {NavigationContainer, DefaultTheme, useNavigation} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import OneSignalNotif from './utils/OneSignalNotif';
 
+import {navigationRef} from './utils/RootNavigation';
 import AuthScreen from './screens/Auth';
 import AppNavigation from './screens/AppNavigation';
 import LoginScreen from './screens/Login';
@@ -27,16 +28,21 @@ import FilterModal from './screens/components/Filter';
 import Loading from './screens/components/Loading';
 
 const App = () => {
+  const oneSignalNotif = OneSignalNotif();
   const [showOnboard, setShowOnboard] = useState();
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
 
   const Stack = createStackNavigator();
+  oneSignalNotif.init();
+  oneSignalNotif.onForegroundListener();
+  oneSignalNotif.onNotificationOpen(useNavigation);
 
   const handleIsNewUser = async () => {
     if (!auth().currentUser) return;
     const userUID = auth().currentUser.uid;
     const userRef = database().ref(`/users/${userUID}`);
+    oneSignalNotif.setUserNotificationId(userUID);
 
     userRef.on('value', snapshot => {
       const data = snapshot.val() ? snapshot.val() : null;
@@ -63,7 +69,7 @@ const App = () => {
   if (initializing) return null;
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator screenOptions={{headerShown: false}}>
         {!user ? (
           <>

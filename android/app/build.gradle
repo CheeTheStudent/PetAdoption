@@ -1,6 +1,16 @@
 apply plugin: "com.android.application"
 import com.android.build.OutputFile
 
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.12.10, 0.99.99]'
+    }
+}
+
+apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
  * and bundleReleaseJsAndAssets).

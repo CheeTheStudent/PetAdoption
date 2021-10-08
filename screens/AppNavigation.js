@@ -14,13 +14,15 @@ import {Spacing, TextStyles} from '../assets/styles';
 import {moderateScale} from '../assets/dimensions';
 import Loading from './components/Loading';
 
-const AppNavigation = () => {
+const AppNavigation = ({navigation}) => {
   const [user, setUser] = useState();
   const Tab = createBottomTabNavigator();
 
   useEffect(async () => {
     const user = await AsyncStorage.getItem('user');
-    setUser(JSON.parse(user));
+    const parsedUser = JSON.parse(user);
+    setUser(parsedUser);
+    if (parsedUser.verified === undefined) navigation.navigate('Permissions'); // Checks if it's user first-time login
   }, []);
 
   const defaultHeader = {

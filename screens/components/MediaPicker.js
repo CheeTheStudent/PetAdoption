@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, Image, FlatList, StyleSheet, PermissionsAndroid, Platform } from 'react-native';
-import { Icon, Button } from 'react-native-elements';
-import Modal from "react-native-modal";
-import CameraRoll from "@react-native-community/cameraroll";
+import React, {useState, useEffect} from 'react';
+import {View, TouchableOpacity, Image, FlatList, StyleSheet, PermissionsAndroid, Platform} from 'react-native';
+import {Icon, Button} from 'react-native-elements';
+import Modal from 'react-native-modal';
+import CameraRoll from '@react-native-community/cameraroll';
 import ImagePicker from 'react-native-image-crop-picker';
 
 import SquareButton from './SquareButton';
-import { scale, verticalScale, moderateScale } from '../../assets/dimensions';
-import { Spacing } from '../../assets/styles';
+import {scale, verticalScale, moderateScale} from '../../assets/dimensions';
+import {Spacing} from '../../assets/styles';
 import colours from '../../assets/colours';
 
-const MediaPicker = ({ singleMedia, imageOnly, profilePicture, buttons, setChosenMedia }) => {
-
+const MediaPicker = ({singleMedia, imageOnly, profilePicture, buttons, setChosenMedia}) => {
   const READ_PERMISSION = PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
 
   const [hasPermission, setHasPermission] = useState(false);
@@ -19,8 +18,6 @@ const MediaPicker = ({ singleMedia, imageOnly, profilePicture, buttons, setChose
   const [isModalVisible, setModalVisible] = useState(false);
 
   const handleRequestPermission = async () => {
-    const permission = PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
-
     if (!hasPermission) {
       const status = await PermissionsAndroid.request(READ_PERMISSION);
       setHasPermission(status === 'granted');
@@ -28,7 +25,6 @@ const MediaPicker = ({ singleMedia, imageOnly, profilePicture, buttons, setChose
   };
 
   useEffect(async () => {
-
     // Check permissions
     const status = await PermissionsAndroid.check(READ_PERMISSION);
     if (status) {
@@ -76,13 +72,13 @@ const MediaPicker = ({ singleMedia, imageOnly, profilePicture, buttons, setChose
   const handleGalleryPicker = () => {
     ImagePicker.openPicker({
       multiple: !singleMedia,
-      mediaType: imageOnly ? 'photo' : 'any,'
-    }).then(images => {
-      if (images.length == 1 && images[0].mime === 'image/jpeg')
-        handleCropImage(images[0]);
-      else
-        handleChosenMedia(images);
-    }).catch(err => console.log(err));
+      mediaType: imageOnly ? 'photo' : 'any,',
+    })
+      .then(images => {
+        if (images.length == 1 && images[0].mime === 'image/jpeg') handleCropImage(images[0]);
+        else handleChosenMedia(images);
+      })
+      .catch(err => console.log(err));
   };
 
   const handleCropImage = image => {
@@ -92,9 +88,11 @@ const MediaPicker = ({ singleMedia, imageOnly, profilePicture, buttons, setChose
       hideBottomControls: true,
       enableRotationGesture: true,
       cropperActiveWidgetColor: colours.mediumGray,
-    }).then(image => {
-      handleChosenMedia(image);
-    }).catch(err => console.log(err));
+    })
+      .then(image => {
+        handleChosenMedia(image);
+      })
+      .catch(err => console.log(err));
   };
 
   const toggleModal = () => {
@@ -108,59 +106,63 @@ const MediaPicker = ({ singleMedia, imageOnly, profilePicture, buttons, setChose
     } else {
       chosenPaths.push(media.path);
     }
-    setChosenMedia(prev => prev ? [...prev, ...chosenPaths] : chosenPaths);
+    setChosenMedia(prev => (prev ? [...prev, ...chosenPaths] : chosenPaths));
   };
 
   return (
     <>
-      {recentPics && hasPermission ?
-        buttons ?
-          <View style={[Spacing.superSmallTopSpacing, { flexDirection: 'row' }]}>
+      {recentPics && hasPermission ? (
+        buttons ? (
+          <View style={[Spacing.superSmallTopSpacing, {flexDirection: 'row'}]}>
             <SquareButton
-              title="Camera"
+              title='Camera'
               containerStyle={Spacing.superSmallRightSpacing}
-              icon={<Icon name="camera-outline" type="material-community" size={moderateScale(30)} containerStyle={Spacing.superSmallRightSpacing} />}
-              onPress={toggleModal} />
+              icon={<Icon name='camera-outline' type='material-community' size={moderateScale(30)} containerStyle={Spacing.superSmallRightSpacing} />}
+              onPress={toggleModal}
+            />
             <SquareButton
-              title="Gallery"
-              icon={<Icon name="image" type="material-community" size={moderateScale(30)} containerStyle={Spacing.superSmallRightSpacing} />}
-              onPress={handleGalleryPicker} />
+              title='Gallery'
+              icon={<Icon name='image' type='material-community' size={moderateScale(30)} containerStyle={Spacing.superSmallRightSpacing} />}
+              onPress={handleGalleryPicker}
+            />
           </View>
-          :
+        ) : (
           <FlatList
             horizontal
             data={recentPics}
             style={Spacing.smallTopSpacing}
-            renderItem={({ item, index }) => {
+            renderItem={({item, index}) => {
               if (item === 'first') {
-                return <TouchableOpacity style={[styles.cameraButton, Spacing.superSmallRightSpacing]} onPress={imageOnly ? handleTakePhoto : toggleModal}>
-                  <Icon name="camera-outline" type="material-community" size={moderateScale(30)} />
-                </TouchableOpacity>;
+                return (
+                  <TouchableOpacity style={[styles.cameraButton, Spacing.superSmallRightSpacing]} onPress={imageOnly ? handleTakePhoto : toggleModal}>
+                    <Icon name='camera-outline' type='material-community' size={moderateScale(30)} />
+                  </TouchableOpacity>
+                );
               } else if (item === 'last') {
-                return <TouchableOpacity style={styles.cameraButton} onPress={handleGalleryPicker}>
-                  <Icon name="image" type="material-community" size={moderateScale(30)} />
-                </TouchableOpacity>;
+                return (
+                  <TouchableOpacity style={styles.cameraButton} onPress={handleGalleryPicker}>
+                    <Icon name='image' type='material-community' size={moderateScale(30)} />
+                  </TouchableOpacity>
+                );
               } else {
-                return <TouchableOpacity onPress={() => handleCropImage(item.node.image.uri)}>
-                  <Image
-                    source={{ uri: item.node.image.uri }}
-                    style={styles.cameraPics}
-                  />
-                </TouchableOpacity>;
+                return (
+                  <TouchableOpacity onPress={() => handleCropImage(item.node.image.uri)}>
+                    <Image source={{uri: item.node.image.uri}} style={styles.cameraPics} />
+                  </TouchableOpacity>
+                );
               }
             }}
           />
-        : <TouchableOpacity style={[styles.cameraButton, Spacing.smallTopSpacing]} onPress={handleRequestPermission}>
-          <Icon name="image" type="material-community" size={moderateScale(30)} />
-        </TouchableOpacity>}
-      <Modal
-        isVisible={isModalVisible}
-        onBackdropPress={() => setModalVisible(false)}
-        backdropTransitionOutTiming={0}
-      >
+        )
+      ) : (
+        <TouchableOpacity style={[styles.cameraButton, Spacing.smallTopSpacing]} onPress={handleRequestPermission}>
+          <Icon name='image' type='material-community' size={moderateScale(30)} />
+        </TouchableOpacity>
+      )}
+      <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)} backdropTransitionOutTiming={0}>
         <View>
-          <Button title="Take Photo" onPress={handleTakePhoto} />
-          <Button title="Take Video" onPress={handleTakeVideo} />
+          <Button title='Take Photo' onPress={handleTakePhoto} />
+          <Button title='Take Video' onPress={handleTakeVideo} />
         </View>
       </Modal>
     </>

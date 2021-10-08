@@ -22,10 +22,13 @@ import PetFormScreen from './screens/PetForm';
 import JobFormScreen from './screens/JobForm';
 import ConvoScreen from './screens/Convo';
 import ChatScreen from './screens/Chat';
-import Testing from './screens/Testing';
+import PermissionsScreen from './screens/Permissions';
+import VerifyScreen from './screens/Verify';
+import SMSConfirmationScreen from './screens/SMSConfirmation';
 import GalleryViewModal from './screens/components/GalleryView';
 import FilterModal from './screens/components/Filter';
 import Loading from './screens/components/Loading';
+import Testing from './screens/Testing';
 
 const App = () => {
   const oneSignalNotif = OneSignalNotif();
@@ -94,6 +97,9 @@ const App = () => {
                   <Stack.Screen name='GalleryModal' component={GalleryViewModal} />
                   <Stack.Screen name='FilterModal' component={FilterModal} />
                   <Stack.Screen name='Chat' component={ChatScreen} options={{headerShown: true}} />
+                  <Stack.Screen name='Permissions' component={PermissionsScreen} />
+                  <Stack.Screen name='Verify' component={VerifyScreen} />
+                  <Stack.Screen name='SMSConfirmation' component={SMSConfirmationScreen} />
                 </Stack.Group>
                 <Stack.Screen name='Testing' component={Testing} />
               </>

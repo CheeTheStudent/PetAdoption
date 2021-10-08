@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   container: {
-    marginTop: 56,
+    marginTop: verticalScale(32),
     paddingHorizontal: scale(24),
   },
   box: {

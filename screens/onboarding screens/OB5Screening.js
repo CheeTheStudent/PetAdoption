@@ -11,7 +11,7 @@ import LongRoundButton from '../components/LongRoundButton';
 import SquareButton from '../components/SquareButton';
 import Textinput from '../components/TextInput';
 import MultiLineInput from '../components/MultiLineInput';
-import {scale, verticalScale} from '../../assets/dimensions';
+import {scale, verticalScale, moderateScale} from '../../assets/dimensions';
 import {TextStyles, Spacing} from '../../assets/styles';
 import colours from '../../assets/colours';
 
@@ -73,19 +73,22 @@ const OB5Screening = ({navigation}) => {
     const prevArr = await AsyncStorage.getItem('onboardUser');
     const user = {...newInfo, ...JSON.parse(prevArr)};
 
-    userRef.set({...user, screening}).then(() => console.log('Data set.'));
+    userRef.set({...user, screening});
+  };
 
-    try {
-      await AsyncStorage.setItem('onboardUser', JSON.stringify(user));
-    } catch (error) {
-      console.log(error);
-    }
+  const handleSkip = async () => {
+    const newInfo = {
+      name: 'Guest',
+    };
+    const prevArr = await AsyncStorage.getItem('onboardUser');
+    const user = {...newInfo, ...JSON.parse(prevArr)};
+    userRef.set(user);
   };
 
   return (
     <View style={styles.body}>
       <ScrollView style={styles.container}>
-        <Text style={TextStyles.h1}>Tell us about yourself</Text>
+        <Text style={[TextStyles.h1, Spacing.bigTopSpacing]}>Tell us about yourself</Text>
         <Text style={TextStyles.h3}>A complete profile will allow you to make a better impression!</Text>
         <Text style={[TextStyles.h3, Spacing.mediumTopSpacing]}>Name</Text>
         <Text style={TextStyles.desc}>This will be shown on your profile.</Text>
@@ -154,7 +157,12 @@ const OB5Screening = ({navigation}) => {
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Short Description</Text>
         <Text style={TextStyles.desc}>Tell us a bit more about yourself. Your experience with animals, your passion, anything!</Text>
         <MultiLineInput numberOfLines={5} onChangeText={desc => setDesc(desc)} containerStyle={Spacing.smallTopSpacing} />
-        <LongRoundButton title='CONTINUE' onPress={handleSubmit} containerStyle={styles.button} />
+        <View style={styles.bottomContainer}>
+          <Text onPress={handleSkip} style={styles.skipText}>
+            SKIP
+          </Text>
+          <LongRoundButton title='CONTINUE' disabled={!name} onPress={handleSubmit} />
+        </View>
       </ScrollView>
     </View>
   );
@@ -166,7 +174,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   container: {
-    marginTop: verticalScale(56),
     paddingHorizontal: scale(16),
   },
   pickerContainer: {
@@ -213,11 +220,18 @@ const styles = StyleSheet.create({
   squareButtonTextPressed: {
     color: colours.white,
   },
-
-  button: {
+  bottomContainer: {
+    flexDirection: 'row',
     marginTop: verticalScale(24),
-    marginBottom: verticalScale(32),
-    alignSelf: 'center',
+    paddingHorizontal: scale(8),
+    paddingBottom: verticalScale(32),
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  skipText: {
+    marginHorizontal: scale(8),
+    fontSize: moderateScale(12),
+    textDecorationLine: 'underline',
   },
 });
 

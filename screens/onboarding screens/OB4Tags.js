@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Tag from '../components/Tag';
 import LongRoundButton from '../components/LongRoundButton';
-import {scale, verticalScale, moderateScale} from '../../assets/dimensions';
+import {scale, verticalScale, moderateScale, SCREEN} from '../../assets/dimensions';
 import {TextStyles, Spacing} from '../../assets/styles';
 import colours from '../../assets/colours';
 
@@ -42,7 +42,10 @@ const OB4Tags = ({navigation}) => {
     } catch (error) {
       console.log(error);
     }
+    handleNavigate();
+  };
 
+  const handleNavigate = () => {
     navigation.navigate('OB5Screening');
   };
 
@@ -64,7 +67,12 @@ const OB4Tags = ({navigation}) => {
           })}
         </View>
       </View>
-      <LongRoundButton title='NEXT' onPress={handleNext} containerStyle={styles.button} />
+      <View style={styles.bottomContainer}>
+        <Text onPress={handleNavigate} style={styles.skipText}>
+          SKIP
+        </Text>
+        <LongRoundButton title='NEXT' disabled={selectedPersonalities.length == 0 && selectedAppearances.length == 0} onPress={handleNext} />
+      </View>
     </View>
   );
 };
@@ -75,18 +83,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   container: {
-    marginTop: 56,
+    marginTop: verticalScale(32),
     paddingHorizontal: scale(24),
   },
   tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-
-  button: {
+  bottomContainer: {
+    width: SCREEN.WIDTH,
+    flexDirection: 'row',
     position: 'absolute',
+    paddingHorizontal: scale(24),
     bottom: verticalScale(32),
-    alignSelf: 'center',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  skipText: {
+    marginHorizontal: scale(8),
+    fontSize: moderateScale(12),
+    textDecorationLine: 'underline',
   },
 });
 

@@ -1,13 +1,25 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
-import { Input } from 'react-native-elements';
+import {StyleSheet} from 'react-native';
+import {Input} from 'react-native-elements';
 
-import { verticalScale, scale } from '../../assets/dimensions';
+import {verticalScale, scale} from '../../assets/dimensions';
 import colours from '../../assets/colours';
 
-const TextInput = ({ compRef, placeholder, returnKeyType, defaultValue, onChangeText, onSubmitEditing,
-  blurOnSubmit, inputStyle, inputContainerStyle, containerStyle, errorMessage, errorStyle, ...rest }) => {
-
+const TextInput = ({
+  compRef,
+  placeholder,
+  returnKeyType,
+  defaultValue,
+  onChangeText,
+  onSubmitEditing,
+  blurOnSubmit,
+  inputStyle,
+  inputContainerStyle,
+  containerStyle,
+  errorMessage,
+  errorStyle,
+  ...rest
+}) => {
   return (
     <Input
       ref={compRef}
@@ -22,7 +34,8 @@ const TextInput = ({ compRef, placeholder, returnKeyType, defaultValue, onChange
       inputContainerStyle={[styles.inputContainer, inputContainerStyle]}
       errorMessage={errorMessage}
       errorStyle={[styles.error, errorStyle]}
-      {...rest} />
+      {...rest}
+    />
   );
 };
 

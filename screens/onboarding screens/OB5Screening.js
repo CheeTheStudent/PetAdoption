@@ -90,7 +90,10 @@ const OB5Screening = ({navigation}) => {
       <ScrollView style={styles.container}>
         <Text style={[TextStyles.h1, Spacing.bigTopSpacing]}>Tell us about yourself</Text>
         <Text style={TextStyles.h3}>A complete profile will allow you to make a better impression!</Text>
-        <Text style={[TextStyles.h3, Spacing.mediumTopSpacing]}>Name</Text>
+        <Text style={[TextStyles.h3, Spacing.mediumTopSpacing]}>
+          Name
+          <Text style={{color: 'red'}}> *</Text>
+        </Text>
         <Text style={TextStyles.desc}>This will be shown on your profile.</Text>
         <Textinput placeholder='Eg. Joan Arc' onChangeText={name => setName(name)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Age</Text>

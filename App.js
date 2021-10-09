@@ -27,6 +27,7 @@ import VerifyScreen from './screens/Verify';
 import SMSConfirmationScreen from './screens/SMSConfirmation';
 import GalleryViewModal from './screens/components/GalleryView';
 import FilterModal from './screens/components/Filter';
+import GooglePlacesInputModal from './screens/components/GooglePlacesInput';
 import Loading from './screens/components/Loading';
 import Testing from './screens/Testing';
 
@@ -83,7 +84,7 @@ const App = () => {
           </>
         ) : (
           <>
-            {showOnboard ? (
+            {!showOnboard ? (
               <Stack.Screen name='Onboarding' component={OnboardingScreen} />
             ) : (
               <>
@@ -96,6 +97,7 @@ const App = () => {
                 <Stack.Group screenOptions={{...TransitionPresets.SlideFromRightIOS, gestureEnabled: true}}>
                   <Stack.Screen name='GalleryModal' component={GalleryViewModal} />
                   <Stack.Screen name='FilterModal' component={FilterModal} />
+                  <Stack.Screen name='GooglePlacesInputModal' component={GooglePlacesInputModal} options={{headerShown: true}} />
                   <Stack.Screen name='Chat' component={ChatScreen} options={{headerShown: true}} />
                   <Stack.Screen name='Permissions' component={PermissionsScreen} />
                   <Stack.Screen name='Verify' component={VerifyScreen} />

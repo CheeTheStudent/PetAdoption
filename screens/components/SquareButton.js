@@ -1,22 +1,12 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
-import { Button, Icon } from 'react-native-elements';
+import {StyleSheet} from 'react-native';
+import {Button, Icon} from 'react-native-elements';
 
 import colours from '../../assets/colours';
-import { moderateScale } from '../../assets/dimensions';
+import {moderateScale} from '../../assets/dimensions';
 
-const SquareButton = ({ title, icon, titleStyle, buttonStyle, containerStyle, onPress, ...rest }) => {
-
-  return (
-    <Button
-      title={title}
-      titleStyle={[styles.buttonText, titleStyle]}
-      buttonStyle={[styles.button, buttonStyle]}
-      containerStyle={containerStyle}
-      icon={icon}
-      onPress={onPress}
-      {...rest} />
-  );
+const SquareButton = ({title, icon, titleStyle, buttonStyle, containerStyle, onPress, ...rest}) => {
+  return <Button title={title} titleStyle={[styles.buttonText, titleStyle]} buttonStyle={[styles.button, buttonStyle]} containerStyle={containerStyle} icon={icon} onPress={onPress} {...rest} />;
 };
 
 const styles = StyleSheet.create({

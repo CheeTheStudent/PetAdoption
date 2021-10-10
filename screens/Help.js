@@ -4,6 +4,7 @@ import database from '@react-native-firebase/database';
 import {Picker} from '@react-native-picker/picker';
 
 import JobCard from './components/JobCard';
+import Loading from './components/Loading';
 import {SCREEN, verticalScale, scale} from '../assets/dimensions';
 import {TextStyles, Spacing} from '../assets/styles';
 import colours from '../assets/colours';
@@ -17,6 +18,7 @@ const Help = ({navigation}) => {
   const [jobs, setJobs] = useState([]);
   const [type, setType] = useState('');
   const [location, setLocation] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -25,12 +27,13 @@ const Help = ({navigation}) => {
   }, []);
 
   useEffect(() => {
+    setLoading(true);
     let jobQuery = jobRef;
 
     if (type && type !== 'All') {
       jobQuery = jobRef.orderByChild('type').equalTo(type);
     } else if (location && location !== 'All') {
-      jobQuery = jobRef.orderByChild('location/state').equalTo('Penang');
+      jobQuery = jobRef.orderByChild('location/state').equalTo(location);
     }
 
     jobQuery.limitToLast(20).once('value', snapshot => {
@@ -39,6 +42,7 @@ const Help = ({navigation}) => {
       Object.entries(data).map(value => jobs.push({id: value[0], ...value[1]}));
       if (type && location) filterResults(jobs);
       else setJobs(jobs);
+      setLoading(false);
     });
   }, [type, location]);
 
@@ -68,7 +72,15 @@ const Help = ({navigation}) => {
           </Picker>
         </View>
       </View>
-      <FlatList data={jobs} renderItem={({item, index}) => <JobCard key={item.id} job={item} onPress={() => navigation.navigate('Job', {job: item})} />} style={styles.listContainer} />
+      {loading ? (
+        <Loading type='paw' />
+      ) : jobs.length > 0 ? (
+        <FlatList data={jobs} renderItem={({item, index}) => <JobCard key={item.id} job={item} onPress={() => navigation.navigate('Job', {job: item})} />} style={styles.listContainer} />
+      ) : (
+        <View style={styles.noResultsContainer}>
+          <Text style={{alignSelf: 'center'}}>There are no jobs for now!</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -102,6 +114,10 @@ const styles = StyleSheet.create({
   listContainer: {
     marginTop: verticalScale(8),
     paddingHorizontal: scale(16),
+  },
+  noResultsContainer: {
+    flex: 1,
+    justifyContent: 'center',
   },
 });
 

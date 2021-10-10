@@ -84,7 +84,7 @@ const App = () => {
           </>
         ) : (
           <>
-            {!showOnboard ? (
+            {showOnboard ? (
               <Stack.Screen name='Onboarding' component={OnboardingScreen} />
             ) : (
               <>

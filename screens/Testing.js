@@ -5,15 +5,25 @@ import MapView from 'react-native-maps';
 import FirebaseMessage from '../utils/FirebaseMessage';
 
 const Testing = () => {
-  const firebaseMessage = FirebaseMessage();
-  useEffect(() => {
-    firebaseMessage.getConvos(convoData => console.log('got it'));
-    // return () => {
-    //   firebaseMessage.off();
-    // };
-  }, []);
+  const location = {latitude: 3.1116619409358566, longitude: 101.66592645489287};
 
-  return <View style={styles.body}></View>;
+  return (
+    <View style={styles.body}>
+      <MapView
+        initialRegion={{
+          latitude: 37.78825,
+          longitude: -122.4324,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+        // pitchEnabled={false}
+        // rotateEnabled={false}
+        // zoomEnabled={false}
+        // scrollEnabled={false}
+        style={styles.map}
+      />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({

@@ -38,7 +38,7 @@ const PetProfile = ({navigation, route}) => {
 
   const renderTag = tag => {
     let included = false;
-    user.preferredTags.map(sTag => {
+    user.preferredTags?.map(sTag => {
       if (sTag === tag) {
         included = true;
       }

@@ -10,7 +10,6 @@ import colours from '../../assets/colours';
 
 const GooglePlacesInput = ({navigation, route}) => {
   const {onGoBack} = route.params;
-  const [location, setLocation] = useState();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -20,16 +19,13 @@ const GooglePlacesInput = ({navigation, route}) => {
     });
   }, []);
 
-  // useEffect(() => {
-  //   return () => onGoBack(location);
-  // }, []);
-
   const handleOnPress = (data, details) => {
     const {location} = details.geometry;
     const {description} = data;
-    setLocation({address: description, latitude: location.lat, longitude: location.lng});
+    const {address_components} = details;
+    const state = address_components.filter((el, i) => el.types[0] === 'administrative_area_level_1');
     navigation.goBack();
-    onGoBack({address: description, latitude: location.lat, longitude: location.lng});
+    onGoBack({address: description, latitude: location.lat, longitude: location.lng, state: state[0].long_name});
   };
 
   return (
@@ -40,17 +36,11 @@ const GooglePlacesInput = ({navigation, route}) => {
       nearbyPlacesAPI='GooglePlacesSearch'
       minLength={3}
       enablePoweredByContainer={false}
-      // currentLocation={true}
-      // currentLocationLabel="Current location"
       query={{
         key: googleAPIkey,
         language: 'en',
         components: 'country:my',
       }}
-      // GoogleReverseGeocodingQuery={{
-      //   key: googleAPIkey,
-      //   language: 'en',
-      // }}
       onFail={err => console.log(err)}
       onPress={handleOnPress}
       renderRow={props => (

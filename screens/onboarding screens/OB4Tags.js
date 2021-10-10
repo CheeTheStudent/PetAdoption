@@ -45,8 +45,13 @@ const OB4Tags = ({navigation}) => {
     handleNavigate();
   };
 
-  const handleNavigate = () => {
-    navigation.navigate('OB5Screening');
+  const handleNavigate = async () => {
+    const onboardUser = await AsyncStorage.getItem('onboardUser');
+    if (JSON.parse(onboardUser).role === 'Shelter') {
+      navigation.navigate('OB6Shelter');
+    } else {
+      navigation.navigate('OB5Screening');
+    }
   };
 
   return (

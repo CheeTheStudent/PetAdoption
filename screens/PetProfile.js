@@ -13,6 +13,7 @@ import SquareButton from './components/SquareButton';
 import {TextStyles, Spacing} from '../assets/styles';
 import {SCREEN, verticalScale, scale, moderateScale} from '../assets/dimensions';
 import colours from '../assets/colours';
+import Loading from './components/Loading';
 
 const PetProfile = ({navigation, route}) => {
   const {pet} = route.params;
@@ -43,7 +44,7 @@ const PetProfile = ({navigation, route}) => {
         included = true;
       }
     });
-    return <Tag title={tag} type={included ? 'black' : 'white-outline'} disabled />;
+    return <Tag key={tag} title={tag} type={included ? 'black' : 'white-outline'} disabled />;
   };
 
   const calcPetAge = () => {
@@ -53,7 +54,7 @@ const PetProfile = ({navigation, route}) => {
     } else if (ageMonth == 0) {
       ageLabel = ageYear + ' years';
     } else if (ageYear > 0 && ageMonth > 0) {
-      ageLabel = ageYear + ' years' + ageMonth + ' months';
+      ageLabel = ageYear + ' years ' + ageMonth + ' months';
     } else {
       ageLabel = 'Age Unspecified';
     }
@@ -100,98 +101,97 @@ const PetProfile = ({navigation, route}) => {
 
   return (
     <View style={styles.body}>
-      <ScrollView>
-        {pet ? (
-          // Pet info is available
-          <>
-            <Image source={{uri: media[0]}} style={styles.image} />
-            <ActionButton name='chevron-up' containerStyle={styles.actionUpButton} onPress={handleGoBack} />
-            <View style={styles.container}>
-              <View style={styles.basicInfoContainer}>
-                <Text style={[TextStyles.h1, Spacing.superSmallRightSpacing]}>{name}</Text>
-                <Text style={TextStyles.h4}>{calcPetAge()}</Text>
-              </View>
-              <Text style={[TextStyles.h4, {color: colours.darkGray}]}>{`${gender ? 'Female' : 'Male'}${Boolean(breed) ? ', ' + breed : ''}`}</Text>
-              <View style={[styles.tagContainer, Spacing.superSmallTopSpacing]}>{user ? tags.map(tag => renderTag(tag)) : <></>}</View>
-              <View style={[styles.healthContainer, Spacing.smallTopSpacing]}>
-                <View>
-                  {weight != 0 && <Text style={TextStyles.h4}>Weight</Text>}
-                  {height != 0 && <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>Height</Text>}
-                  <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>Vaccinated</Text>
-                  <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>{gender ? 'Spayed' : 'Neutered'}</Text>
-                </View>
-                <View style={styles.healthValuesContainer}>
-                  {weight != 0 && <Text style={[TextStyles.h4, {color: colours.darkGray}]}>{`${weight} kg`}</Text>}
-                  {height != 0 && <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing, {color: colours.darkGray}]}>{`${height} cm`}</Text>}
-                  <Icon name={vaccinated ? 'checkmark-circle' : 'close-circle'} type='ionicon' size={scale(24)} color='black' style={Spacing.superSmallTopSpacing} />
-                  <Icon name={spayed ? 'checkmark-circle' : 'close-circle'} type='ionicon' size={scale(24)} color='black' style={Spacing.superSmallTopSpacing} />
-                </View>
-              </View>
-              {Boolean(desc) && (
-                <>
-                  <Text style={[TextStyles.h3, Spacing.superSmallTopSpacing]}>About</Text>
-                  <Text style={[TextStyles.desc, Spacing.superSmallTopSpacing]}>{desc}</Text>
-                </>
-              )}
-              {media && (
-                <>
-                  <Text style={[TextStyles.h3, Spacing.superSmallTopSpacing]}>Gallery</Text>
-                  <FlatList
-                    horizontal
-                    data={media}
-                    style={Spacing.smallTopSpacing}
-                    renderItem={({item, index}) => (
-                      <TouchableOpacity style={styles.cameraPics} onPress={toggleModal}>
-                        {isVideo(item) ? (
-                          <Video source={{uri: item}} resizeMode='cover' muted={true} style={{flex: 1, backgroundColor: colours.darkGray}} />
-                        ) : (
-                          <Image source={{uri: item}} style={{flex: 1}} />
-                        )}
-                      </TouchableOpacity>
-                    )}
-                  />
-                </>
-              )}
-              {owner && (
-                <View style={[styles.ownerContainer, Spacing.smallTopSpacing, Spacing.superSmallBottomSpacing]}>
-                  <Image source={require('../assets/images/dog.png')} style={[styles.ownerImage, Spacing.smallRightSpacing]} />
-                  <View style={[styles.shelterInfoContainer, Spacing.superSmallRightSpacing]}>
-                    <Text style={[TextStyles.h3]} numberOfLines={1}>
-                      {owner.name}
-                    </Text>
-                    <Text style={TextStyles.desc}>{owner.role}</Text>
-                  </View>
-                  <SquareButton
-                    title='VIEW'
-                    onPress={() => navigation.navigate('OwnerProfile', {ownerId, ownerName: owner.name})}
-                    titleStyle={styles.buttonText}
-                    buttonStyle={styles.viewOwnerButton}
-                    containerStyle={styles.viewOwnerButtonCon}
-                  />
-                </View>
-              )}
-              <View style={[styles.actionButtonsContainer, Spacing.superSmallTopSpacing]}>
-                <SquareButton
-                  onPress={handleDislikePet}
-                  buttonStyle={styles.buttonStyle}
-                  containerStyle={styles.dislikeButtonContainerStyle}
-                  icon={<Icon name='thumb-down' type='material-community' color='black' />}
-                />
-                <SquareButton
-                  onPress={handleLikePet}
-                  buttonStyle={styles.buttonStyle}
-                  containerStyle={styles.likeButtonContainerStyle}
-                  icon={<Icon name='thumb-up' type='material-community' color='black' />}
-                />
-              </View>
-              <SquareButton title='MESSAGE' onPress={handleSendMessage} buttonStyle={styles.buttonStyle} containerStyle={[styles.buttonContainerStyle, Spacing.superSmallTopSpacing]} />
+      {pet && user ? (
+        // Pet info is available
+        <ScrollView>
+          <Image source={media ? {uri: media[0]} : require('../assets/images/placeholder.png')} style={styles.image} />
+          <ActionButton name='chevron-up' containerStyle={styles.actionUpButton} onPress={handleGoBack} />
+          <View style={styles.container}>
+            <View style={styles.basicInfoContainer}>
+              <Text style={[TextStyles.h1, Spacing.superSmallRightSpacing]}>{name}</Text>
+              <Text style={TextStyles.h4}>{calcPetAge()}</Text>
             </View>
-          </>
-        ) : (
-          // Pet info is unavailable
-          <Text>Nothing to see here</Text>
-        )}
-      </ScrollView>
+            <Text style={[TextStyles.h4, {color: colours.darkGray}]}>{`${gender ? 'Female' : 'Male'}${Boolean(breed) ? ', ' + breed : ''}`}</Text>
+            <View style={[styles.tagContainer, Spacing.superSmallTopSpacing]}>{tags ? tags.map(tag => renderTag(tag)) : <></>}</View>
+            <View style={[styles.healthContainer, Spacing.smallTopSpacing]}>
+              <View>
+                {weight != 0 && <Text style={TextStyles.h4}>Weight</Text>}
+                {height != 0 && <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>Height</Text>}
+                <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>Vaccinated</Text>
+                <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>{gender ? 'Spayed' : 'Neutered'}</Text>
+              </View>
+              <View style={styles.healthValuesContainer}>
+                {weight != 0 && <Text style={[TextStyles.h4, {color: colours.darkGray}]}>{`${weight} kg`}</Text>}
+                {height != 0 && <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing, {color: colours.darkGray}]}>{`${height} cm`}</Text>}
+                <Icon name={vaccinated ? 'checkmark-circle' : 'close-circle'} type='ionicon' size={scale(24)} color='black' style={Spacing.superSmallTopSpacing} />
+                <Icon name={spayed ? 'checkmark-circle' : 'close-circle'} type='ionicon' size={scale(24)} color='black' style={Spacing.superSmallTopSpacing} />
+              </View>
+            </View>
+            {Boolean(desc) && (
+              <>
+                <Text style={[TextStyles.h3, Spacing.superSmallTopSpacing]}>About</Text>
+                <Text style={[TextStyles.desc, Spacing.superSmallTopSpacing]}>{desc}</Text>
+              </>
+            )}
+            {media && (
+              <>
+                <Text style={[TextStyles.h3, Spacing.superSmallTopSpacing]}>Gallery</Text>
+                <FlatList
+                  horizontal
+                  data={media}
+                  keyExtractor={(item, index) => index}
+                  style={Spacing.smallTopSpacing}
+                  renderItem={({item, index}) => (
+                    <TouchableOpacity style={styles.cameraPics} onPress={toggleModal}>
+                      {isVideo(item) ? (
+                        <Video source={{uri: item}} resizeMode='cover' muted={true} style={{flex: 1, backgroundColor: colours.darkGray}} />
+                      ) : (
+                        <Image source={{uri: item}} style={{flex: 1}} />
+                      )}
+                    </TouchableOpacity>
+                  )}
+                />
+              </>
+            )}
+            {owner && (
+              <View style={[styles.ownerContainer, Spacing.smallTopSpacing, Spacing.superSmallBottomSpacing]}>
+                <Image source={require('../assets/images/dog.png')} style={[styles.ownerImage, Spacing.smallRightSpacing]} />
+                <View style={[styles.shelterInfoContainer, Spacing.superSmallRightSpacing]}>
+                  <Text style={[TextStyles.h3]} numberOfLines={1}>
+                    {owner.name}
+                  </Text>
+                  <Text style={TextStyles.desc}>{owner.role}</Text>
+                </View>
+                <SquareButton
+                  title='VIEW'
+                  onPress={() => navigation.navigate('OwnerProfile', {ownerId, ownerName: owner.name})}
+                  titleStyle={styles.buttonText}
+                  buttonStyle={styles.viewOwnerButton}
+                  containerStyle={styles.viewOwnerButtonCon}
+                />
+              </View>
+            )}
+            <View style={[styles.actionButtonsContainer, Spacing.superSmallTopSpacing]}>
+              <SquareButton
+                onPress={handleDislikePet}
+                buttonStyle={styles.buttonStyle}
+                containerStyle={styles.dislikeButtonContainerStyle}
+                icon={<Icon name='thumb-down' type='material-community' color='black' />}
+              />
+              <SquareButton
+                onPress={handleLikePet}
+                buttonStyle={styles.buttonStyle}
+                containerStyle={styles.likeButtonContainerStyle}
+                icon={<Icon name='thumb-up' type='material-community' color='black' />}
+              />
+            </View>
+            <SquareButton title='MESSAGE' onPress={handleSendMessage} buttonStyle={styles.buttonStyle} containerStyle={[styles.buttonContainerStyle, Spacing.superSmallTopSpacing]} />
+          </View>
+        </ScrollView>
+      ) : (
+        // Pet info is unavailable
+        <Loading />
+      )}
     </View>
   );
 };

@@ -138,6 +138,7 @@ const Chat = ({navigation, route}) => {
           messages={messages}
           alwaysShowSend
           scrollToBottom
+          renderLoading={() => <Loading type='paw' />}
           onSend={messages => firebaseMessage.sendMessage(messages, convoId)}
           renderAvatar={null}
           user={{
@@ -158,7 +159,7 @@ const Chat = ({navigation, route}) => {
           renderComposer={props => <Composer {...props} textInputStyle={styles.composerText} />}
         />
       ) : (
-        <Loading />
+        <Loading type='paw' />
       )}
       {interest ? (
         <View style={styles.interestContainer}>

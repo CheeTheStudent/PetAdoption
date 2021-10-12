@@ -1,22 +1,13 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
-import { Button } from 'react-native-elements';
+import {StyleSheet} from 'react-native';
+import {Button} from 'react-native-elements';
 
 import colours from '../../assets/colours';
-import { TextStyles } from '../../assets/styles';
-import { SCREEN, scale, verticalScale, moderateScale } from '../../assets/dimensions';
+import {TextStyles} from '../../assets/styles';
+import {SCREEN, scale, verticalScale, moderateScale} from '../../assets/dimensions';
 
-const LongRoundButton = ({ title, onPress, containerStyle, ...rest }) => {
-
-  return (
-    <Button
-      title={title}
-      buttonStyle={styles.button}
-      titleStyle={TextStyles.button}
-      containerStyle={[styles.buttonContainer, containerStyle]}
-      onPress={onPress}
-      {...rest} />
-  );
+const LongRoundButton = ({title, onPress, buttonStyle, containerStyle, ...rest}) => {
+  return <Button title={title} buttonStyle={[styles.button, buttonStyle]} titleStyle={TextStyles.button} containerStyle={[styles.buttonContainer, containerStyle]} onPress={onPress} {...rest} />;
 };
 
 const styles = StyleSheet.create({

@@ -55,18 +55,18 @@ const animals = [
 ];
 const locations = ['Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembilan', 'Pahang', 'Penang', 'Perak', 'Perlis', 'Sabah', 'Sarawak', 'Selangor', 'Terengganu'];
 
-const PF1Basic = ({navigation}) => {
+const PF1Basic = ({navigation, pet}) => {
   const [dogBreeds, setDogBreeds] = useState();
   const [catBreeds, setCatBreeds] = useState();
-  const [name, setName] = useState('');
-  const [ageYear, setAgeYear] = useState(0);
-  const [ageMonth, setAgeMonth] = useState(0);
-  const [gender, setGender] = useState(true);
-  const [species, setSpecies] = useState('');
+  const [name, setName] = useState(pet ? pet.name : '');
+  const [ageYear, setAgeYear] = useState(pet ? pet.ageYear : 0);
+  const [ageMonth, setAgeMonth] = useState(pet ? pet.ageMonth : 0);
+  const [gender, setGender] = useState(pet ? pet.gender : true);
+  const [species, setSpecies] = useState(pet ? pet.species : '');
   const [breed, setBreed] = useState('');
-  const [location, setLocation] = useState('Penang');
-  const [desc, setDesc] = useState('');
-  const [chosenMedia, setChosenMedia] = useState([]);
+  const [location, setLocation] = useState(pet ? pet.location : 'Penang');
+  const [desc, setDesc] = useState(pet ? pet.desc : '');
+  const [chosenMedia, setChosenMedia] = useState(pet ? pet.media : []);
 
   useEffect(async () => {
     fetch('https://api.thedogapi.com/v1/breeds', {
@@ -78,6 +78,7 @@ const PF1Basic = ({navigation}) => {
           let extractedBreeds = [];
           results.map(breed => extractedBreeds.push(breed.name));
           setDogBreeds(extractedBreeds);
+          if (pet) setBreed(pet.breed);
         },
         error => {
           console.log(error);
@@ -93,6 +94,7 @@ const PF1Basic = ({navigation}) => {
           let extractedBreeds = [];
           results.map(breed => extractedBreeds.push(breed.name));
           setCatBreeds(extractedBreeds);
+          if (pet) setBreed(pet.breed);
         },
         error => {
           console.log(error);
@@ -144,7 +146,7 @@ const PF1Basic = ({navigation}) => {
       breed,
       location,
       desc,
-      media: chosenMedia,
+      media: chosenMedia || [],
     };
 
     navigation.navigate('Medical', {petInfo: petBasicInfo});
@@ -156,7 +158,7 @@ const PF1Basic = ({navigation}) => {
         <View style={styles.container}>
           <Text style={[TextStyles.h3, Spacing.mediumTopSpacing]}>Name</Text>
           <Text style={TextStyles.desc}>Write your pet's name here.</Text>
-          <Textinput placeholder='Eg. Rex' onChangeText={name => setName(name)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
+          <Textinput placeholder='Eg. Rex' defaultValue={name} onChangeText={name => setName(name)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
           <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Age</Text>
           <View style={[styles.rowContainer, {justifyContent: 'space-between'}]}>
             <View style={styles.ageRowContainer}>
@@ -217,13 +219,14 @@ const PF1Basic = ({navigation}) => {
           </View>
           <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Short Description</Text>
           <Text style={TextStyles.desc}>Tell us about your pet! You can put in additional information here.</Text>
-          <MultiLineInput numberOfLines={5} onChangeText={desc => setDesc(desc)} containerStyle={Spacing.smallTopSpacing} />
+          <MultiLineInput numberOfLines={5} defaultValue={desc} onChangeText={desc => setDesc(desc)} containerStyle={Spacing.smallTopSpacing} />
           <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Media</Text>
           <Text style={TextStyles.desc}>Attach images and videos to better showcase your pet’s qualities! Adopters are more likely to be interested if more photos are available.</Text>
           {chosenMedia && chosenMedia.length > 0 && (
             <FlatList
               horizontal
               data={chosenMedia}
+              keyExtractor={(item, index) => index}
               style={Spacing.smallTopSpacing}
               renderItem={({item, index}) => {
                 return (

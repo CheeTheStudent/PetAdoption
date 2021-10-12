@@ -129,6 +129,7 @@ const MediaPicker = ({singleMedia, imageOnly, profilePicture, buttons, setChosen
         ) : (
           <FlatList
             horizontal
+            keyExtractor={(item, index) => index}
             data={recentPics}
             style={Spacing.smallTopSpacing}
             renderItem={({item, index}) => {

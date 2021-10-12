@@ -40,7 +40,7 @@ const AppNavigation = ({navigation}) => {
     headerTitle: {},
   };
 
-  if (!user) return <Loading type='cat' />;
+  if (!user) return <Loading />;
 
   return (
     <Tab.Navigator

@@ -29,6 +29,7 @@ const GalleryView = ({navigation, route}) => {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         data={media}
+        keyExtractor={index => index}
         renderItem={({item, index}) => (
           <View key={index} style={styles.item}>
             {isVideo(item) ? (

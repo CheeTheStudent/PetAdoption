@@ -1,24 +1,17 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ImageBackground, StyleSheet } from 'react-native';
+import {View, Text, TouchableOpacity, ImageBackground, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-import { scale } from '../../assets/dimensions';
-import { Spacing, TextStyles } from '../../assets/styles';
+import {scale} from '../../assets/dimensions';
+import {Spacing, TextStyles} from '../../assets/styles';
 
-const SmallPetCard = ({ name, age, image, onPress }) => {
-
+const SmallPetCard = ({name, image, onPress}) => {
   return (
-    <TouchableOpacity
-      key={name}
-      onPress={() => console.log("pressed on hori item")}
-      style={Spacing.superSmallRightSpacing}>
-      <ImageBackground source={image} style={styles.imageContainer} imageStyle={styles.image}>
-        <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.9)']}
-          style={styles.linearGradient} />
+    <TouchableOpacity key={name} onPress={onPress} style={Spacing.superSmallRightSpacing}>
+      <ImageBackground source={image ? {uri: image} : require('../../assets/images/placeholder.png')} style={styles.imageContainer} imageStyle={styles.image}>
+        <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={styles.linearGradient} />
         <View style={styles.card}>
           <Text style={[TextStyles.h4, styles.text]}>{name}</Text>
-          <Text style={[TextStyles.text, styles.text]}>{age}</Text>
         </View>
       </ImageBackground>
     </TouchableOpacity>
@@ -48,8 +41,8 @@ const styles = StyleSheet.create({
     borderRadius: scale(5),
   },
   text: {
-    color: 'white'
-  }
+    color: 'white',
+  },
 });
 
 export default SmallPetCard;

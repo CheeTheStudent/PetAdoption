@@ -10,7 +10,25 @@ import {TextStyles, Spacing} from '../assets/styles';
 import colours from '../assets/colours';
 
 const jobTypes = ['Job Type', 'All', 'Full-time', 'Part-time'];
-const locations = ['Location', 'All', 'Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembilan', 'Pahang', 'Penang', 'Perak', 'Perlis', 'Sabah', 'Sarawak', 'Selangor', 'Terengganu'];
+const locations = [
+  'Location',
+  'All',
+  'Federal Territory of Kuala Lumpur',
+  'Johor',
+  'Kedah',
+  'Kelantan',
+  'Melaka',
+  'Negeri Sembilan',
+  'Pahang',
+  'Pulau Pinang',
+  'Perak',
+  'Perlis',
+  'Sabah',
+  'Sarawak',
+  'Selangor',
+  'Terengganu',
+  'Wilayah Persekutuan Kuala Lumpur',
+];
 
 const Help = ({navigation}) => {
   const jobRef = database().ref('jobs');

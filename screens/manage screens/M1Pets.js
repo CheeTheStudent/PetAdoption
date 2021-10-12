@@ -1,19 +1,25 @@
 import React, {useState} from 'react';
-import {View, FlatList, Text, TouchableOpacity, StyleSheet, ScrollView} from 'react-native';
+import {View, FlatList, Text, TouchableOpacity, StyleSheet, ScrollView, ToastAndroid} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import {Icon, Button, Image} from 'react-native-elements';
-import OptionsMenu from 'react-native-option-menu';
+import Modal from 'react-native-modal';
+import database from '@react-native-firebase/database';
+import storage from '@react-native-firebase/storage';
 
+import LongRoundButton from '../components/LongRoundButton';
 import {scale, verticalScale, moderateScale, SCREEN} from '../../assets/dimensions';
 import {Spacing, TextStyles} from '../../assets/styles';
 import colours from '../../assets/colours';
 import {useEffect} from 'react';
 
 const M1Pets = ({navigation, setManageScreenNavigationOptions, pets}) => {
+  const petRef = database().ref('pets');
+  const petStore = storage().ref('pets');
   const [isLongPress, setIsLongPress] = useState(false);
   const initialSwitches = new Array(pets.length).fill(false);
   const [switches, setSwitches] = useState(initialSwitches);
   const [selected, setSelected] = useState(0);
+  const [modalPet, setModalPet] = useState(null);
 
   const renderManageNavigationOptions = () => {
     setManageScreenNavigationOptions({
@@ -24,13 +30,10 @@ const M1Pets = ({navigation, setManageScreenNavigationOptions, pets}) => {
             <Text style={[TextStyles.h2, Spacing.superSmallLeftSpacing]}>{selected}</Text>
           </View>
           <View style={{flexDirection: 'row'}}>
-            <OptionsMenu
-              customButton={<Icon name='pencil' type='material-community' size={moderateScale(24)} style={Spacing.superSmallRightSpacing} />}
-              destructiveIndex={1}
-              options={['Update Status', 'Edit Pet', 'Cancel']}
-              // actions={[editPost, deletePost]}
-            />
-            <Icon name='trash-can-outline' type='material-community' size={moderateScale(24)} />
+            {selected <= 1 && (
+              <Icon name='pencil' type='material-community' size={moderateScale(24)} onPress={() => handleEditPet(pets[switches.indexOf(true)])} style={Spacing.superSmallRightSpacing} />
+            )}
+            <Icon name='trash-can-outline' type='material-community' size={moderateScale(24)} onPress={() => handleDeletePet(pets.filter((el, i) => (switches[i] ? el : null)))} />
           </View>
         </View>
       ),
@@ -87,13 +90,54 @@ const M1Pets = ({navigation, setManageScreenNavigationOptions, pets}) => {
     return ageLabel;
   };
 
+  const handleViewPet = pet => {
+    navigation.navigate('PetProfile', {pet});
+  };
+
+  const handleEditPet = pet => {
+    setModalPet(null);
+    setSwitches(initialSwitches);
+    setSelected(0);
+    navigation.navigate('PetForm', {root: navigation, pet});
+  };
+
+  const handleDeletePet = pets => {
+    pets.map(async pet => {
+      if (pet.media) {
+        const existingMedia = await petStore.child(pet.id).listAll();
+        existingMedia.items.map(em => storage().ref(em.path).delete());
+      }
+      petRef.child(pet.id).remove();
+    });
+    ToastAndroid.show('Successfully deleted!', ToastAndroid.SHORT);
+    setModalPet(null);
+    setSwitches(initialSwitches);
+    setSelected(0);
+  };
+
+  const renderPetModal = () => {
+    return (
+      <Modal isVisible={Boolean(modalPet)} onBackdropPress={() => setModalPet(null)} backdropTransitionOutTiming={0}>
+        <View style={styles.modalContainer}>
+          <Image source={modalPet?.media ? {uri: modalPet.media[0]} : require('../../assets/images/placeholder.png')} style={styles.modalImage} />
+          <View style={styles.modalInfo}>
+            <Text style={TextStyles.h3}>{modalPet?.name}</Text>
+            <Icon name='trash-can-outline' type='material-community' size={moderateScale(24)} color='red' onPress={() => handleDeletePet([modalPet])} />
+          </View>
+          <LongRoundButton title='VIEW PROFILE' onPress={() => handleViewPet(modalPet)} buttonStyle={styles.modalButton} containerStyle={[Spacing.superSmallTopSpacing, styles.modalButton]} />
+          <LongRoundButton title='EDIT PROFILE' onPress={() => handleEditPet(modalPet)} buttonStyle={styles.modalButton} containerStyle={[Spacing.superSmallTopSpacing, styles.modalButton]} />
+        </View>
+      </Modal>
+    );
+  };
+
   return (
     <View style={styles.body}>
       <FlatList
         numColumns={2}
         data={pets}
         renderItem={({item, index}) => (
-          <TouchableOpacity onLongPress={() => handleLongPress(index)} onPress={() => isLongPress && handleSwitchToggle(index)}>
+          <TouchableOpacity onLongPress={() => handleLongPress(index)} onPress={() => (isLongPress ? handleSwitchToggle(index) : setModalPet(item))}>
             <Image source={item.media ? {uri: item.media[0]} : require('../../assets/images/placeholder.png')} style={styles.image} />
             <Text style={[TextStyles.h4, Spacing.superSmallLeftSpacing, {marginTop: verticalScale(4)}]}>{item.name}</Text>
             <Text style={[TextStyles.desc, Spacing.superSmallLeftSpacing]}>{calcPetAge(item.ageYear, item.ageMonth)}</Text>
@@ -101,11 +145,12 @@ const M1Pets = ({navigation, setManageScreenNavigationOptions, pets}) => {
           </TouchableOpacity>
         )}
         columnWrapperStyle={styles.rowContainer}
-        contentContainerStyle={{paddingBottom: verticalScale(16)}}
+        contentContainerStyle={styles.listContainer}
       />
       <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('PetForm', {root: navigation})}>
         <Icon name='plus' type='material-community' size={30} color='white' />
       </TouchableOpacity>
+      {renderPetModal()}
     </View>
   );
 };
@@ -114,7 +159,10 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     backgroundColor: 'white',
+  },
+  listContainer: {
     paddingHorizontal: scale(16),
+    paddingBottom: verticalScale(16),
   },
   manageHeader: {
     width: '100%',
@@ -147,6 +195,31 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: colours.whiteTransparent,
     position: 'absolute',
+  },
+  modalContainer: {
+    width: scale(232),
+    alignSelf: 'center',
+    alignItems: 'center',
+    padding: scale(16),
+    borderRadius: moderateScale(10),
+    backgroundColor: 'white',
+  },
+  modalImage: {
+    width: scale(200),
+    height: scale(200),
+    borderRadius: scale(10),
+  },
+  modalInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: scale(8),
+    paddingTop: verticalScale(8),
+    width: scale(200),
+  },
+  modalButton: {
+    width: scale(200),
+    height: verticalScale(36),
   },
 });
 

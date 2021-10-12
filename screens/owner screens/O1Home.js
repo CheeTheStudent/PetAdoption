@@ -8,15 +8,15 @@ import FirebaseMessage from '../../utils/FirebaseMessage';
 
 import LongRoundButton from '../components/LongRoundButton';
 import SmallPetCard from '../components/SmallPetCard';
-import SmallJobCard from '../components/SmallJobCard';
+import JobCard from '../components/JobCard';
 import {SCREEN, verticalScale, scale, moderateScale} from '../../assets/dimensions';
 import {TextStyles, Spacing} from '../../assets/styles';
 import colours from '../../assets/colours';
 
 const daysOfTheWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-const O1Home = ({navigation, owner}) => {
-  const {id: ownerId, name, profilePic, petsAdopted, openingHours, location, phoneNum, email, facebookId, twitterId, private: ownerPrivate} = owner;
+const O1Home = ({navigation, owner, pets, jobs}) => {
+  const {id: ownerId, name, description, profilePic, petsAdopted, location, phoneNum, email, facebookId, twitterId, private: ownerPrivate} = owner;
 
   const userUID = auth().currentUser.uid;
   const firebaseMessage = FirebaseMessage();
@@ -27,17 +27,6 @@ const O1Home = ({navigation, owner}) => {
     const user = JSON.parse(userData);
     setUser(user);
   }, []);
-
-  const renderHorizontalList = type => {
-    return (
-      <FlatList
-        horizontal={true}
-        data={[{title: 'Title Text', key: 'item1'}, {}]}
-        renderItem={({item, index}) => (type == 'pets' ? <SmallPetCard name='Ron' age='12 months' /> : <SmallJobCard title='Volunteer' desc='Bloop bleep beep' small />)}
-        style={Spacing.superSmallTopSpacing}
-      />
-    );
-  };
 
   const renderOpeningHours = (day, hours) => {
     return (
@@ -89,41 +78,26 @@ const O1Home = ({navigation, owner}) => {
         </View>
         <View style={styles.container}>
           <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>About</Text>
-          <Text style={[TextStyles.text, Spacing.superSmallTopSpacing]}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras cras mi scelerisque quis arcu luctus lacus id vestibulum. Sollicitudin vestibulum mi elit nulla sed. Faucibus pretium
-            convallis quam enim sed tincidunt adipiscing in enim. Aliquam metus in convallis sodales ornare nisl.
-          </Text>
-          <View style={[styles.seeAlllRow, Spacing.superSmallTopSpacing]}>
+          <Text style={[TextStyles.text, Spacing.superSmallTopSpacing]}>{description}</Text>
+          <View style={[styles.rowContainer, Spacing.superSmallTopSpacing]}>
             <Text style={TextStyles.h4}>Pets For Adoption</Text>
             <Text style={[TextStyles.desc, {alignSelf: 'flex-end'}]} onPress={() => navigation.jumpTo('Pets', {owner: owner})}>
               See All
             </Text>
           </View>
-          {renderHorizontalList('pets')}
-          <View style={[styles.seeAlllRow, Spacing.superSmallTopSpacing]}>
+          <View style={[styles.rowContainer, Spacing.superSmallTopSpacing]}>
+            {pets.map((pet, index) => {
+              if (index > 2) return;
+              return <SmallPetCard key={pet.id} name={pet.name} image={pet.media && pet.media[0]} onPress={() => navigation.navigate('PetProfile', {pet: pet})} />;
+            })}
+          </View>
+          <View style={[styles.rowContainer, Spacing.superSmallTopSpacing]}>
             <Text style={TextStyles.h4}>Join Us</Text>
             <Text style={[TextStyles.desc, {alignSelf: 'flex-end'}]} onPress={() => navigation.jumpTo('Jobs', {owner: owner})}>
               See All
             </Text>
           </View>
-          {renderHorizontalList('jobs')}
-          {openingHours ? (
-            <>
-              <Text style={[TextStyles.h4, Spacing.smallTopSpacing]}>Opening Hours</Text>
-              <View style={[Spacing.smallTopSpacing, {flexDirection: 'row'}]}>
-                <View>
-                  {daysOfTheWeek.map(day => (
-                    <Text style={(TextStyles.text, {fontWeight: 'bold'})}>{day}</Text>
-                  ))}
-                </View>
-                <View style={[Spacing.superSmallLeftSpacing, {justifyContent: 'space-between'}]}>
-                  {Object.entries(openingHours).map(([day, hours]) => (
-                    <Text style={TextStyles.text}>{hours}</Text>
-                  ))}
-                </View>
-              </View>
-            </>
-          ) : null}
+          <View style={Spacing.superSmallTopSpacing}>{jobs.length > 0 && <JobCard job={jobs[0]} />}</View>
           {location ? (
             <>
               <Text style={[TextStyles.h4, Spacing.smallTopSpacing]}>Location</Text>
@@ -211,9 +185,9 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingTop: verticalScale(16),
-    paddingHorizontal: scale(24),
+    paddingHorizontal: scale(16),
   },
-  seeAlllRow: {
+  rowContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },

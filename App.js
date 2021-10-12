@@ -92,7 +92,7 @@ const App = () => {
                 <Stack.Screen name='PetProfile' component={PetProfileScreen} />
                 <Stack.Screen name='Job' component={JobScreen} />
                 <Stack.Screen name='OwnerProfile' component={OwnerProfileScreen} options={{headerShown: true}} />
-                <Stack.Screen name='PetForm' component={PetFormScreen} />
+                <Stack.Screen name='PetForm' component={PetFormScreen} options={{headerShown: true}} />
                 <Stack.Screen name='JobForm' component={JobFormScreen} options={{headerShown: true}} />
                 <Stack.Group screenOptions={{...TransitionPresets.SlideFromRightIOS, gestureEnabled: true}}>
                   <Stack.Screen name='GalleryModal' component={GalleryViewModal} />

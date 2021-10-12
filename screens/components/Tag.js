@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { Chip } from 'react-native-elements';
+import React, {useState} from 'react';
+import {StyleSheet} from 'react-native';
+import {Chip} from 'react-native-elements';
 
 import colours from '../../assets/colours';
-import { TextStyles } from '../../assets/styles';
-import { moderateScale, scale, verticalScale } from '../../assets/dimensions';
+import {TextStyles} from '../../assets/styles';
+import {moderateScale, scale, verticalScale} from '../../assets/dimensions';
 
-const Tag = ({ title, type, disabled, onSelected, onSingleSelected }) => {
-
+const Tag = ({title, type, disabled, onSelected, onSingleSelected}) => {
   const [pressed, setPressed] = useState(false);
 
-  const handleOnPress = ({ target }) => {
+  const handleOnPress = ({target}) => {
     if (onSelected) {
       setPressed(!pressed);
       onSelected(title, !pressed);
@@ -19,21 +18,27 @@ const Tag = ({ title, type, disabled, onSelected, onSingleSelected }) => {
     }
   };
 
-  const buttonStyle = (type) => {
+  const buttonStyle = type => {
     switch (type) {
-      case 'white': return { backgroundColor: colours.white };
-      case 'white-outline': return { backgroundColor: colours.white, borderColor: colours.black };
-      case 'black': return { backgroundColor: colours.black, borderColor: colours.white };
-      default: return { backgroundColor: colours.lightGray };
+      case 'white':
+        return {backgroundColor: colours.white};
+      case 'white-outline':
+        return {backgroundColor: colours.white, borderColor: colours.black};
+      case 'black':
+        return {backgroundColor: colours.black, borderColor: colours.white};
+      default:
+        return {backgroundColor: colours.lightGray};
     }
   };
 
-  const textStyle = (type) => {
+  const textStyle = type => {
     switch (type) {
-      case 'black': return { color: 'white' };
+      case 'black':
+        return {color: 'white'};
       case 'white':
       case 'white-outline':
-      default: return { color: 'black' };
+      default:
+        return {color: 'black'};
     }
   };
 
@@ -46,7 +51,8 @@ const Tag = ({ title, type, disabled, onSelected, onSingleSelected }) => {
       containerStyle={styles.container}
       disabledStyle={[styles.button, buttonStyle(type)]}
       disabledTitleStyle={textStyle(type)}
-      onPress={handleOnPress} />
+      onPress={handleOnPress}
+    />
   );
 };
 
@@ -66,8 +72,8 @@ const styles = StyleSheet.create({
   container: {
     marginRight: scale(8),
     marginTop: verticalScale(8),
-    borderRadius: moderateScale(24)
-  }
+    borderRadius: moderateScale(24),
+  },
 });
 
 export default Tag;

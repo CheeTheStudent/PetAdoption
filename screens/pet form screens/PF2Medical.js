@@ -1,26 +1,24 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, ScrollView} from 'react-native';
 
 import TextInput from '../components/TextInput';
 import SquareButton from '../components/SquareButton';
 import LongRoundButton from '../components/LongRoundButton';
 import MultiLineInput from '../components/MultiLineInput';
-import { verticalScale, scale } from '../../assets/dimensions';
-import { TextStyles, Spacing } from '../../assets/styles';
+import {verticalScale, scale} from '../../assets/dimensions';
+import {TextStyles, Spacing} from '../../assets/styles';
 import colours from '../../assets/colours';
 
-const PF2Medical = ({ navigation, route }) => {
+const PF2Medical = ({navigation, route, pet}) => {
+  const {petInfo} = route.params;
 
-  const { petInfo } = route.params;
-
-  const [weight, setWeight] = useState(0);
-  const [height, setHeight] = useState(0);
-  const [vaccine, setVaccine] = useState('None');
-  const [spayed, setSpayed] = useState(false);
-  const [desc, setDesc] = useState('');
+  const [weight, setWeight] = useState(pet ? pet.weight : '');
+  const [height, setHeight] = useState(pet ? pet.height : '');
+  const [vaccine, setVaccine] = useState(pet ? pet.vaccinated : 'None');
+  const [spayed, setSpayed] = useState(pet ? pet.spayed : false);
+  const [desc, setDesc] = useState(pet ? pet.illnessDescription : '');
 
   const handleSubmit = async () => {
-
     const updatedPetInfo = {
       ...petInfo,
       weight,
@@ -30,84 +28,90 @@ const PF2Medical = ({ navigation, route }) => {
       illnessDescription: desc,
     };
 
-    navigation.navigate("Tags", { petInfo: updatedPetInfo });
+    navigation.navigate('Tags', {petInfo: updatedPetInfo});
   };
 
   return (
     <View style={styles.body}>
-      <ScrollView style={{ paddingHorizontal: scale(16) }}>
+      <ScrollView style={{paddingHorizontal: scale(16)}}>
         <View style={styles.rowContainer}>
           <Text style={TextStyles.h3}>Weight</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <TextInput
-              placeholder="0.00"
-              keyboardType="numeric"
+              placeholder='0.00'
+              keyboardType='numeric'
               maxLength={4}
+              defaultValue={weight}
               onChangeText={value => setWeight(value)}
               renderErrorMessage={false}
-              inputContainerStyle={{ height: verticalScale(40) }}
-              containerStyle={[Spacing.smallRightSpacing, { width: scale(60) }]} />
+              inputContainerStyle={{height: verticalScale(40)}}
+              containerStyle={[Spacing.smallRightSpacing, {width: scale(60)}]}
+            />
             <Text style={TextStyles.h4}>kg</Text>
           </View>
         </View>
         <View style={styles.rowContainer}>
           <Text style={TextStyles.h3}>Height</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <TextInput
-              placeholder="0.00"
-              keyboardType="numeric"
+              placeholder='0.00'
+              keyboardType='numeric'
               maxLength={4}
+              defaultValue={height}
               onChangeText={value => setHeight(value)}
               renderErrorMessage={false}
-              inputContainerStyle={{ height: verticalScale(40) }}
-              containerStyle={[Spacing.smallRightSpacing, { width: scale(60) }]} />
+              inputContainerStyle={{height: verticalScale(40)}}
+              containerStyle={[Spacing.smallRightSpacing, {width: scale(60)}]}
+            />
             <Text style={TextStyles.h4}>cm</Text>
           </View>
         </View>
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Vaccination Status</Text>
         <View style={styles.rowContainer}>
           <SquareButton
-            title="None"
+            title='None'
             containerStyle={styles.squareLeftButton}
-            buttonStyle={[vaccine === "None" && styles.squareButtonPressed, styles.squareButton]}
-            titleStyle={vaccine === "None" && styles.squareButtonTextPressed}
-            onPress={() => setVaccine('None')} />
+            buttonStyle={[vaccine === 'None' && styles.squareButtonPressed, styles.squareButton]}
+            titleStyle={vaccine === 'None' && styles.squareButtonTextPressed}
+            onPress={() => setVaccine('None')}
+          />
           <SquareButton
-            title="Half"
+            title='Half'
             containerStyle={styles.squareLeftButton}
-            buttonStyle={[vaccine === "Half" && styles.squareButtonPressed, styles.squareButton]}
-            titleStyle={vaccine === "Half" && styles.squareButtonTextPressed}
-            onPress={() => setVaccine('Half')} />
+            buttonStyle={[vaccine === 'Half' && styles.squareButtonPressed, styles.squareButton]}
+            titleStyle={vaccine === 'Half' && styles.squareButtonTextPressed}
+            onPress={() => setVaccine('Half')}
+          />
           <SquareButton
-            title="Full"
+            title='Full'
             containerStyle={styles.squareRightButton}
-            buttonStyle={[vaccine === "Full" && styles.squareButtonPressed, styles.squareButton]}
-            titleStyle={vaccine === "Full" && styles.squareButtonTextPressed}
-            onPress={() => setVaccine('Full')} />
+            buttonStyle={[vaccine === 'Full' && styles.squareButtonPressed, styles.squareButton]}
+            titleStyle={vaccine === 'Full' && styles.squareButtonTextPressed}
+            onPress={() => setVaccine('Full')}
+          />
         </View>
-        <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>{petInfo.gender ? "Spayed" : "Neutered"}</Text>
+        <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>{petInfo.gender ? 'Spayed' : 'Neutered'}</Text>
         <View style={styles.rowContainer}>
           <SquareButton
-            title="No"
+            title='No'
             containerStyle={styles.squareLeftButton}
             buttonStyle={[!spayed && styles.squareButtonPressed, styles.squareButton]}
             titleStyle={!spayed && styles.squareButtonTextPressed}
-            onPress={() => setSpayed(false)} />
+            onPress={() => setSpayed(false)}
+          />
           <SquareButton
-            title="Yes"
+            title='Yes'
             containerStyle={styles.squareRightButton}
             buttonStyle={[spayed && styles.squareButtonPressed, styles.squareButton]}
             titleStyle={spayed && styles.squareButtonTextPressed}
-            onPress={() => setSpayed(true)} />
+            onPress={() => setSpayed(true)}
+          />
         </View>
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Health Issues</Text>
         <Text style={TextStyles.desc}>If your pet has any illnesses or allergies, write them down here!</Text>
-        <MultiLineInput
-          numberOfLines={5}
-          onChangeText={desc => setDesc(desc)}
-          containerStyle={Spacing.smallTopSpacing} />
+        <MultiLineInput numberOfLines={5} defaultValue={desc} onChangeText={desc => setDesc(desc)} containerStyle={Spacing.smallTopSpacing} />
+        <LongRoundButton title='CONTINUE' onPress={handleSubmit} containerStyle={styles.button} />
       </ScrollView>
-      <LongRoundButton title="CONTINUE" onPress={handleSubmit} containerStyle={styles.button} />
     </View>
   );
 };

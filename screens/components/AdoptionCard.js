@@ -59,7 +59,7 @@ const AdoptionCard = ({navigation, pet, isFirst, swipe, tiltPoint, ...rest}) => 
             <Text style={[TextStyles.h1, styles.name]}>{pet.name}</Text>
             <Text style={[TextStyles.h3, styles.age]}>{calcPetAge()}</Text>
           </View>
-          <View style={styles.tagsContainer}>{pet.tags ? pet.tags.map(tag => <Tag title={tag} type='white' disabled />) : <></>}</View>
+          <View style={styles.tagsContainer}>{pet.tags ? pet.tags.map(tag => <Tag key={tag} title={tag} type='white' disabled />) : <></>}</View>
         </View>
       </TouchableWithoutFeedback>
     </Animated.View>

@@ -10,7 +10,7 @@ import {scale, verticalScale, moderateScale} from '../../assets/dimensions';
 import {Spacing} from '../../assets/styles';
 import colours from '../../assets/colours';
 
-const MediaPicker = ({singleMedia, imageOnly, profilePicture, buttons, setChosenMedia}) => {
+const MediaPicker = ({singleMedia, imageOnly, profilePicture, buttons, setChosenMedia, style}) => {
   const READ_PERMISSION = PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
 
   const [hasPermission, setHasPermission] = useState(false);
@@ -44,11 +44,13 @@ const MediaPicker = ({singleMedia, imageOnly, profilePicture, buttons, setChosen
         .catch(err => console.log(err));
     }
 
-    // ImagePicker.clean().then(() => {
-    //   console.log('removed all tmp images from tmp directory');
-    // }).catch(e => {
-    //   alert(e);
-    // });
+    // ImagePicker.clean()
+    //   .then(() => {
+    //     console.log('removed all tmp images from tmp directory');
+    //   })
+    //   .catch(e => {
+    //     alert(e);
+    //   });
   }, [hasPermission]);
 
   const handleTakePhoto = () => {
@@ -110,7 +112,7 @@ const MediaPicker = ({singleMedia, imageOnly, profilePicture, buttons, setChosen
   };
 
   return (
-    <>
+    <View style={style}>
       {recentPics && hasPermission ? (
         buttons ? (
           <View style={[Spacing.superSmallTopSpacing, {flexDirection: 'row'}]}>
@@ -166,7 +168,7 @@ const MediaPicker = ({singleMedia, imageOnly, profilePicture, buttons, setChosen
           <Button title='Take Video' onPress={handleTakeVideo} />
         </View>
       </Modal>
-    </>
+    </View>
   );
 };
 

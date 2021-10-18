@@ -22,10 +22,11 @@ const GooglePlacesInput = ({navigation, route}) => {
   const handleOnPress = (data, details) => {
     const {location} = details.geometry;
     const {description} = data;
-    const {address_components} = details;
+    const {address_components, name} = details;
+
     const state = address_components.filter((el, i) => el.types[0] === 'administrative_area_level_1');
     navigation.goBack();
-    onGoBack({address: description, latitude: location.lat, longitude: location.lng, state: state[0].long_name});
+    onGoBack({address: description, latitude: location.lat, longitude: location.lng, name: name, state: state[0].long_name});
   };
 
   return (

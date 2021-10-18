@@ -9,6 +9,7 @@ import HomeScreen from './Home';
 import MessagesScreen from './Messages';
 import HelpScreen from './Help';
 import ManageScreen from './Manage';
+import CommunityScreen from './Community';
 import colours from '../assets/colours';
 import {Spacing, TextStyles} from '../assets/styles';
 import {moderateScale} from '../assets/dimensions';
@@ -32,9 +33,13 @@ const AppNavigation = ({navigation}) => {
         rounded
         size={moderateScale(32)}
         containerStyle={Spacing.smallLeftSpacing}
-        source={{
-          uri: user.profilePic,
-        }}
+        source={
+          user.profilePic
+            ? {
+                uri: user.profilePic,
+              }
+            : require('../assets/images/placeholder.png')
+        }
       />
     ),
     headerTitle: {},
@@ -80,7 +85,7 @@ const AppNavigation = ({navigation}) => {
       })}>
       <Tab.Screen name='Home' component={HomeScreen} options={{tabBarLabel: 'Adoption'}} />
       <Tab.Screen name='Help' component={HelpScreen} options={{tabBarLabel: 'Help'}} />
-      <Tab.Screen name='Community' component={HomeScreen} options={{tabBarLabel: 'Community'}} />
+      <Tab.Screen name='Community' component={CommunityScreen} options={{tabBarLabel: 'Community'}} />
       <Tab.Screen name='Manage' children={props => <ManageScreen defaultHeader={defaultHeader} {...props} />} options={{tabBarLabel: 'Manage'}} />
       <Tab.Screen name='Messages' component={MessagesScreen} options={{tabBarLabel: 'Messages'}} />
     </Tab.Navigator>

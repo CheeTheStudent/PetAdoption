@@ -3,8 +3,8 @@ import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 import {Button, Icon, Image} from 'react-native-elements';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
-import moment from 'moment';
 
+import {getTimeConvo} from '../utils/utils';
 import {TextStyles, Spacing} from '../assets/styles';
 import {scale, moderateScale, verticalScale} from '../assets/dimensions';
 import colours from '../assets/colours';
@@ -15,16 +15,6 @@ const Convo = ({chats, onConvoPress}) => {
   const getFriend = convo => {
     if (userUID === convo.sender.id) return convo.receiver;
     else return convo.sender;
-  };
-
-  const getLastMessageTime = timestamp => {
-    const momentSent = moment(timestamp);
-    const today = moment().startOf('day');
-    if (momentSent.isSame(today, 'd')) {
-      return momentSent.format('LT');
-    } else {
-      return momentSent.calendar('do MMM YY');
-    }
   };
 
   const newMessage = item => {
@@ -48,7 +38,7 @@ const Convo = ({chats, onConvoPress}) => {
                 {item.lastMessage ? item.lastMessage.text : 'This is the start of the conversation'}
               </Text>
             </View>
-            <Text style={[TextStyles.desc, {position: 'absolute', right: 0, top: 0}]}>{item.lastMessage ? getLastMessageTime(item.lastMessage.timestamp) : ''}</Text>
+            <Text style={[TextStyles.desc, {position: 'absolute', right: 0, top: 0}]}>{item.lastMessage ? getTimeConvo(item.lastMessage.timestamp) : ''}</Text>
             {newMessage(item) ? <Icon name='circle-medium' type='material-community' size={moderateScale(24)} /> : null}
           </TouchableOpacity>
         )}

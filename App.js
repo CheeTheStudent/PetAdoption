@@ -20,6 +20,8 @@ import JobScreen from './screens/Job';
 import OwnerProfileScreen from './screens/OwnerProfile';
 import PetFormScreen from './screens/PetForm';
 import JobFormScreen from './screens/JobForm';
+import PostScreen from './screens/Post';
+import PostFormScreen from './screens/PostForm';
 import ConvoScreen from './screens/Convo';
 import ChatScreen from './screens/Chat';
 import PermissionsScreen from './screens/Permissions';
@@ -94,6 +96,8 @@ const App = () => {
                 <Stack.Screen name='OwnerProfile' component={OwnerProfileScreen} options={{headerShown: true}} />
                 <Stack.Screen name='PetForm' component={PetFormScreen} options={{headerShown: true}} />
                 <Stack.Screen name='JobForm' component={JobFormScreen} options={{headerShown: true}} />
+                <Stack.Screen name='Post' component={PostScreen} options={{headerShown: true}} />
+                <Stack.Screen name='PostForm' component={PostFormScreen} options={{headerShown: true}} />
                 <Stack.Group screenOptions={{...TransitionPresets.SlideFromRightIOS, gestureEnabled: true}}>
                   <Stack.Screen name='GalleryModal' component={GalleryViewModal} />
                   <Stack.Screen name='FilterModal' component={FilterModal} />

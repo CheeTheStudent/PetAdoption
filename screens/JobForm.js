@@ -16,7 +16,7 @@ import {TextStyles, Spacing} from '../assets/styles';
 import colours from '../assets/colours';
 
 const JobForm = ({navigation, route}) => {
-  const {rootNavigation, job} = route.params;
+  const {job} = route.params || {};
 
   const userUID = auth().currentUser.uid;
   const userRef = database().ref(`/users/${userUID}`);
@@ -81,7 +81,7 @@ const JobForm = ({navigation, route}) => {
     }
 
     ToastAndroid.show(job ? 'Job Edited!' : 'Job Added!', ToastAndroid.SHORT);
-    rootNavigation.navigate('Jobs');
+    navigation.navigate('Jobs');
   };
 
   return (

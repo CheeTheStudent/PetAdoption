@@ -52,7 +52,6 @@ const Manage = ({navigation, route, defaultHeader}) => {
       });
 
     return () => {
-      console.log('off');
       petRef.off();
       jobRef.off();
     };

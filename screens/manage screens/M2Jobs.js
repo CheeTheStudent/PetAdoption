@@ -19,7 +19,7 @@ const M2Jobs = ({navigation, jobs}) => {
   };
 
   const handleEditJob = job => {
-    navigation.navigate('JobForm', {rootNavigation: navigation, job});
+    navigation.navigate('JobForm', {job});
   };
 
   const handleDeleteJob = async job => {
@@ -46,7 +46,7 @@ const M2Jobs = ({navigation, jobs}) => {
           contentContainerStyle={styles.listContainer}
         />
       </View>
-      <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('JobForm', {rootNavigation: navigation})}>
+      <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('JobForm')}>
         <Icon name='plus' type='material-community' size={30} color='white' />
       </TouchableOpacity>
     </>

@@ -60,7 +60,7 @@ const PF3Tags = ({navigation, route, rootNavigation, pet}) => {
     const fullPetInfo = {
       ...otherPetInfo,
       ownerId: userUID,
-      status: 'Available',
+      status: {status: 'Available', createdAt: database.ServerValue.TIMESTAMP},
       tags: selectedPersonalities.concat(selectedAppearances),
     };
 

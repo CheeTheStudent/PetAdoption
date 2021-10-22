@@ -6,7 +6,7 @@ import colours from '../../assets/colours';
 import {TextStyles} from '../../assets/styles';
 import {moderateScale, scale, verticalScale} from '../../assets/dimensions';
 
-const Tag = ({title, type, disabled, onSelected, onSingleSelected}) => {
+const Tag = ({title, type, disabled, onSelected, onSingleSelected, containerStyle, ...rest}) => {
   const [pressed, setPressed] = useState(false);
 
   const handleOnPress = ({target}) => {
@@ -48,10 +48,11 @@ const Tag = ({title, type, disabled, onSelected, onSingleSelected}) => {
       disabled={disabled}
       titleStyle={[TextStyles.h4, pressed ? styles.textPressed : textStyle(type)]}
       buttonStyle={[styles.button, pressed ? styles.buttonPressed : buttonStyle(type)]}
-      containerStyle={styles.container}
+      containerStyle={[styles.container, containerStyle]}
       disabledStyle={[styles.button, buttonStyle(type)]}
       disabledTitleStyle={textStyle(type)}
       onPress={handleOnPress}
+      {...rest}
     />
   );
 };

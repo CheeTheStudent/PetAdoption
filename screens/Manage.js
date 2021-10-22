@@ -4,6 +4,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 
+import MOverview from './manage screens/MOverview';
 import M1Pets from './manage screens/M1Pets';
 import M2Jobs from './manage screens/M2Jobs';
 import Loading from './components/Loading';
@@ -64,9 +65,10 @@ const Manage = ({navigation, route, defaultHeader}) => {
       ) : (
         <Tab.Navigator
           screenOptions={{
-            tabBarIndicatorStyle: {backgroundColor: 'black', width: SCREEN.WIDTH / 2 / 3, left: SCREEN.WIDTH / 2 / 3},
+            tabBarIndicatorStyle: {backgroundColor: 'black', width: SCREEN.WIDTH / 3 / 3, left: SCREEN.WIDTH / 3 / 3},
             tabBarStyle: {elevation: 0, borderBottomWidth: 1, borderBottomColor: colours.lightGray},
           }}>
+          <Tab.Screen name='Overview' children={props => <MOverview {...props} />} />
           <Tab.Screen name='Pets' children={props => <M1Pets pets={pets} setManageScreenNavigationOptions={setManageScreenNavigationOptions} {...props} />} />
           <Tab.Screen name='Jobs' children={props => <M2Jobs jobs={jobs} {...props} />} />
         </Tab.Navigator>

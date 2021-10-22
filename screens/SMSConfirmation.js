@@ -56,7 +56,7 @@ const SMSConfirmation = ({navigation, route}) => {
 
   return (
     <ScrollView style={styles.body}>
-      {loading && <ActivityIndicator size={50} color='blue' style={styles.loading} />}
+      <ActivityIndicator animating={loading} size={50} color='blue' style={styles.loading} />
       <View style={styles.container}>
         <Text style={TextStyles.h1}>Almost there!</Text>
         <Text style={TextStyles.h3}>Please enter the verification code sent to {phoneNumber}</Text>

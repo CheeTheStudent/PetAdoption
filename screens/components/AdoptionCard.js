@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import {View, Text, Image, TouchableWithoutFeedback, Animated, StyleSheet} from 'react-native';
+import {Icon} from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
 import Video from 'react-native-video';
 
 import Tag from '../components/Tag';
-import {CARD, ACTION_OFFSET, verticalScale, scale} from '../../assets/dimensions';
+import {CARD, ACTION_OFFSET, verticalScale, scale, moderateScale} from '../../assets/dimensions';
 import {TextStyles} from '../../assets/styles';
 import {useEffect} from 'react';
 import {useState} from 'react';
@@ -14,6 +15,18 @@ const AdoptionCard = ({navigation, pet, isFirst, swipe, tiltPoint, ...rest}) => 
   const rotate = Animated.multiply(swipe.x, tiltPoint).interpolate({
     inputRange: [-ACTION_OFFSET, 0, ACTION_OFFSET],
     outputRange: ['8deg', '0deg', '-8deg'],
+  });
+
+  const likeOpacity = swipe.x.interpolate({
+    inputRange: [10, ACTION_OFFSET],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
+
+  const dislikeOpacity = swipe.x.interpolate({
+    inputRange: [-ACTION_OFFSET, -10],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
   });
 
   const animatedCardStyle = {
@@ -47,6 +60,19 @@ const AdoptionCard = ({navigation, pet, isFirst, swipe, tiltPoint, ...rest}) => 
     });
   };
 
+  const renderChoice = useCallback(() => {
+    return (
+      <>
+        <Animated.View style={[styles.choiceContainer, styles.dislikeContainer, {opacity: dislikeOpacity}]}>
+          <Icon name='close' type='ionicon' size={moderateScale(40)} />
+        </Animated.View>
+        <Animated.View style={[styles.choiceContainer, styles.likeContainer, {opacity: likeOpacity}]}>
+          <Icon name='heart' type='ionicon' size={moderateScale(40)} />
+        </Animated.View>
+      </>
+    );
+  }, []);
+
   return (
     <Animated.View style={[styles.card, isFirst && animatedCardStyle]} {...rest}>
       {pet.media &&
@@ -62,6 +88,7 @@ const AdoptionCard = ({navigation, pet, isFirst, swipe, tiltPoint, ...rest}) => 
           <View style={styles.tagsContainer}>{pet.tags ? pet.tags.map(tag => <Tag key={tag} title={tag} type='white' disabled />) : <></>}</View>
         </View>
       </TouchableWithoutFeedback>
+      {isFirst ? renderChoice() : null}
     </Animated.View>
   );
 };
@@ -127,6 +154,21 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: 'white',
     borderRadius: 25,
+  },
+  choiceContainer: {
+    width: moderateScale(70),
+    aspectRatio: 1,
+    position: 'absolute',
+    top: CARD.HEIGHT * 0.1,
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    borderRadius: moderateScale(35),
+  },
+  likeContainer: {
+    left: CARD.WIDTH * 0.15,
+  },
+  dislikeContainer: {
+    right: CARD.WIDTH * 0.15,
   },
 });
 

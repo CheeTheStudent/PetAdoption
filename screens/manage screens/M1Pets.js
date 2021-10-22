@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
-import {View, FlatList, Text, TouchableOpacity, StyleSheet, ScrollView, ToastAndroid} from 'react-native';
+import {View, FlatList, Text, TouchableOpacity, StyleSheet, ScrollView, SectionList, ToastAndroid} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import {Icon, Button, Image} from 'react-native-elements';
 import Modal from 'react-native-modal';
+import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 
@@ -13,13 +14,17 @@ import colours from '../../assets/colours';
 import {useEffect} from 'react';
 
 const M1Pets = ({navigation, setManageScreenNavigationOptions, pets}) => {
+  const userUID = auth().currentUser.uid;
+  const userRef = database().ref(`users/${userUID}`);
   const petRef = database().ref('pets');
   const petStore = storage().ref('pets');
+
   const [isLongPress, setIsLongPress] = useState(false);
   const initialSwitches = new Array(pets.length).fill(false);
   const [switches, setSwitches] = useState(initialSwitches);
   const [selected, setSelected] = useState(0);
   const [modalPet, setModalPet] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const renderManageNavigationOptions = () => {
     setManageScreenNavigationOptions({
@@ -46,7 +51,6 @@ const M1Pets = ({navigation, setManageScreenNavigationOptions, pets}) => {
     if (setManageScreenNavigationOptions && !checker) {
       renderManageNavigationOptions();
     }
-    navigation.o;
   }, [selected]);
 
   const handleLongPress = index => {
@@ -90,15 +94,44 @@ const M1Pets = ({navigation, setManageScreenNavigationOptions, pets}) => {
     return ageLabel;
   };
 
+  const handleShowModal = pet => {
+    setModalPet(pet);
+    setShowModal(true);
+  };
+
   const handleViewPet = pet => {
     navigation.navigate('PetProfile', {pet});
   };
 
   const handleEditPet = pet => {
-    setModalPet(null);
+    setShowModal(false);
     setSwitches(initialSwitches);
     setSelected(0);
     navigation.navigate('PetForm', {root: navigation, pet});
+  };
+
+  const setToAdopted = pet => {
+    const newStatus = {status: 'Adopted', createdAt: database.ServerValue.TIMESTAMP};
+    petRef.child(`${pet.id}/status`).set(newStatus);
+    userRef.child('petsAdopted').once('value', snapshot => {
+      const currentAdopted = snapshot.val();
+      if (currentAdopted) {
+        userRef.child('petsAdopted').set(currentAdopted + 1);
+      } else userRef.child('petsAdopted').set(1);
+    });
+    setShowModal(false);
+  };
+
+  const setToAvailable = pet => {
+    const newStatus = {status: 'Available', createdAt: database.ServerValue.TIMESTAMP};
+    petRef.child(`${pet.id}/status`).set(newStatus);
+    userRef.child('petsAdopted').once('value', snapshot => {
+      const currentAdopted = snapshot.val();
+      if (currentAdopted) {
+        userRef.child('petsAdopted').set(currentAdopted - 1);
+      }
+    });
+    setShowModal(false);
   };
 
   const handleDeletePet = pets => {
@@ -110,24 +143,42 @@ const M1Pets = ({navigation, setManageScreenNavigationOptions, pets}) => {
       petRef.child(pet.id).remove();
     });
     ToastAndroid.show('Successfully deleted!', ToastAndroid.SHORT);
-    setModalPet(null);
+    setShowModal(false);
     setSwitches(initialSwitches);
     setSelected(0);
   };
 
   const renderPetModal = () => {
     return (
-      <Modal isVisible={Boolean(modalPet)} onBackdropPress={() => setModalPet(null)} backdropTransitionOutTiming={0}>
+      <Modal isVisible={showModal} onBackdropPress={() => setShowModal(false)} backdropTransitionOutTiming={0}>
         <View style={styles.modalContainer}>
           <Image source={modalPet?.media ? {uri: modalPet.media[0]} : require('../../assets/images/placeholder.png')} style={styles.modalImage} />
           <View style={styles.modalInfo}>
             <Text style={TextStyles.h3}>{modalPet?.name}</Text>
-            <Icon name='trash-can-outline' type='material-community' size={moderateScale(24)} color='red' onPress={() => handleDeletePet([modalPet])} />
+            <Icon name='trash-can-outline' type='material-community' size={moderateScale(24)} color={colours.darkGray} onPress={() => handleDeletePet([modalPet])} />
           </View>
           <LongRoundButton title='VIEW PROFILE' onPress={() => handleViewPet(modalPet)} buttonStyle={styles.modalButton} containerStyle={[Spacing.superSmallTopSpacing, styles.modalButton]} />
-          <LongRoundButton title='EDIT PROFILE' onPress={() => handleEditPet(modalPet)} buttonStyle={styles.modalButton} containerStyle={[Spacing.superSmallTopSpacing, styles.modalButton]} />
+          {modalPet?.status?.status !== 'Adopted' ? (
+            <>
+              <LongRoundButton title='EDIT PROFILE' onPress={() => handleEditPet(modalPet)} buttonStyle={styles.modalButton} containerStyle={[{marginTop: verticalScale(4)}, styles.modalButton]} />
+              <LongRoundButton title='SET TO ADOPTED' onPress={() => setToAdopted(modalPet)} buttonStyle={styles.modalButton} containerStyle={[{marginTop: verticalScale(4)}, styles.modalButton]} />
+            </>
+          ) : (
+            <LongRoundButton title='SET TO AVAILABLE' onPress={() => setToAvailable(modalPet)} buttonStyle={styles.modalButton} containerStyle={[{marginTop: verticalScale(4)}, styles.modalButton]} />
+          )}
         </View>
       </Modal>
+    );
+  };
+
+  const renderPetItem = (item, index) => {
+    return (
+      <TouchableOpacity onLongPress={() => handleLongPress(index)} onPress={() => (isLongPress ? handleSwitchToggle(index) : handleShowModal(item))}>
+        <Image source={item.media ? {uri: item.media[0]} : require('../../assets/images/placeholder.png')} style={styles.image} />
+        <Text style={[TextStyles.h4, Spacing.superSmallLeftSpacing, {marginTop: verticalScale(4)}]}>{item.name}</Text>
+        <Text style={[TextStyles.desc, Spacing.superSmallLeftSpacing]}>{calcPetAge(item.ageYear, item.ageMonth)}</Text>
+        {switches[index] && <View style={styles.whiteOverlay} />}
+      </TouchableOpacity>
     );
   };
 
@@ -135,17 +186,27 @@ const M1Pets = ({navigation, setManageScreenNavigationOptions, pets}) => {
     <View style={styles.body}>
       <FlatList
         numColumns={2}
-        data={pets}
-        renderItem={({item, index}) => (
-          <TouchableOpacity onLongPress={() => handleLongPress(index)} onPress={() => (isLongPress ? handleSwitchToggle(index) : setModalPet(item))}>
-            <Image source={item.media ? {uri: item.media[0]} : require('../../assets/images/placeholder.png')} style={styles.image} />
-            <Text style={[TextStyles.h4, Spacing.superSmallLeftSpacing, {marginTop: verticalScale(4)}]}>{item.name}</Text>
-            <Text style={[TextStyles.desc, Spacing.superSmallLeftSpacing]}>{calcPetAge(item.ageYear, item.ageMonth)}</Text>
-            {switches[index] && <View style={styles.whiteOverlay} />}
-          </TouchableOpacity>
-        )}
+        data={pets.filter(pet => pet.status.status === 'Available')}
+        renderItem={({item, index}) => renderPetItem(item, index)}
         columnWrapperStyle={styles.rowContainer}
         contentContainerStyle={styles.listContainer}
+        ListFooterComponent={
+          <>
+            {pets.filter(pet => pet.status.status === 'Adopted').length > 0 ? (
+              <>
+                {pets.filter(pet => pet.status.status === 'Available').length > 0 ? <View style={styles.horizontalLine} /> : null}
+                <Text style={[TextStyles.h3, Spacing.superSmallTopSpacing]}>Adopted</Text>
+              </>
+            ) : null}
+            <FlatList
+              numColumns={2}
+              data={pets.filter(pet => pet.status.status === 'Adopted')}
+              renderItem={({item, index}) => renderPetItem(item, index)}
+              columnWrapperStyle={styles.rowContainer}
+              contentContainerStyle={styles.listContainer}
+            />
+          </>
+        }
       />
       <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('PetForm', {root: navigation})}>
         <Icon name='plus' type='material-community' size={30} color='white' />
@@ -219,7 +280,12 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     width: scale(200),
-    height: verticalScale(36),
+    height: verticalScale(34),
+  },
+  horizontalLine: {
+    marginTop: verticalScale(16),
+    borderBottomWidth: 1,
+    borderBottomColor: colours.mediumGray,
   },
 });
 

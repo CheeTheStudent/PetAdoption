@@ -115,7 +115,7 @@ const Auth = ({navigation}) => {
 
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
-      {loading && <ActivityIndicator size={50} color='blue' style={styles.loading} />}
+      <ActivityIndicator animating={loading} size={50} color='blue' style={styles.loading} />
       <View style={{flex: 2}}>
         <AppIntroSlider keyExtractor={keyExtractor} renderItem={renderItem} showNextButton={false} dotStyle={styles.dotStyle} activeDotStyle={styles.activeDotStyle} data={data} />
       </View>

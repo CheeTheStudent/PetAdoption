@@ -1,6 +1,7 @@
 import React, {useLayoutEffect, useEffect, useState, useRef, useCallback} from 'react';
 import {View, Text, Button, ImageBackground, Image, StyleSheet, Animated, PanResponder, TouchableOpacity} from 'react-native';
 import {Icon, Badge, Avatar} from 'react-native-elements';
+import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 
 import AdoptionCard from './components/AdoptionCard';
@@ -13,6 +14,9 @@ import {Spacing, TextStyles} from '../assets/styles';
 const Home = ({navigation, route}) => {
   const swipeAway = route.params?.swipeAway;
 
+  const userUID = auth().currentUser.uid;
+  const userDataRef = database().ref(`userData/${userUID}`);
+  const petDataRef = database().ref(`petData`);
   const petRef = database().ref('pets');
   const [pets, setPets] = useState([]);
   const [queries, setQueries] = useState();
@@ -104,6 +108,7 @@ const Home = ({navigation, route}) => {
       const isActionActive = Math.abs(dx) > ACTION_OFFSET;
 
       if (isActionActive) {
+        saveChoice();
         swipeAnimation(direction, dy);
       } else {
         Animated.spring(swipe, {
@@ -134,6 +139,19 @@ const Home = ({navigation, route}) => {
     swipe.setValue({x: 0, y: 0});
   }, [swipe]);
 
+  const saveChoice = () => {
+    const swipeValue = parseInt(JSON.stringify(swipe.x));
+    if (swipeValue > 0) {
+      const likeInfo = {petId: pets[0].id, userId: userUID, liked: true, createdAt: database.ServerValue.TIMESTAMP};
+      userDataRef.push(likeInfo);
+      petDataRef.child(`${pets[0].ownerId}`).push(likeInfo);
+    } else {
+      const dislikeInfo = {petId: pets[0].id, userId: userUID, liked: false, createdAt: database.ServerValue.TIMESTAMP};
+      userDataRef.push(dislikeInfo);
+      petDataRef.child(`${pets[0].ownerId}`).push(dislikeInfo);
+    }
+  };
+
   const handleOpenFilter = () => {
     navigation.navigate('FilterModal', {
       setQueries: setQueries,
@@ -163,9 +181,9 @@ const Home = ({navigation, route}) => {
             })
             .reverse()}
           <View style={styles.iconButtonsContainer}>
-            <ActionButton name='thumb-down' onPress={() => swipeAnimation(-1, 100)} />
+            <ActionButton name='close' onPress={() => swipeAnimation(-1, 100)} />
             <ActionButton name='chevron-down' containerStyle={{top: CARD.HEIGHT * 0.02}} onPress={handleOpenProfile} />
-            <ActionButton name='thumb-up' onPress={() => swipeAnimation(1, 100)} />
+            <ActionButton name='heart' onPress={() => swipeAnimation(1, 100)} />
           </View>
         </>
       ) : (

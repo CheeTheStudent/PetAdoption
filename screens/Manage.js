@@ -65,7 +65,7 @@ const Manage = ({navigation, route, defaultHeader}) => {
       ) : (
         <Tab.Navigator
           screenOptions={{
-            tabBarIndicatorStyle: {backgroundColor: 'black', width: SCREEN.WIDTH / 3 / 3, left: SCREEN.WIDTH / 3 / 3},
+            tabBarIndicatorStyle: {backgroundColor: 'black', width: (SCREEN.WIDTH / 3) * 0.7, left: (SCREEN.WIDTH / 3) * 0.15},
             tabBarStyle: {elevation: 0, borderBottomWidth: 1, borderBottomColor: colours.lightGray},
           }}>
           <Tab.Screen name='Overview' children={props => <MOverview {...props} />} />

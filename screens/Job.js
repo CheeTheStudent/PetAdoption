@@ -66,7 +66,7 @@ const Job = ({navigation, route}) => {
       <ScrollView>
         <Image source={{uri: image}} style={styles.image} />
         <TouchableOpacity style={styles.fab} onPress={handleGoBack}>
-          <Icon name='arrow-back' type='material' size={moderateScale(24)} color='black' />
+          <Icon name='arrow-back' type='ionicon' size={moderateScale(24)} color='white' />
         </TouchableOpacity>
         <View style={styles.container}>
           <View style={styles.titleContainer}>
@@ -147,15 +147,14 @@ const styles = StyleSheet.create({
     width: SCREEN.WIDTH,
   },
   fab: {
-    width: verticalScale(40),
-    height: verticalScale(40),
-    borderRadius: verticalScale(20),
-    backgroundColor: 'white',
-    justifyContent: 'center',
+    width: verticalScale(32),
+    aspectRatio: 1,
     position: 'absolute',
     top: verticalScale(16),
     left: scale(16),
-    elevation: 10,
+    justifyContent: 'center',
+    borderRadius: verticalScale(16),
+    backgroundColor: colours.blackTransparent,
   },
   container: {
     paddingVertical: verticalScale(16),

@@ -14,7 +14,9 @@ const OneSignalNotif = () => {
   };
 
   // Put on logout method
-  const removeUserNotificationId = () => {};
+  const removeUserNotificationId = () => {
+    OneSignal.removeExternalUserId();
+  };
 
   const onForegroundListener = () => {
     OneSignal.setNotificationWillShowInForegroundHandler(notificationReceivedEvent => {

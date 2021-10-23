@@ -41,7 +41,7 @@ const PostCard = ({post, onLike, onOpenPost, onBookmark, disabled, style}) => {
           <Text style={TextStyles.h4}>{user.name}</Text>
           {location ? <Text style={TextStyles.desc}>{location.name}</Text> : null}
         </View>
-        <Icon name='ellipsis-vertical' size={moderateScale(24)} color={colours.darkGray} style={{marginLeft: 'auto'}} />
+        <Icon name='ellipsis-vertical' size={moderateScale(20)} color={colours.darkGray} style={{marginLeft: 'auto'}} />
       </View>
       <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>{caption}</Text>
       {media && mediaType === 'image' ? (

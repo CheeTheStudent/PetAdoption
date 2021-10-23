@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingHorizontal: scale(16),
+    paddingTop: verticalScale(8),
     paddingBottom: verticalScale(16),
   },
 });

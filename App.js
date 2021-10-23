@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import OneSignalNotif from './utils/OneSignalNotif';
 
 import {navigationRef} from './utils/RootNavigation';
+import DrawerNavigation from './screens/DrawerNavigation';
 import AuthScreen from './screens/Auth';
 import AppNavigation from './screens/AppNavigation';
 import LoginScreen from './screens/Login';
@@ -90,10 +91,11 @@ const App = () => {
               <Stack.Screen name='Onboarding' component={OnboardingScreen} />
             ) : (
               <>
-                <Stack.Screen name='AppNavigation' component={AppNavigation} />
+                <Stack.Screen name='DrawerNavigation' component={DrawerNavigation} />
+                {/* <Stack.Screen name='AppNavigation' component={AppNavigation} /> */}
                 <Stack.Screen name='PetProfile' component={PetProfileScreen} />
                 <Stack.Screen name='Job' component={JobScreen} />
-                <Stack.Screen name='OwnerProfile' component={OwnerProfileScreen} options={{headerShown: true}} />
+                <Stack.Screen name='OwnerProfile' component={OwnerProfileScreen} />
                 <Stack.Screen name='PetForm' component={PetFormScreen} options={{headerShown: true}} />
                 <Stack.Screen name='JobForm' component={JobFormScreen} options={{headerShown: true}} />
                 <Stack.Screen name='Post' component={PostScreen} options={{headerShown: true}} />

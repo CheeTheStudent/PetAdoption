@@ -49,7 +49,7 @@ const GalleryView = ({navigation, route}) => {
         )}
       />
       <TouchableOpacity onPress={goBack} style={styles.fab}>
-        <Icon name='arrow-left' type='material-community' size={25} color='black' />
+        <Icon name='arrow-back' type='ionicon' size={24} color='white' />
       </TouchableOpacity>
     </View>
   );
@@ -71,15 +71,14 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   fab: {
-    width: verticalScale(40),
-    height: verticalScale(40),
-    borderRadius: verticalScale(25),
-    backgroundColor: colours.white,
-    justifyContent: 'center',
+    width: verticalScale(32),
+    aspectRatio: 1,
     position: 'absolute',
     top: verticalScale(16),
     left: scale(16),
-    elevation: 30,
+    justifyContent: 'center',
+    borderRadius: verticalScale(16),
+    backgroundColor: colours.blackTransparent,
   },
 });
 

@@ -15,15 +15,15 @@ import {Spacing, TextStyles} from '../assets/styles';
 import {moderateScale} from '../assets/dimensions';
 import Loading from './components/Loading';
 
-const AppNavigation = ({navigation}) => {
-  const [user, setUser] = useState();
+const AppNavigation = ({navigation, user}) => {
+  // const [user, setUser] = useState();
   const Tab = createBottomTabNavigator();
 
   useEffect(async () => {
-    const user = await AsyncStorage.getItem('user');
-    const parsedUser = JSON.parse(user);
-    setUser(parsedUser);
-    if (parsedUser.verified === undefined) navigation.navigate('Permissions'); // Checks if it's user first-time login
+    // const user = await AsyncStorage.getItem('user');
+    // const parsedUser = JSON.parse(user);
+    // setUser(parsedUser);
+    if (user.verified === undefined) navigation.navigate('Permissions'); // Checks if it's user first-time login
   }, []);
 
   const defaultHeader = {
@@ -33,6 +33,7 @@ const AppNavigation = ({navigation}) => {
         rounded
         size={moderateScale(32)}
         containerStyle={Spacing.smallLeftSpacing}
+        onPress={() => navigation.openDrawer()}
         source={
           user.profilePic
             ? {
@@ -44,8 +45,6 @@ const AppNavigation = ({navigation}) => {
     ),
     headerTitle: {},
   };
-
-  if (!user) return <Loading />;
 
   return (
     <Tab.Navigator

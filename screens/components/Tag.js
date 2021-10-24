@@ -7,9 +7,13 @@ import {TextStyles} from '../../assets/styles';
 import {moderateScale, scale, verticalScale} from '../../assets/dimensions';
 
 const Tag = ({title, type, disabled, onSelected, onSingleSelected, containerStyle, ...rest}) => {
-  const [pressed, setPressed] = useState(false);
+  const [pressed, setPressed] = useState(null);
 
-  const handleOnPress = ({target}) => {
+  if ((type === 'black') != pressed) {
+    setPressed(type === 'black');
+  }
+
+  const handleOnPress = () => {
     if (onSelected) {
       setPressed(!pressed);
       onSelected(title, !pressed);

@@ -19,6 +19,7 @@ import OnboardingScreen from './screens/Onboarding';
 import PetProfileScreen from './screens/PetProfile';
 import JobScreen from './screens/Job';
 import OwnerProfileScreen from './screens/OwnerProfile';
+import ProfileFormScreen from './screens/ProfileForm';
 import PetFormScreen from './screens/PetForm';
 import JobFormScreen from './screens/JobForm';
 import PostScreen from './screens/Post';
@@ -96,6 +97,7 @@ const App = () => {
                 <Stack.Screen name='PetProfile' component={PetProfileScreen} />
                 <Stack.Screen name='Job' component={JobScreen} />
                 <Stack.Screen name='OwnerProfile' component={OwnerProfileScreen} />
+                <Stack.Screen name='ProfileForm' component={ProfileFormScreen} />
                 <Stack.Screen name='PetForm' component={PetFormScreen} options={{headerShown: true}} />
                 <Stack.Screen name='JobForm' component={JobFormScreen} options={{headerShown: true}} />
                 <Stack.Screen name='Post' component={PostScreen} options={{headerShown: true}} />

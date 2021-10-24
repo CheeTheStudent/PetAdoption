@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {ScrollView, View, Text, StyleSheet} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Input, Slider} from 'react-native-elements';
@@ -26,18 +26,34 @@ const ageGroups = [
   {label: '55 - 64 years old', value: '55-64'},
   {label: '> 65 years old ', value: 'mt65'},
 ];
-const OB5Screening = ({navigation}) => {
+const OB5Screening = ({navigation, user, onSave}) => {
   const userUID = auth().currentUser.uid;
   const userRef = database().ref(`/users/${userUID}`);
 
-  const [name, setName] = useState('');
-  const [ageGroup, setAgeGroup] = useState('lt18');
+  const [name, setName] = useState(user ? user.name : '');
+  const [ageGroup, setAgeGroup] = useState(user ? user.screening.age : 'lt18');
   const [selectedlivingConditions, setSelectedLivingConditions] = useState([]);
   const [statuses, setStatuses] = useState([]);
-  const [numOfPets, setNumOfPets] = useState(0);
-  const [vaccinated, setVaccinated] = useState(false);
-  const [spayed, setSpayed] = useState(false);
-  const [desc, setDesc] = useState('');
+  const [numOfPets, setNumOfPets] = useState(user ? user.screening.numOfPetsOwned : 0);
+  const [vaccinated, setVaccinated] = useState(user ? user.screening.petsVaccinated : false);
+  const [spayed, setSpayed] = useState(user ? user.screening.petsSpayed : false);
+  const [desc, setDesc] = useState(user ? user.screening.description : '');
+
+  useEffect(() => {
+    if (user) {
+      let prevLivingConditions = [];
+      let prevStatuses = [];
+
+      user.screening.livingCondition.map(tag => {
+        livingConditions.map(el => (el === tag ? prevLivingConditions.push(tag) : null));
+      });
+      user.screening.status.map(tag => {
+        status.map(el => (el === tag ? prevStatuses.push(tag) : null));
+      });
+      setSelectedLivingConditions(prevLivingConditions);
+      setStatuses(prevStatuses);
+    }
+  }, []);
 
   const handleLivingCondition = (value, include) => {
     if (include) {
@@ -70,10 +86,13 @@ const OB5Screening = ({navigation}) => {
     const newInfo = {
       name: name,
     };
-    const prevArr = await AsyncStorage.getItem('onboardUser');
-    const user = {...newInfo, ...JSON.parse(prevArr)};
+    if (user) return onSave({name, screening});
+    else {
+      const prevArr = await AsyncStorage.getItem('onboardUser');
+      const user = {...newInfo, ...JSON.parse(prevArr)};
 
-    userRef.set({...user, screening});
+      userRef.set({...user, screening});
+    }
   };
 
   const handleSkip = async () => {
@@ -88,14 +107,18 @@ const OB5Screening = ({navigation}) => {
   return (
     <View style={styles.body}>
       <ScrollView style={styles.container}>
-        <Text style={[TextStyles.h1, Spacing.bigTopSpacing]}>Tell us about yourself</Text>
-        <Text style={TextStyles.h3}>A complete profile will allow you to make a better impression!</Text>
+        {!user ? (
+          <>
+            <Text style={[TextStyles.h1, Spacing.bigTopSpacing]}>Tell us about yourself</Text>
+            <Text style={TextStyles.h3}>A complete profile will allow you to make a better impression!</Text>
+          </>
+        ) : null}
         <Text style={[TextStyles.h3, Spacing.mediumTopSpacing]}>
           Name
           <Text style={{color: 'red'}}> *</Text>
         </Text>
         <Text style={TextStyles.desc}>This will be shown on your profile.</Text>
-        <Textinput placeholder='Eg. Joan Arc' onChangeText={name => setName(name)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
+        <Textinput placeholder='Eg. Joan Arc' value={name} onChangeText={name => setName(name)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Age</Text>
         <View style={styles.pickerContainer}>
           <Picker selectedValue={ageGroup} onValueChange={(value, index) => setAgeGroup(value)}>
@@ -107,14 +130,14 @@ const OB5Screening = ({navigation}) => {
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Living Condition</Text>
         <View style={styles.tagsContainer}>
           {livingConditions.map(type => {
-            return <Tag title={type} onSelected={handleLivingCondition} />;
+            return <Tag title={type} type={selectedlivingConditions.indexOf(type) >= 0 && 'black'} onSelected={handleLivingCondition} />;
           })}
         </View>
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Status</Text>
         <Text style={TextStyles.desc}>Choose the roles relevant to you.</Text>
         <View style={styles.tagsContainer}>
           {status.map(type => {
-            return <Tag title={type} onSelected={handleStatus} />;
+            return <Tag title={type} type={statuses.indexOf(type) >= 0 && 'black'} onSelected={handleStatus} />;
           })}
         </View>
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Number of Pets</Text>
@@ -159,12 +182,14 @@ const OB5Screening = ({navigation}) => {
         </View>
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Short Description</Text>
         <Text style={TextStyles.desc}>Tell us a bit more about yourself. Your experience with animals, your passion, anything!</Text>
-        <MultiLineInput numberOfLines={5} onChangeText={desc => setDesc(desc)} containerStyle={Spacing.smallTopSpacing} />
+        <MultiLineInput numberOfLines={5} defaultValue={desc} onChangeText={desc => setDesc(desc)} containerStyle={Spacing.smallTopSpacing} />
         <View style={styles.bottomContainer}>
-          <Text onPress={handleSkip} style={styles.skipText}>
-            SKIP
-          </Text>
-          <LongRoundButton title='CONTINUE' disabled={!name} onPress={handleSubmit} />
+          {
+            <Text onPress={handleSkip} style={styles.skipText}>
+              {user ? 'CANCEL' : 'SKIP'}
+            </Text>
+          }
+          <LongRoundButton title={user ? 'SAVE' : 'CONTINUE'} disabled={!name} onPress={handleSubmit} />
         </View>
       </ScrollView>
     </View>

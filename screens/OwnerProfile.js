@@ -11,22 +11,26 @@ import FirebaseMessage from '../utils/FirebaseMessage';
 import O1HomeScreen from './owner screens/O1Home';
 import O2PetsScreen from './owner screens/O2Pets';
 import O3JobsScreen from './owner screens/O3Jobs';
+import O4Screening from './owner screens/O4Screening';
 import Loading from './components/Loading';
 import {SCREEN, verticalScale, scale, moderateScale} from '../assets/dimensions';
 import {TextStyles, Spacing} from '../assets/styles';
 import colours from '../assets/colours';
 
 const OwnerProfile = ({navigation, route}) => {
-  const {ownerId} = route.params;
+  const {ownerId} = route.params || {};
   const userUID = auth().currentUser.uid;
+  const profileId = ownerId ? ownerId : userUID;
   const firebaseMessage = FirebaseMessage();
 
-  const userRef = database().ref(`users/${ownerId}`);
+  const userRef = database().ref(`users/${userUID}`);
+  const profileRef = database().ref(`users/${profileId}`);
   const petRef = database().ref(`pets`);
   const jobRef = database().ref(`jobs`);
   const postRef = database().ref(`posts`);
   const [user, setUser] = useState();
-  const [owner, setOwner] = useState();
+  const [profile, setProfile] = useState();
+  const [isOwner, setIsOwner] = useState();
   const [pets, setPets] = useState();
   const [jobs, setJobs] = useState();
   const [posts, setPosts] = useState();
@@ -38,21 +42,22 @@ const OwnerProfile = ({navigation, route}) => {
 
   const Tab = createCollapsibleNavigator();
 
-  useEffect(() => {
-    AsyncStorage.getItem('user').then(userData => {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
+  useEffect(async () => {
+    userRef.on('value', snapshot => {
+      const userData = snapshot.val() ? snapshot.val() : {};
+      setUser({id: snapshot.key, ...userData});
     });
 
-    userRef.on('value', snapshot => {
-      const data = snapshot.val() ? snapshot.val() : {};
-      setOwner({id: snapshot.key, ...data});
-      setLoading(false);
-    });
+    const snapshot = await profileRef.once('value');
+    const profileData = snapshot.val() ? snapshot.val() : {};
+    setProfile({id: snapshot.key, ...profileData});
+    if (profileData.role === 'Shelter' || profileData.role === 'Rescuer') setIsOwner(true);
+    else setIsOwner(false);
+    setLoading(false);
 
     postRef
       .orderByChild('user/id')
-      .equalTo(ownerId)
+      .equalTo(profileId)
       .on('value', snapshot => {
         const data = snapshot.val() ? snapshot.val() : {};
         let postData = [];
@@ -61,27 +66,32 @@ const OwnerProfile = ({navigation, route}) => {
         setPostLoading(false);
       });
 
-    petRef
-      .orderByChild('ownerId')
-      .equalTo(ownerId)
-      .on('value', snapshot => {
-        const data = snapshot.val() ? snapshot.val() : {};
-        let petData = [];
-        Object.entries(data).map(value => petData.push({id: value[0], ...value[1]}));
-        setPets(petData);
-        setPetLoading(false);
-      });
+    if (profileData.role === 'Shelter' || profileData.role === 'Rescuer') {
+      petRef
+        .orderByChild('ownerId')
+        .equalTo(profileId)
+        .on('value', snapshot => {
+          const data = snapshot.val() ? snapshot.val() : {};
+          let petData = [];
+          Object.entries(data).map(value => petData.push({id: value[0], ...value[1]}));
+          setPets(petData);
+          setPetLoading(false);
+        });
 
-    jobRef
-      .orderByChild('ownerId')
-      .equalTo(ownerId)
-      .on('value', snapshot => {
-        const data = snapshot.val() ? snapshot.val() : {};
-        let jobData = [];
-        Object.entries(data).map(value => jobData.push({id: value[0], ...value[1]}));
-        setJobs(jobData);
-        setJobLoading(false);
-      });
+      jobRef
+        .orderByChild('ownerId')
+        .equalTo(profileId)
+        .on('value', snapshot => {
+          const data = snapshot.val() ? snapshot.val() : {};
+          let jobData = [];
+          Object.entries(data).map(value => jobData.push({id: value[0], ...value[1]}));
+          setJobs(jobData);
+          setJobLoading(false);
+        });
+    } else {
+      setPetLoading(false);
+      setJobLoading(false);
+    }
 
     return () => {
       userRef.off();
@@ -89,6 +99,15 @@ const OwnerProfile = ({navigation, route}) => {
       jobRef.off();
       postRef.off();
     };
+  }, []);
+
+  useEffect(() => {
+    profileRef.on('value', snapshot => {
+      const profileData = snapshot.val() ? snapshot.val() : {};
+      setProfile({id: snapshot.key, ...profileData});
+    });
+
+    return () => userRef.off();
   }, []);
 
   if (loading || petLoading || jobLoading || postLoading) return <Loading type='paw' />;
@@ -105,70 +124,88 @@ const OwnerProfile = ({navigation, route}) => {
   const handleSendMessage = async () => {
     const convoInfo = {
       sender: {id: userUID, name: user.name, image: user.profilePic},
-      receiver: {id: ownerId, name: owner.name, image: owner.profilePic},
-      requestAccepted: owner.private ? false : true,
+      receiver: {id: profileId, name: profile.name, image: profile.profilePic},
+      requestAccepted: profile.private ? false : true,
     };
     const convoId = await firebaseMessage.createConvo(convoInfo);
     navigation.navigate('Chat', {convo: {id: convoId, ...convoInfo}});
+  };
+
+  const handleEditProfile = () => {
+    navigation.navigate('ProfileForm', {user: profile});
   };
 
   const renderHeader = () => {
     return (
       <View style={styles.header}>
         <View style={styles.profileTop}>
-          <Image source={require('../assets/images/banner.png')} style={styles.banner} />
-          <Avatar rounded size={moderateScale(75)} source={owner.profilePic ? {uri: owner.profilePic} : require('../assets/images/placeholder.png')} containerStyle={styles.profilePicture} />
-          <Button title='Message' onPress={handleSendMessage} buttonStyle={styles.profileButton} titleStyle={styles.profileButtonText} containerStyle={styles.profileButtonContainer} />
+          <Image source={profile.banner ? {uri: profile.banner} : require('../assets/images/banner.png')} style={styles.banner} />
+          <Avatar rounded size={moderateScale(75)} source={profile.profilePic ? {uri: profile.profilePic} : require('../assets/images/placeholder.png')} containerStyle={styles.profilePicture} />
+          <Button
+            title={ownerId ? 'Message' : 'Edit Profile'}
+            onPress={ownerId ? handleSendMessage : handleEditProfile}
+            buttonStyle={styles.profileButton}
+            titleStyle={styles.profileButtonText}
+            containerStyle={styles.profileButtonContainer}
+          />
         </View>
         <View style={styles.profileInfo}>
-          <Text style={[TextStyles.h2, Spacing.superSmallTopSpacing]}>{owner.name}</Text>
-          {owner.location ? (
-            <Text numberOfLines={1} onPress={() => openMaps(owner.location.latitude, owner.location.longitude)} style={TextStyles.desc}>
+          <Text style={[TextStyles.h2, Spacing.superSmallTopSpacing]}>{profile.name}</Text>
+          {profile.location ? (
+            <Text numberOfLines={1} onPress={() => openMaps(profile.location.latitude, profile.location.longitude)} style={TextStyles.desc}>
               <Icon name='location-sharp' type='ionicon' size={moderateScale(12)} />
-              {owner.location.address}
+              {profile.location.address}
             </Text>
           ) : (
-            <Text style={styles.lightText}>{owner.role}</Text>
+            <Text style={styles.lightText}>{profile.role}</Text>
           )}
-          {owner.description ? (
+          {profile.description || profile.screening.description ? (
             <Text numberOfLines={3} style={[Spacing.superSmallTopSpacing]}>
-              {owner.description}
+              {profile.description || profile.screening.description}
             </Text>
           ) : null}
-          <View style={[styles.rowContainer, Spacing.superSmallTopSpacing]}>
-            <Text style={styles.lightText}>
-              <Text style={styles.darkText}>{pets.length - owner.petsAdopted}</Text> For Adoption
-            </Text>
-            <Text style={[styles.lightText, Spacing.smallLeftSpacing, {flex: 1}]}>
-              <Text style={styles.darkText}>{owner.petsAdopted}</Text> Successfully Adopted
-            </Text>
-            <Icon name={showContact ? 'chevron-up' : 'chevron-down'} type='ionicon' size={moderateScale(16)} onPress={() => setShowContact(prev => !prev)} />
-          </View>
+          {isOwner ? (
+            <View style={[styles.rowContainer, Spacing.superSmallTopSpacing]}>
+              <Text style={styles.lightText}>
+                <Text style={styles.darkText}>{pets.length - profile.petsAdopted}</Text> For Adoption
+              </Text>
+              <Text style={[styles.lightText, Spacing.smallLeftSpacing, {flex: 1}]}>
+                <Text style={styles.darkText}>{profile.petsAdopted}</Text> Successfully Adopted
+              </Text>
+              <Icon name={showContact ? 'chevron-up' : 'chevron-down'} type='ionicon' size={moderateScale(16)} onPress={() => setShowContact(prev => !prev)} />
+            </View>
+          ) : null}
           {showContact ? (
             <>
               <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>Contact Us</Text>
-              {owner.phoneNum ? (
+              {profile.phoneNum ? (
                 <View style={styles.contactRow}>
                   <Icon name='call' type='ionicon' size={moderateScale(20)} style={Spacing.superSmallRightSpacing} />
-                  <Text style={TextStyles.desc}>{owner.phoneNum}</Text>
+                  <Text style={TextStyles.desc}>{profile.phoneNum}</Text>
                 </View>
               ) : null}
-              {owner.email ? (
+              {profile.email ? (
                 <View style={styles.contactRow}>
                   <Icon name='mail' type='ionicon' size={moderateScale(20)} style={Spacing.superSmallRightSpacing} />
-                  <Text style={TextStyles.desc}>{owner.email}</Text>
+                  <Text style={TextStyles.desc}>{profile.email}</Text>
                 </View>
               ) : null}
-              {owner.facebookId ? (
+              {profile.facebookId ? (
                 <View style={styles.contactRow}>
                   <Icon name='logo-facebook' type='ionicon' size={moderateScale(20)} style={Spacing.superSmallRightSpacing} />
-                  <Text style={TextStyles.desc}>{owner.facebookId}</Text>
+                  <Text style={TextStyles.desc}>{profile.facebookId}</Text>
                 </View>
               ) : null}
-              {owner.twitterId ? (
+              {profile.twitterId ? (
                 <View style={styles.contactRow}>
                   <Icon name='logo-twitter' type='ionicon' size={moderateScale(20)} style={Spacing.superSmallRightSpacing} />
-                  <Text style={TextStyles.desc}>{owner.twitterId}</Text>
+                  <Text style={TextStyles.desc}>{profile.twitterId}</Text>
+                </View>
+              ) : null}
+              {profile.instaId ? (
+                <View style={styles.contactRow}>
+                  <Icon name='logo-instagram' type='ionicon' size={moderateScale(20)} style={Spacing.superSmallRightSpacing} />
+                  <Text style={TextStyles.desc}>{profile.instaId}</Text>
                 </View>
               ) : null}
             </>
@@ -187,18 +224,27 @@ const OwnerProfile = ({navigation, route}) => {
         collapsibleOptions={{
           headerHeight: SCREEN.HEIGHT * 0.42,
           headerContainerStyle: {elevation: 0},
-          renderTabBar: props => (
-            <MaterialTabBar
-              indicatorStyle={{backgroundColor: 'black', width: (SCREEN.WIDTH / 3) * 0.7, left: (SCREEN.WIDTH / 3) * 0.15}}
-              tabStyle={{elevation: 0, borderBottomWidth: 1, borderBottomColor: colours.lightGray}}
-              {...props}
-            />
-          ),
+          renderTabBar: props => {
+            const numOfTabs = isOwner ? 3 : 2;
+            return (
+              <MaterialTabBar
+                indicatorStyle={{backgroundColor: 'black', width: (SCREEN.WIDTH / numOfTabs) * 0.7, left: (SCREEN.WIDTH / numOfTabs) * 0.15}}
+                tabStyle={{elevation: 0, borderBottomWidth: 1, borderBottomColor: colours.lightGray}}
+                {...props}
+              />
+            );
+          },
           renderHeader,
         }}>
         <Tab.Screen name='Home' children={props => <O1HomeScreen posts={posts} {...props} />} />
-        <Tab.Screen name='Pets' children={props => <O2PetsScreen pets={pets} {...props} />} />
-        <Tab.Screen name='Jobs' children={props => <O3JobsScreen jobs={jobs} {...props} />} />
+        {isOwner ? (
+          <>
+            <Tab.Screen name='Pets' children={props => <O2PetsScreen pets={pets} {...props} />} />
+            <Tab.Screen name='Jobs' children={props => <O3JobsScreen jobs={jobs} {...props} />} />
+          </>
+        ) : (
+          <Tab.Screen name='Screening' children={props => <O4Screening user={profile} {...props} />} />
+        )}
       </Tab.Navigator>
     </>
   );

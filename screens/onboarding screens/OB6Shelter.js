@@ -14,19 +14,19 @@ import {scale, verticalScale, moderateScale} from '../../assets/dimensions';
 import {TextStyles, Spacing} from '../../assets/styles';
 import colours from '../../assets/colours';
 
-const OB6Shelter = ({navigation}) => {
+const OB6Shelter = ({navigation, user, onSave}) => {
   const userUID = auth().currentUser.uid;
   const userRef = database().ref(`/users/${userUID}`);
 
-  const [name, setName] = useState('');
-  const [desc, setDesc] = useState('');
-  const [location, setLocation] = useState();
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [email, setEmail] = useState('');
-  const [facebook, setFacebook] = useState('');
-  const [twitter, setTwitter] = useState('');
-  const [insta, setInsta] = useState('');
-  const [isPrivate, setIsPrivate] = useState(false);
+  const [name, setName] = useState(user ? user.name : '');
+  const [desc, setDesc] = useState(user ? user.description : '');
+  const [location, setLocation] = useState(user ? user.location : null);
+  const [phoneNumber, setPhoneNumber] = useState(user ? user.phoneNumber : '');
+  const [email, setEmail] = useState(user ? user.email : '');
+  const [facebook, setFacebook] = useState(user ? user.facebookId : '');
+  const [twitter, setTwitter] = useState(user ? user.twitterId : '');
+  const [insta, setInsta] = useState(user ? user.instaId : '');
+  const [isPrivate, setIsPrivate] = useState(user ? user.private : false);
 
   const handleGetLocation = location => {
     setLocation(location);
@@ -44,26 +44,33 @@ const OB6Shelter = ({navigation}) => {
       private: isPrivate,
       description: desc,
     };
-    const prevArr = await AsyncStorage.getItem('onboardUser');
-    const user = {...shelter, ...JSON.parse(prevArr)};
+    if (user) return onSave(shelter);
+    else {
+      const prevArr = await AsyncStorage.getItem('onboardUser');
+      const user = {...shelter, ...JSON.parse(prevArr)};
 
-    userRef.set(user);
+      userRef.set(user);
+    }
   };
 
   return (
     <View style={styles.body}>
       <ScrollView style={styles.container}>
-        <Text style={[TextStyles.h1, Spacing.bigTopSpacing]}>Tell us about your Organization</Text>
-        <Text style={TextStyles.h3}>Let adopters know more about who you are and what you do!</Text>
+        {!user ? (
+          <>
+            <Text style={[TextStyles.h1, Spacing.bigTopSpacing]}>Tell us about your Organization</Text>
+            <Text style={TextStyles.h3}>Let adopters know more about who you are and what you do!</Text>
+          </>
+        ) : null}
         <Text style={[TextStyles.h3, Spacing.mediumTopSpacing]}>
           Shelter/Organization Name
           <Text style={{color: 'red'}}> *</Text>
         </Text>
         <Text style={TextStyles.desc}>This will be shown on your profile.</Text>
-        <Textinput placeholder='Eg. Animal Rescue Association' onChangeText={name => setName(name)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
+        <Textinput placeholder='Eg. Animal Rescue Association' defaultValue={name} onChangeText={name => setName(name)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>About The Organization</Text>
         <Text style={TextStyles.desc}>Describe the shelter’s history, purpose, visions and even achievements!</Text>
-        <MultiLineInput numberOfLines={5} onChangeText={desc => setDesc(desc)} containerStyle={Spacing.smallTopSpacing} />
+        <MultiLineInput numberOfLines={5} defaultValue={desc} onChangeText={desc => setDesc(desc)} containerStyle={Spacing.smallTopSpacing} />
 
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Address</Text>
         <SquareButton
@@ -76,15 +83,22 @@ const OB6Shelter = ({navigation}) => {
         />
 
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Contact Number</Text>
-        <Textinput placeholder='Eg. 01x-xxxxxxxx' onChangeText={value => setPhoneNumber(value)} keyboardType='numeric' containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
+        <Textinput
+          placeholder='Eg. 01x-xxxxxxxx'
+          defaultValue={phoneNumber}
+          onChangeText={value => setPhoneNumber(value)}
+          keyboardType='numeric'
+          containerStyle={Spacing.superSmallTopSpacing}
+          renderErrorMessage={false}
+        />
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Contact Email</Text>
-        <Textinput placeholder='Eg. association@email.com' onChangeText={value => setEmail(value)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
+        <Textinput placeholder='Eg. association@email.com' defaultValue={email} onChangeText={value => setEmail(value)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Facebook Page</Text>
-        <Textinput placeholder='Username' onChangeText={value => setFacebook(value)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
+        <Textinput placeholder='Username' defaultValue={facebook} onChangeText={value => setFacebook(value)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Twitter Profile</Text>
-        <Textinput placeholder='@twitter_handle' onChangeText={value => setTwitter(value)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
+        <Textinput placeholder='@twitter_handle' defaultValue={twitter} onChangeText={value => setTwitter(value)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Instagram Page</Text>
-        <Textinput placeholder='@insta_page' onChangeText={value => setInsta(value)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
+        <Textinput placeholder='@insta_page' defaultValue={insta} onChangeText={value => setInsta(value)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
 
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Set to Private</Text>
         <View style={styles.rowContainer}>

@@ -70,7 +70,7 @@ const PF3Tags = ({navigation, route, rootNavigation, pet}) => {
       await petRef.child(petKey).update(fullPetInfo);
 
       const existingMedia = await storage().ref(`/pets/${petKey}`).listAll();
-      if (existingMedia.items > 0) {
+      if (existingMedia.items.length > 0) {
         existingMedia.items.map(async em => {
           const dwurl = await em.getDownloadURL();
           if (media.indexOf(dwurl) < 0) {

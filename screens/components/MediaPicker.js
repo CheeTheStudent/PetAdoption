@@ -10,7 +10,7 @@ import {scale, verticalScale, moderateScale} from '../../assets/dimensions';
 import {Spacing} from '../../assets/styles';
 import colours from '../../assets/colours';
 
-const MediaPicker = ({singleMedia, imageOnly, profilePicture, buttons, setChosenMedia, style}) => {
+const MediaPicker = ({singleMedia, imageOnly, profilePicture, profilePictureSize, buttons, setChosenMedia, style}) => {
   const READ_PERMISSION = PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
 
   const [hasPermission, setHasPermission] = useState(false);
@@ -54,33 +54,37 @@ const MediaPicker = ({singleMedia, imageOnly, profilePicture, buttons, setChosen
   }, [hasPermission]);
 
   const handleTakePhoto = () => {
-    setModalVisible(false);
     ImagePicker.openCamera({
       mediaType: 'any',
-    }).then(image => {
-      handleCropImage(image);
-    });
+    })
+      .then(image => {
+        handleCropImage(image);
+      })
+      .catch(() => setModalVisible(false));
   };
 
   const handleTakeVideo = () => {
     setModalVisible(false);
     ImagePicker.openCamera({
       mediaType: 'video',
-    }).then(video => {
-      handleChosenMedia(video);
-    });
+    })
+      .then(video => {
+        handleChosenMedia(video);
+      })
+      .catch(() => setModalVisible(false));
   };
 
   const handleGalleryPicker = () => {
     ImagePicker.openPicker({
-      multiple: !singleMedia,
-      mediaType: imageOnly ? 'photo' : 'any,',
+      multiple: !singleMedia && !profilePicture,
+      mediaType: imageOnly || profilePicture ? 'photo' : 'any,',
     })
       .then(images => {
         if (images.length == 1 && images[0].mime === 'image/jpeg') handleCropImage(images[0]);
+        else if (!images.length) handleCropImage(images);
         else handleChosenMedia(images);
       })
-      .catch(err => console.log(err));
+      .catch(() => setModalVisible(false));
   };
 
   const handleCropImage = image => {
@@ -94,11 +98,16 @@ const MediaPicker = ({singleMedia, imageOnly, profilePicture, buttons, setChosen
       .then(image => {
         handleChosenMedia(image);
       })
-      .catch(err => console.log(err));
+      .catch(() => setModalVisible(false));
   };
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
+  };
+
+  const handleRemoveMedia = () => {
+    setModalVisible(false);
+    setChosenMedia(null);
   };
 
   const handleChosenMedia = media => {
@@ -108,13 +117,17 @@ const MediaPicker = ({singleMedia, imageOnly, profilePicture, buttons, setChosen
     } else {
       chosenPaths.push(media.path);
     }
+    setModalVisible(false);
+    if (profilePicture || singleMedia) return setChosenMedia(chosenPaths);
     setChosenMedia(prev => (prev ? [...prev, ...chosenPaths] : chosenPaths));
   };
 
   return (
     <View style={style}>
       {recentPics && hasPermission ? (
-        buttons ? (
+        profilePicture ? (
+          <Icon name='camera-outline' type='material-community' size={profilePictureSize || moderateScale(24)} color='white' onPress={toggleModal} />
+        ) : buttons ? (
           <View style={[Spacing.superSmallTopSpacing, {flexDirection: 'row'}]}>
             <SquareButton
               title='Camera'
@@ -157,6 +170,8 @@ const MediaPicker = ({singleMedia, imageOnly, profilePicture, buttons, setChosen
             }}
           />
         )
+      ) : profilePicture ? (
+        <Icon name='camera-outline' type='material-community' size={profilePictureSize || moderateScale(24)} color='white' onPress={handleRequestPermission} />
       ) : (
         <TouchableOpacity style={[styles.cameraButton, Spacing.smallTopSpacing]} onPress={handleRequestPermission}>
           <Icon name='image' type='material-community' size={moderateScale(30)} />
@@ -165,7 +180,14 @@ const MediaPicker = ({singleMedia, imageOnly, profilePicture, buttons, setChosen
       <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)} backdropTransitionOutTiming={0}>
         <View>
           <Button title='Take Photo' onPress={handleTakePhoto} />
-          <Button title='Take Video' onPress={handleTakeVideo} />
+          {profilePicture ? (
+            <>
+              <Button title='Choose Existing Photo' onPress={handleGalleryPicker} />
+              <Button title='Remove Photo' onPress={handleRemoveMedia} />
+            </>
+          ) : (
+            <Button title='Take Video' onPress={handleTakeVideo} />
+          )}
         </View>
       </Modal>
     </View>

@@ -57,10 +57,10 @@ const JobForm = ({navigation, route}) => {
       await jobRef.child(jobKey).update(fullJobInfo);
 
       const existingMedia = await storage().ref(`/jobs/${jobKey}`).listAll();
-      if (existingMedia.items > 0) {
+      if (existingMedia.items.length > 0) {
         const item = existingMedia.items[0];
         const dwurl = await item.getDownloadURL();
-        if (image[0] === dwurl) {
+        if (image[0] !== dwurl) {
           storage().ref(item.path).delete();
         }
       }
@@ -81,7 +81,7 @@ const JobForm = ({navigation, route}) => {
     }
 
     ToastAndroid.show(job ? 'Job Edited!' : 'Job Added!', ToastAndroid.SHORT);
-    navigation.navigate('Jobs');
+    navigation.goBack();
   };
 
   return (

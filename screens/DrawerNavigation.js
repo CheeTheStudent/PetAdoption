@@ -3,7 +3,7 @@ import {View, Text, StyleSheet, Pressable} from 'react-native';
 import {Avatar, Icon} from 'react-native-elements';
 import {createDrawerNavigator, DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
 import auth from '@react-native-firebase/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import database from '@react-native-firebase/database';
 
 import AppNavigation from './AppNavigation';
 import OwnerProfile from './OwnerProfile';
@@ -16,12 +16,17 @@ import colours from '../assets/colours';
 const DrawerNavigation = () => {
   const Drawer = createDrawerNavigator();
 
+  const userUID = auth().currentUser.uid;
+  const userRef = database().ref(`users/${userUID}`);
   const [user, setUser] = useState();
 
-  useEffect(async () => {
-    const user = await AsyncStorage.getItem('user');
-    const parsedUser = JSON.parse(user);
-    setUser(parsedUser);
+  useEffect(() => {
+    userRef.on('value', snapshot => {
+      const userData = snapshot.val() ? snapshot.val() : {};
+      setUser({id: snapshot.key, ...userData});
+    });
+
+    return () => userRef.off();
   }, []);
 
   const navigateTo = screen => {
@@ -36,9 +41,10 @@ const DrawerNavigation = () => {
   if (!user) return <Loading />;
 
   const CustomDrawerContent = props => {
+    const {navigation} = props;
     return (
       <DrawerContentScrollView {...props}>
-        <Pressable onPress={() => props.navigation.jumpTo('Profile')} style={styles.header}>
+        <Pressable onPress={() => navigation.jumpTo('Profile')} style={styles.header}>
           <View style={styles.rowContainer}>
             <Avatar
               rounded
@@ -56,7 +62,7 @@ const DrawerNavigation = () => {
           <Text style={TextStyles.h2}>{user.name}</Text>
           <Text style={TextStyles.h4}>{user.role}</Text>
         </Pressable>
-        <DrawerItem label='Profile' icon={() => <Icon name='person' type='ionicon' />} onPress={() => navigateTo('Profile')} />
+        <DrawerItem label='Profile' icon={() => <Icon name='person' type='ionicon' />} onPress={() => navigation.jumpTo('Profile')} />
         <DrawerItem label='Liked Pets' icon={() => <Icon name='heart' type='ionicon' />} onPress={() => navigateTo('LikedPets')} />
         <DrawerItem label='Tags' icon={() => <Icon name='pricetag' type='ionicon' />} onPress={() => navigateTo('Tags')} />
         <DrawerItem label='Screening' icon={() => <Icon name='clipboard-list' type='font-awesome-5' />} onPress={() => navigateTo('Tags')} />

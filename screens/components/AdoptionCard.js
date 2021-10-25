@@ -1,5 +1,5 @@
 import React, {useCallback} from 'react';
-import {View, Text, Image, TouchableWithoutFeedback, Animated, StyleSheet} from 'react-native';
+import {View, Text, Image, Pressable, Animated, StyleSheet} from 'react-native';
 import {Icon} from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
 import Video from 'react-native-video';
@@ -57,6 +57,7 @@ const AdoptionCard = ({navigation, pet, isFirst, swipe, tiltPoint, ...rest}) => 
   const handleOpenProfile = () => {
     navigation.navigate('PetProfile', {
       pet: pet,
+      home: true,
     });
   };
 
@@ -79,7 +80,7 @@ const AdoptionCard = ({navigation, pet, isFirst, swipe, tiltPoint, ...rest}) => 
         (isVideo() ? <Video source={{uri: pet.media[0]}} resizeMode='cover' repeat={true} muted={true} style={styles.backgroundVideo} /> : <Image source={{uri: pet.media[0]}} style={styles.image} />)}
       <LinearGradient colors={['transparent', 'rgba(0,0,0,1)']} style={styles.linearGradient} />
       {isVideo() && <LinearGradient colors={['rgba(0,0,0,1)', 'transparent']} locations={[0.05, 1]} style={styles.linearGradientTop} />}
-      <TouchableWithoutFeedback onPress={handleOpenProfile}>
+      <Pressable onPress={handleOpenProfile}>
         <View style={styles.contentContainer}>
           <View style={styles.detailsContainer}>
             <Text style={[TextStyles.h1, styles.name]}>{pet.name}</Text>
@@ -87,7 +88,7 @@ const AdoptionCard = ({navigation, pet, isFirst, swipe, tiltPoint, ...rest}) => 
           </View>
           <View style={styles.tagsContainer}>{pet.tags ? pet.tags.map(tag => <Tag key={tag} title={tag} type='white' disabled />) : <></>}</View>
         </View>
-      </TouchableWithoutFeedback>
+      </Pressable>
       {isFirst ? renderChoice() : null}
     </Animated.View>
   );

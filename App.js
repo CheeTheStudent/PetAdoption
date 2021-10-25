@@ -74,7 +74,7 @@ const App = () => {
     return subscriber; // unsubscribes on unmount
   }, []);
 
-  if (initializing) return null;
+  if (initializing || user == null || showOnboard == null) return null;
 
   return (
     <NavigationContainer ref={navigationRef}>

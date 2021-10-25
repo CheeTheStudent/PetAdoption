@@ -16,10 +16,12 @@ import colours from '../assets/colours';
 import Loading from './components/Loading';
 
 const PetProfile = ({navigation, route}) => {
-  const {pet} = route.params;
+  const {pet, home} = route.params;
   const {id: petId, name, ageYear, ageMonth, gender, species, breed, tags, weight, height, vaccinated, spayed, desc, media, ownerId} = pet;
   const userUID = auth().currentUser.uid;
   const ownerRef = database().ref(`/users/${ownerId}`);
+  const userDataRef = database().ref(`userData/${userUID}`);
+  const petDataRef = database().ref(`petData`);
   const firebaseMessage = FirebaseMessage();
 
   const [owner, setOwner] = useState();
@@ -76,15 +78,29 @@ const PetProfile = ({navigation, route}) => {
   };
 
   const handleLikePet = () => {
-    navigation.navigate('Home', {
-      swipeAway: 'like',
-    });
+    if (home) {
+      navigation.navigate('Home', {
+        swipeAway: 'like',
+      });
+    } else {
+      const likeInfo = {petId, userId: userUID, liked: true, createdAt: database.ServerValue.TIMESTAMP};
+      userDataRef.child(petId).set(likeInfo);
+      petDataRef.child(`${ownerId}`).push(likeInfo);
+      navigation.goBack();
+    }
   };
 
   const handleDislikePet = () => {
-    navigation.navigate('Home', {
-      swipeAway: 'dislike',
-    });
+    if (home) {
+      navigation.navigate('Home', {
+        swipeAway: 'dislike',
+      });
+    } else {
+      const dislikeInfo = {petId, userId: userUID, liked: false, createdAt: database.ServerValue.TIMESTAMP};
+      userDataRef.child(petId).set(dislikeInfo);
+      petDataRef.child(`${ownerId}`).push(dislikeInfo);
+      navigation.goBack();
+    }
   };
 
   const handleSendMessage = async () => {
@@ -155,7 +171,7 @@ const PetProfile = ({navigation, route}) => {
             )}
             {owner && (
               <View style={[styles.ownerContainer, Spacing.smallTopSpacing, Spacing.superSmallBottomSpacing]}>
-                <Image source={require('../assets/images/dog.png')} style={[styles.ownerImage, Spacing.smallRightSpacing]} />
+                <Image source={owner.profilePic ? {uri: owner.profilePic} : require('../assets/images/placeholder.png')} style={[styles.ownerImage, Spacing.smallRightSpacing]} />
                 <View style={[styles.shelterInfoContainer, Spacing.superSmallRightSpacing]}>
                   <Text style={[TextStyles.h3]} numberOfLines={1}>
                     {owner.name}

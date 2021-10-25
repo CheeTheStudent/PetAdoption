@@ -167,12 +167,14 @@ const OwnerProfile = ({navigation, route}) => {
           {isOwner ? (
             <View style={[styles.rowContainer, Spacing.superSmallTopSpacing]}>
               <Text style={styles.lightText}>
-                <Text style={styles.darkText}>{pets.length - profile.petsAdopted}</Text> For Adoption
+                <Text style={styles.darkText}>{pets.length - profile.petsAdopted || 0}</Text> For Adoption
               </Text>
               <Text style={[styles.lightText, Spacing.smallLeftSpacing, {flex: 1}]}>
-                <Text style={styles.darkText}>{profile.petsAdopted}</Text> Successfully Adopted
+                <Text style={styles.darkText}>{profile.petsAdopted || 0}</Text> Successfully Adopted
               </Text>
-              <Icon name={showContact ? 'chevron-up' : 'chevron-down'} type='ionicon' size={moderateScale(16)} onPress={() => setShowContact(prev => !prev)} />
+              {profile.phoneNum || profile.email || profile.facebookId || profile.twitterId || profile.instaId ? (
+                <Icon name={showContact ? 'chevron-up' : 'chevron-down'} type='ionicon' size={moderateScale(16)} onPress={() => setShowContact(prev => !prev)} />
+              ) : null}
             </View>
           ) : null}
           {showContact ? (
@@ -236,14 +238,14 @@ const OwnerProfile = ({navigation, route}) => {
           },
           renderHeader,
         }}>
-        <Tab.Screen name='Home' children={props => <O1HomeScreen posts={posts} {...props} />} />
+        <Tab.Screen name='ProHome' children={props => <O1HomeScreen posts={posts} {...props} />} options={{title: 'HOME'}} />
         {isOwner ? (
           <>
-            <Tab.Screen name='Pets' children={props => <O2PetsScreen pets={pets} {...props} />} />
-            <Tab.Screen name='Jobs' children={props => <O3JobsScreen jobs={jobs} {...props} />} />
+            <Tab.Screen name='ProPets' children={props => <O2PetsScreen pets={pets} {...props} />} options={{title: 'PETS'}} />
+            <Tab.Screen name='ProJobs' children={props => <O3JobsScreen jobs={jobs} {...props} />} options={{title: 'JOBS'}} />
           </>
         ) : (
-          <Tab.Screen name='Screening' children={props => <O4Screening user={profile} {...props} />} />
+          <Tab.Screen name='ProScreening' children={props => <O4Screening user={profile} {...props} />} options={{title: 'SCREENING'}} />
         )}
       </Tab.Navigator>
     </>

@@ -143,11 +143,11 @@ const Home = ({navigation, route}) => {
     const swipeValue = parseInt(JSON.stringify(swipe.x));
     if (swipeValue > 0) {
       const likeInfo = {petId: pets[0].id, userId: userUID, liked: true, createdAt: database.ServerValue.TIMESTAMP};
-      userDataRef.push(likeInfo);
+      userDataRef.child(likeInfo.petId).set(likeInfo);
       petDataRef.child(`${pets[0].ownerId}`).push(likeInfo);
     } else {
       const dislikeInfo = {petId: pets[0].id, userId: userUID, liked: false, createdAt: database.ServerValue.TIMESTAMP};
-      userDataRef.push(dislikeInfo);
+      userDataRef.child(dislikeInfo.petId).set(dislikeInfo);
       petDataRef.child(`${pets[0].ownerId}`).push(dislikeInfo);
     }
   };
@@ -165,6 +165,7 @@ const Home = ({navigation, route}) => {
   const handleOpenProfile = () => {
     navigation.navigate('PetProfile', {
       pet: pets[0],
+      home: true,
     });
   };
 

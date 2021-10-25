@@ -1,5 +1,7 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
+import auth from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Tag from '../components/Tag';
@@ -12,9 +14,26 @@ const personalities = ['Playful', 'Curious', 'Obedient', 'Active', 'Sociable', '
 
 const appearances = ['Cute', 'Elegant', 'Handsome', 'Pretty', 'Beautiful', 'Colourful', 'Big', 'Medium', 'Small'];
 
-const OB4Tags = ({navigation}) => {
+const OB4Tags = ({navigation, user}) => {
+  const userUID = auth().currentUser.uid;
+  const userRef = database().ref(`users/${userUID}`);
+
   const [selectedPersonalities, setSelectedPersonalities] = useState([]);
   const [selectedAppearances, setSelectedAppearances] = useState([]);
+
+  useEffect(() => {
+    if (user) {
+      let prevPersonalities = [];
+      let prevAppearances = [];
+
+      user.preferredTags?.map(tag => {
+        personalities.map(el => (el === tag ? prevPersonalities.push(tag) : null));
+        appearances.map(el => (el === tag ? prevAppearances.push(tag) : null));
+      });
+      setSelectedPersonalities(prevPersonalities);
+      setSelectedAppearances(prevAppearances);
+    }
+  }, []);
 
   const handleOnSelectedPersonalities = (value, include) => {
     if (include) {
@@ -35,17 +54,24 @@ const OB4Tags = ({navigation}) => {
   };
 
   const handleNext = async () => {
-    const user = {preferredTags: selectedPersonalities.concat(selectedAppearances)};
+    const userTags = {preferredTags: selectedPersonalities.concat(selectedAppearances)};
 
-    try {
-      await AsyncStorage.mergeItem('onboardUser', JSON.stringify(user));
-    } catch (error) {
-      console.log(error);
+    if (user) {
+      userRef.update(userTags);
+    } else {
+      try {
+        await AsyncStorage.mergeItem('onboardUser', JSON.stringify(userTags));
+      } catch (error) {
+        console.log(error);
+      }
     }
+
     handleNavigate();
   };
 
   const handleNavigate = async () => {
+    if (user) return navigation.goBack();
+
     const onboardUser = await AsyncStorage.getItem('onboardUser');
     if (JSON.parse(onboardUser).role === 'Shelter') {
       navigation.navigate('OB6Shelter');
@@ -56,27 +82,27 @@ const OB4Tags = ({navigation}) => {
 
   return (
     <View style={styles.body}>
-      <View style={styles.container}>
-        <Text style={TextStyles.h1}>Specifics, specifics..</Text>
+      <View style={[styles.container, user ? Spacing.smallTopSpacing : Spacing.bigTopSpacing]}>
+        {!user ? <Text style={TextStyles.h1}>Specifics, specifics..</Text> : null}
         <Text style={TextStyles.h3}>Choose the tags that describe the pet you would like to adopt</Text>
-        <Text style={[TextStyles.h3, Spacing.mediumTopSpacing]}>Personality</Text>
+        <Text style={[TextStyles.h3, user ? Spacing.superSmallTopSpacing : Spacing.mediumTopSpacing]}>Personality</Text>
         <View style={styles.tagsContainer}>
           {personalities.map(type => {
-            return <Tag title={type} onSelected={handleOnSelectedPersonalities} />;
+            return <Tag title={type} type={selectedPersonalities.indexOf(type) >= 0 && 'black'} onSelected={handleOnSelectedPersonalities} />;
           })}
         </View>
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Appearances</Text>
         <View style={styles.tagsContainer}>
           {appearances.map(type => {
-            return <Tag title={type} onSelected={handleOnSelectedAppearances} />;
+            return <Tag title={type} type={selectedAppearances.indexOf(type) >= 0 && 'black'} onSelected={handleOnSelectedAppearances} />;
           })}
         </View>
       </View>
       <View style={styles.bottomContainer}>
         <Text onPress={handleNavigate} style={styles.skipText}>
-          SKIP
+          {user ? 'CANCEL' : 'SKIP'}
         </Text>
-        <LongRoundButton title='NEXT' disabled={selectedPersonalities.length == 0 && selectedAppearances.length == 0} onPress={handleNext} />
+        <LongRoundButton title={user ? 'SAVE' : 'NEXT'} disabled={selectedPersonalities.length == 0 && selectedAppearances.length == 0} onPress={handleNext} />
       </View>
     </View>
   );
@@ -88,7 +114,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   container: {
-    marginTop: verticalScale(32),
     paddingHorizontal: scale(24),
   },
   tagsContainer: {

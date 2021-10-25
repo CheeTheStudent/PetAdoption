@@ -7,7 +7,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 
 import SquareButton from './SquareButton';
 import {scale, verticalScale, moderateScale} from '../../assets/dimensions';
-import {Spacing} from '../../assets/styles';
+import {Spacing, TextStyles} from '../../assets/styles';
 import colours from '../../assets/colours';
 
 const MediaPicker = ({singleMedia, imageOnly, profilePicture, profilePictureSize, buttons, setChosenMedia, style}) => {
@@ -178,15 +178,15 @@ const MediaPicker = ({singleMedia, imageOnly, profilePicture, profilePictureSize
         </TouchableOpacity>
       )}
       <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)} backdropTransitionOutTiming={0}>
-        <View>
-          <Button title='Take Photo' onPress={handleTakePhoto} />
+        <View style={styles.modal}>
+          <Button title='Take Photo' onPress={handleTakePhoto} buttonStyle={styles.modalButton} titleStyle={styles.modalButtonText} />
           {profilePicture ? (
             <>
-              <Button title='Choose Existing Photo' onPress={handleGalleryPicker} />
-              <Button title='Remove Photo' onPress={handleRemoveMedia} />
+              <Button title='Choose Existing Photo' onPress={handleGalleryPicker} buttonStyle={styles.modalButton} titleStyle={styles.modalButtonText} />
+              <Button title='Remove Photo' onPress={handleRemoveMedia} buttonStyle={styles.modalButton} titleStyle={styles.modalButtonText} />
             </>
           ) : (
-            <Button title='Take Video' onPress={handleTakeVideo} />
+            <Button title='Take Video' onPress={handleTakeVideo} buttonStyle={styles.modalButton} titleStyle={styles.modalButtonText} />
           )}
         </View>
       </Modal>
@@ -209,6 +209,19 @@ const styles = StyleSheet.create({
     height: verticalScale(105),
     marginRight: scale(8),
     borderRadius: moderateScale(3),
+  },
+  modal: {
+    backgroundColor: 'white',
+    borderRadius: moderateScale(5),
+  },
+  modalButton: {
+    paddingVertical: verticalScale(8),
+    borderRadius: moderateScale(5),
+    backgroundColor: 'white',
+  },
+  modalButtonText: {
+    ...TextStyles.h3,
+    color: 'black',
   },
 });
 

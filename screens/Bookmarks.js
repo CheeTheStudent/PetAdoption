@@ -1,31 +1,33 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, FlatList, StyleSheet} from 'react-native';
-import {Icon} from 'react-native-elements';
+import React, {useState, useEffect} from 'react';
+import {View, FlatList, StyleSheet} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 
 import PostCard from './components/PostCard';
-import Loading from './components/Loading';
-import {SCREEN, verticalScale, scale} from '../assets/dimensions';
-import {TextStyles, Spacing} from '../assets/styles';
+import {scale, verticalScale} from '../assets/dimensions';
 import colours from '../assets/colours';
 
-const Community = ({navigation}) => {
+const Bookmarks = ({navigation}) => {
   const userUID = auth().currentUser.uid;
-  const postRef = database().ref('/posts');
-  const userRef = database().ref(`/users/${userUID}`);
-
-  const [posts, setPosts] = useState();
+  const userRef = database().ref(`users/${userUID}/savedPosts`);
+  const postRef = database().ref('posts');
+  const [posts, setPosts] = useState([]);
   const [refresh, setRefresh] = useState(false);
 
-  useEffect(() => {
-    postRef.limitToFirst(20).once('value', snapshot => {
-      const data = snapshot.val() ? snapshot.val() : {};
-      let posts = [];
-      Object.entries(data).map(value => posts.push({id: value[0], ...value[1]}));
-      setPosts(posts);
-      setRefresh(false);
-    });
+  useEffect(async () => {
+    let bookmarkedPosts = [];
+    const snapshot = await userRef.once('value');
+    const data = snapshot.val() ? snapshot.val() : {};
+    await Promise.all(
+      Object.entries(data).map(async value => {
+        const postSnapshot = await postRef.child(value[0]).once('value');
+        const postData = postSnapshot.val() ? postSnapshot.val() : {};
+        if (Object.keys(postData).length != 0) bookmarkedPosts.push({id: postSnapshot.key, ...postData, bookmarkedTime: value[1]});
+      }),
+    );
+    bookmarkedPosts.sort((x, y) => y.bookmarkedTime - x.bookmarkedTime);
+    setPosts(bookmarkedPosts);
+    setRefresh(false);
   }, [refresh]);
 
   useEffect(() => {
@@ -44,10 +46,10 @@ const Community = ({navigation}) => {
 
   const handleOnBookmark = post => {
     if (post.saves?.hasOwnProperty(userUID)) {
-      userRef.child(`savedPosts/${post.id}`).remove();
+      userRef.child(`${post.id}`).remove();
       return postRef.child(`${post.id}/saves/${userUID}`).remove();
     }
-    userRef.child(`savedPosts/${post.id}`).set(database.ServerValue.TIMESTAMP);
+    userRef.child(`${post.id}`).set(database.ServerValue.TIMESTAMP);
     postRef.child(`${post.id}/saves/${userUID}`).set(database.ServerValue.TIMESTAMP);
   };
 
@@ -72,9 +74,6 @@ const Community = ({navigation}) => {
           />
         )}
       />
-      <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('PostForm')}>
-        <Icon name='plus' type='material-community' size={30} color='white' />
-      </TouchableOpacity>
     </View>
   );
 };
@@ -84,17 +83,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
   },
-  fab: {
-    width: verticalScale(50),
-    height: verticalScale(50),
-    borderRadius: verticalScale(25),
-    backgroundColor: 'black',
-    justifyContent: 'center',
-    position: 'absolute',
-    bottom: verticalScale(16),
-    right: scale(16),
-    elevation: 10,
-  },
 });
 
-export default Community;
+export default Bookmarks;

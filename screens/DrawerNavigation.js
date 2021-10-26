@@ -10,6 +10,8 @@ import OwnerProfile from './OwnerProfile';
 import LikedPets from './LikedPets';
 import Tags from './onboarding screens/OB4Tags';
 import Bookmarks from './Bookmarks';
+import Settings from './Settings';
+import ChangePassword from './ChangePassword';
 import Loading from './components/Loading';
 import OneSignalNotif from '../utils/OneSignalNotif';
 import {Spacing, TextStyles} from '../assets/styles';
@@ -65,11 +67,11 @@ const DrawerNavigation = () => {
           <Text style={TextStyles.h2}>{user.name}</Text>
           <Text style={TextStyles.h4}>{user.role}</Text>
         </Pressable>
-        <DrawerItem label='Profile' icon={() => <Icon name='person' type='ionicon' />} onPress={() => navigation.jumpTo('Profile')} />
+        <DrawerItem label='Profile' icon={() => <Icon name='person' type='ionicon' />} onPress={() => navigation.navigate('Profile')} />
         <DrawerItem label='Liked Pets' icon={() => <Icon name='heart' type='ionicon' />} onPress={() => navigation.jumpTo('LikedPets')} />
         <DrawerItem label='Tags' icon={() => <Icon name='pricetag' type='ionicon' />} onPress={() => navigation.jumpTo('Tags')} />
         <DrawerItem label='Bookmarks' icon={() => <Icon name='bookmark' type='ionicon' />} onPress={() => navigation.jumpTo('Bookmarks')} />
-        <DrawerItem label='Settings' icon={() => <Icon name='settings-sharp' type='ionicon' />} onPress={() => navigateTo('Tags')} />
+        <DrawerItem label='Settings' icon={() => <Icon name='settings-sharp' type='ionicon' />} onPress={() => navigation.navigate('Settings')} />
         <DrawerItem label='About' icon={() => <Icon name='info' type='foundation' />} onPress={() => navigateTo('Tags')} />
       </DrawerContentScrollView>
     );
@@ -81,16 +83,18 @@ const DrawerNavigation = () => {
         headerShown: false,
         headerLeft: () => (
           <View style={Spacing.smallLeftSpacing}>
-            <Icon name='arrow-back' type='ionicon' size={moderateScale(24)} onPress={() => navigation.goBack()} />
+            <Icon name='arrow-left' type='material-community' size={moderateScale(24)} onPress={() => navigation.goBack()} />
           </View>
         ),
       })}
       drawerContent={props => <CustomDrawerContent {...props} />}>
-      <Drawer.Screen name='AppNavigation' children={props => <AppNavigation user={user} {...props} />} options={{unmountOnBlur: true}} />
+      <Drawer.Screen name='AppNavigation' children={props => <AppNavigation user={user} {...props} />} options={{unmountOnBlur: false}} />
       <Drawer.Screen name='Profile' component={OwnerProfile} options={{unmountOnBlur: true}} />
       <Drawer.Screen name='LikedPets' component={LikedPets} options={{headerShown: true, title: 'Liked Pets', unmountOnBlur: true}} />
       <Drawer.Screen name='Tags' children={props => <Tags user={user} {...props} />} options={{headerShown: true, title: 'Tags', unmountOnBlur: true}} />
       <Drawer.Screen name='Bookmarks' component={Bookmarks} options={{headerShown: true, unmountOnBlur: true}} />
+      <Drawer.Screen name='Settings' children={props => <Settings user={user} {...props} />} options={{headerShown: true, unmountOnBlur: true}} />
+      <Drawer.Screen name='ChangePassword' component={ChangePassword} options={{headerShown: true, title: 'Change Password', unmountOnBlur: true}} />
     </Drawer.Navigator>
   );
 };

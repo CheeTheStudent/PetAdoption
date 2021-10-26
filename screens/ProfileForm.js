@@ -74,12 +74,10 @@ const ProfileForm = ({navigation, route}) => {
         <View style={styles.profileTop}>
           <Image source={banner ? {uri: banner[0]} : require('../assets/images/banner.png')} style={styles.banner} />
           <View style={[styles.banner, styles.bannerOverlay]}>
-            {/* <Icon name='camera-outline' type='material-community' size={moderateScale(32)} color='white' /> */}
             <MediaPicker profilePicture profilePictureSize={moderateScale(32)} setChosenMedia={setBanner} />
           </View>
           <Avatar rounded size={moderateScale(75)} source={profilePic ? {uri: profilePic[0]} : require('../assets/images/placeholder.png')} containerStyle={styles.profilePicture} />
           <View style={[styles.profilePicture, styles.profilePicOverlay]}>
-            {/* <Icon name='camera-outline' type='material-community' size={moderateScale(24)} color='white' /> */}
             <MediaPicker profilePicture setChosenMedia={setProfilePic} />
           </View>
         </View>

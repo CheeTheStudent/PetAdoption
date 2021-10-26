@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {Tab, TabView, Icon, Avatar} from 'react-native-elements';
 import {NavigationContainer} from '@react-navigation/native';
@@ -16,35 +16,33 @@ import {moderateScale} from '../assets/dimensions';
 import Loading from './components/Loading';
 
 const AppNavigation = ({navigation, user}) => {
-  // const [user, setUser] = useState();
   const Tab = createBottomTabNavigator();
 
   useEffect(async () => {
-    // const user = await AsyncStorage.getItem('user');
-    // const parsedUser = JSON.parse(user);
-    // setUser(parsedUser);
     if (user.verified === undefined) navigation.navigate('Permissions'); // Checks if it's user first-time login
   }, []);
 
-  const defaultHeader = {
-    headerTitleStyle: [TextStyles.h2, Spacing.superSmallLeftSpacing, {fontFamily: 'Roboto-Medium'}],
-    headerLeft: () => (
-      <Avatar
-        rounded
-        size={moderateScale(32)}
-        containerStyle={Spacing.smallLeftSpacing}
-        onPress={() => navigation.openDrawer()}
-        source={
-          user.profilePic
-            ? {
-                uri: user.profilePic,
-              }
-            : require('../assets/images/placeholder.png')
-        }
-      />
-    ),
-    headerTitle: {},
-  };
+  const defaultHeader = useMemo(() => {
+    return {
+      headerTitleStyle: [TextStyles.h2, Spacing.superSmallLeftSpacing, {fontFamily: 'Roboto-Medium'}],
+      headerLeft: () => (
+        <Avatar
+          rounded
+          size={moderateScale(32)}
+          containerStyle={Spacing.smallLeftSpacing}
+          onPress={() => navigation.openDrawer()}
+          source={
+            user.profilePic
+              ? {
+                  uri: user.profilePic,
+                }
+              : require('../assets/images/placeholder.png')
+          }
+        />
+      ),
+      headerTitle: {},
+    };
+  }, [user]);
 
   return (
     <Tab.Navigator
@@ -82,7 +80,7 @@ const AppNavigation = ({navigation, user}) => {
           },
         },
       })}>
-      <Tab.Screen name='Home' component={HomeScreen} options={{tabBarLabel: 'Adoption'}} />
+      <Tab.Screen name='Home' children={props => <HomeScreen user={user} {...props} />} options={{tabBarLabel: 'Adoption'}} />
       <Tab.Screen name='Help' component={HelpScreen} options={{tabBarLabel: 'Help'}} />
       <Tab.Screen name='Community' component={CommunityScreen} options={{tabBarLabel: 'Community'}} />
       <Tab.Screen name='Manage' children={props => <ManageScreen defaultHeader={defaultHeader} {...props} />} options={{tabBarLabel: 'Manage'}} />

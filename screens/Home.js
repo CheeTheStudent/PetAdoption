@@ -7,19 +7,21 @@ import database from '@react-native-firebase/database';
 import AdoptionCard from './components/AdoptionCard';
 import ActionButton from './components/ActionButton';
 import Loading from './components/Loading';
+import NoResults from './components/NoResults';
 import colours from '../assets/colours';
 import {CARD, ACTION_OFFSET, SCREEN, scale, moderateScale, verticalScale} from '../assets/dimensions';
 import {Spacing, TextStyles} from '../assets/styles';
 
-const Home = ({navigation, route}) => {
-  const swipeAway = route.params?.swipeAway;
+const Home = ({navigation, route, user}) => {
+  const {swipeAway, queries} = route.params || {};
+  const {settings} = user || {};
 
   const userUID = auth().currentUser.uid;
   const userDataRef = database().ref(`userData/${userUID}`);
   const petDataRef = database().ref(`petData`);
   const petRef = database().ref('pets');
-  const [pets, setPets] = useState([]);
-  const [queries, setQueries] = useState();
+  const [pets, setPets] = useState();
+  const [loading, setLoading] = useState(true);
   const swipe = useRef(new Animated.ValueXY()).current;
   const tiltPoint = useRef(new Animated.Value(1)).current;
 
@@ -35,16 +37,17 @@ const Home = ({navigation, route}) => {
             <Badge badgeStyle={{backgroundColor: 'red'}} containerStyle={{position: 'absolute', right: 0}} />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleOpenFilter}>
-            <Icon name='search' type='Ionicons' size={24} color={colours.black} />
+            <Icon name='options' type='ionicon' size={24} color={colours.black} />
+            {queries && queries.length > 0 ? <Badge value={queries.length} badgeStyle={{backgroundColor: 'black'}} containerStyle={{position: 'absolute', right: -4, top: -4}} /> : null}
           </TouchableOpacity>
         </View>
       ),
     });
-  }, [navigation]);
+  }, [navigation, queries]);
 
   useEffect(() => {
     let petQuery = petRef;
-
+    setLoading(true);
     if (queries && queries.length > 0) {
       const query = queries[0];
       if (query.field === 'age') {
@@ -59,12 +62,11 @@ const Home = ({navigation, route}) => {
       const data = snapshot.val() ? snapshot.val() : {};
       let pets = [];
       Object.entries(data).map(value => pets.push({id: value[0], ...value[1]}));
-      if (queries && queries.length > 1) filterResults(pets);
-      else setPets(pets);
+      if (queries && queries.length > 1) pets = filterResults(pets);
+      filterSeen(pets);
     });
-
     return () => petRef.off();
-  }, [queries]);
+  }, [queries, user]);
 
   useEffect(() => {
     if (swipeAway) {
@@ -93,7 +95,24 @@ const Home = ({navigation, route}) => {
         }
       }
     });
-    setPets(filteredPets);
+    return filteredPets;
+  };
+
+  const filterSeen = async pets => {
+    let filteredData = pets;
+
+    if (!settings.showLiked) {
+      const snapshot = await userDataRef.orderByChild('liked').equalTo(true).once('value');
+      const likedPets = snapshot.val() ? snapshot.val() : {};
+      Object.entries(likedPets).map(value => (filteredData = filteredData.filter(e => e.id !== value[0])));
+    }
+    if (!settings.showDisliked) {
+      const snapshot = await userDataRef.orderByChild('liked').equalTo(false).once('value');
+      const dislikedPets = snapshot.val() ? snapshot.val() : {};
+      Object.entries(dislikedPets).map(value => (filteredData = filteredData.filter(e => e.id !== value[0])));
+    }
+    setPets(filteredData);
+    setLoading(false);
   };
 
   const panResponder = PanResponder.create({
@@ -153,9 +172,7 @@ const Home = ({navigation, route}) => {
   };
 
   const handleOpenFilter = () => {
-    navigation.navigate('FilterModal', {
-      setQueries: setQueries,
-    });
+    navigation.navigate('FilterModal', {queries});
   };
 
   const handleOpenNotifications = () => {
@@ -171,22 +188,26 @@ const Home = ({navigation, route}) => {
 
   return (
     <View style={styles.body}>
-      {pets && pets.length > 0 ? (
-        <>
-          {pets
-            .map((pet, index) => {
-              const isFirst = index === 0;
-              const dragHandlers = isFirst ? panResponder.panHandlers : {};
+      {!loading && pets ? (
+        pets.length > 0 ? (
+          <>
+            {pets
+              .map((pet, index) => {
+                const isFirst = index === 0;
+                const dragHandlers = isFirst ? panResponder.panHandlers : {};
 
-              return <AdoptionCard key={pet.id} pet={pet} isFirst={isFirst} swipe={swipe} tiltPoint={tiltPoint} {...dragHandlers} navigation={navigation} />;
-            })
-            .reverse()}
-          <View style={styles.iconButtonsContainer}>
-            <ActionButton name='close' onPress={() => swipeAnimation(-1, 100)} />
-            <ActionButton name='chevron-down' containerStyle={{top: CARD.HEIGHT * 0.02}} onPress={handleOpenProfile} />
-            <ActionButton name='heart' onPress={() => swipeAnimation(1, 100)} />
-          </View>
-        </>
+                return <AdoptionCard key={pet.id} pet={pet} isFirst={isFirst} swipe={swipe} tiltPoint={tiltPoint} {...dragHandlers} navigation={navigation} />;
+              })
+              .reverse()}
+            <View style={styles.iconButtonsContainer}>
+              <ActionButton name='close' onPress={() => swipeAnimation(-1, 100)} />
+              <ActionButton name='chevron-down' containerStyle={{top: CARD.HEIGHT * 0.02}} onPress={handleOpenProfile} />
+              <ActionButton name='heart' onPress={() => swipeAnimation(1, 100)} />
+            </View>
+          </>
+        ) : (
+          <NoResults title='No matching pets!' desc='Try a different search.' />
+        )
       ) : (
         <Loading type='paw' />
       )}

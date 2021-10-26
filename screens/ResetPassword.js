@@ -1,35 +1,31 @@
-import React, { useState } from 'react';
-import { View, Text, ToastAndroid, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import React, {useState} from 'react';
+import {View, Text, ToastAndroid, StyleSheet} from 'react-native';
 import auth from '@react-native-firebase/auth';
-import { LoginButton, AccessToken } from 'react-native-fbsdk-next';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import TextInput from './components/TextInput';
 import LongRoundButton from './components/LongRoundButton';
-import { TextStyles, Spacing } from '../assets/styles';
-import { scale, verticalScale } from '../assets/dimensions';
+import {TextStyles, Spacing} from '../assets/styles';
+import {scale, verticalScale} from '../assets/dimensions';
 import colours from '../assets/colours';
 
-const ResetPassword = ({ navigation }) => {
-
+const ResetPassword = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
 
   const emailChecker = (input: String) => {
     setEmail(input);
 
-    if (input.trim() == "") {
+    if (input.trim() == '') {
       setEmailError(null);
       return false;
     }
 
     let pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (!pattern.test(String(input).toLowerCase())) {
-      setEmailError("Invalid email");
+      setEmailError('Invalid email');
       return false;
-    }
-    else {
+    } else {
       setEmailError(null);
       return true;
     }
@@ -38,13 +34,14 @@ const ResetPassword = ({ navigation }) => {
   const handleResetPassword = () => {
     if (!emailChecker(email)) return;
 
-    auth().sendPasswordResetEmail(email)
+    auth()
+      .sendPasswordResetEmail(email)
       .then(() => {
-        ToastAndroid.show("Email sent!", ToastAndroid.SHORT);
-        navigation.navigate("Authentication");
+        ToastAndroid.show('Email sent!', ToastAndroid.SHORT);
+        navigation.navigate('Authentication');
       })
       .catch(error => {
-        ToastAndroid.show("Email failed to send, try again.", ToastAndroid.SHORT);
+        ToastAndroid.show('Email failed to send, try again.', ToastAndroid.SHORT);
         console.error(error);
       });
   };
@@ -54,13 +51,14 @@ const ResetPassword = ({ navigation }) => {
       <Text style={[TextStyles.h1, styles.title]}>Password Reset</Text>
       <Text style={[TextStyles.h4, styles.text]}>An email will be sent to you to reset your password</Text>
       <TextInput
-        placeholder="Enter your email"
-        returnKeyType="next"
+        placeholder='Enter your email'
+        returnKeyType='next'
         onChangeText={email => emailChecker(email)}
         defaultValue={email}
         errorMessage={emailError}
-        inputContainerStyle={styles.inputContainer} />
-      <LongRoundButton title="RESET PASSWORD" onPress={handleResetPassword} />
+        inputContainerStyle={styles.inputContainer}
+      />
+      <LongRoundButton title='RESET PASSWORD' onPress={handleResetPassword} />
     </View>
   );
 };

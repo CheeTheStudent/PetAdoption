@@ -9,7 +9,7 @@ import {moderateScale, scale, verticalScale} from '../../assets/dimensions';
 const Tag = ({title, type, disabled, onSelected, onSingleSelected, containerStyle, ...rest}) => {
   const [pressed, setPressed] = useState(null);
 
-  if (type === 'black') {
+  if (!onSingleSelected && type === 'black') {
     if ((type === 'black') != pressed) {
       setPressed(type === 'black');
     }

@@ -1,22 +1,12 @@
 import React from 'react';
 import {View, FlatList, Image, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import NoResults from '../components/NoResults';
+import {calcPetAge} from '../../utils/utils';
 import {scale, verticalScale} from '../../assets/dimensions';
 import {Spacing, TextStyles} from '../../assets/styles';
 
 const O2Pets = ({navigation, pets}) => {
-  const calcPetAge = (ageYear, ageMonth) => {
-    let ageLabel = '';
-    if (ageYear == 0) {
-      ageLabel = ageMonth + ' months';
-    } else if (ageMonth == 0) {
-      ageLabel = ageYear + ' years';
-    } else if (ageYear > 0 && ageMonth > 0) {
-      ageLabel = ageYear + ' years ' + ageMonth + ' months';
-    } else {
-      ageLabel = 'Age Unspecified';
-    }
-    return ageLabel;
-  };
+  if (!pets) return <NoResults title='No pets posted yet!' desc='Add pets in Manage.' />;
 
   return (
     <View style={styles.body}>

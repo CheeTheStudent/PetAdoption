@@ -1,14 +1,13 @@
-import React, {useCallback} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {View, Text, Image, Pressable, Animated, StyleSheet} from 'react-native';
 import {Icon} from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
 import Video from 'react-native-video';
 
 import Tag from '../components/Tag';
+import {calcPetAge} from '../../utils/utils';
 import {CARD, ACTION_OFFSET, verticalScale, scale, moderateScale} from '../../assets/dimensions';
 import {TextStyles} from '../../assets/styles';
-import {useEffect} from 'react';
-import {useState} from 'react';
 import colours from '../../assets/colours';
 
 const AdoptionCard = ({navigation, pet, isFirst, swipe, tiltPoint, ...rest}) => {
@@ -31,20 +30,6 @@ const AdoptionCard = ({navigation, pet, isFirst, swipe, tiltPoint, ...rest}) => 
 
   const animatedCardStyle = {
     transform: [...swipe.getTranslateTransform(), {rotate}],
-  };
-
-  const calcPetAge = () => {
-    let ageLabel = '';
-    if (pet.ageYear == 0) {
-      ageLabel = pet.ageMonth + ' months';
-    } else if (pet.ageMonth == 0) {
-      ageLabel = pet.ageYear + ' years';
-    } else if (pet.ageYear > 0 && pet.ageMonth > 0) {
-      ageLabel = pet.ageYear + ' years ' + pet.ageMonth + ' months';
-    } else {
-      ageLabel = 'Age Unspecified';
-    }
-    return ageLabel;
   };
 
   const isVideo = () => {
@@ -84,9 +69,9 @@ const AdoptionCard = ({navigation, pet, isFirst, swipe, tiltPoint, ...rest}) => 
         <View style={styles.contentContainer}>
           <View style={styles.detailsContainer}>
             <Text style={[TextStyles.h1, styles.name]}>{pet.name}</Text>
-            <Text style={[TextStyles.h3, styles.age]}>{calcPetAge()}</Text>
+            <Text style={[TextStyles.h3, styles.age]}>{calcPetAge(pet.ageYear, pet.ageMonth)}</Text>
           </View>
-          <View style={styles.tagsContainer}>{pet.tags ? pet.tags.map(tag => <Tag key={tag} title={tag} type='white' disabled />) : <></>}</View>
+          <View style={styles.tagsContainer}>{pet.tags ? pet.tags.slice(0, 6).map(tag => <Tag key={tag} title={tag} type='white' disabled />) : <></>}</View>
         </View>
       </Pressable>
       {isFirst ? renderChoice() : null}

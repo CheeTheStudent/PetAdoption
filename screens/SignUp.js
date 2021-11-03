@@ -1,5 +1,5 @@
 import React, {useState, useRef} from 'react';
-import {View, Text, StyleSheet, Dimensions, Linking} from 'react-native';
+import {View, Text, StyleSheet, Dimensions, Linking, ActivityIndicator} from 'react-native';
 import {Input, Button, CheckBox} from 'react-native-elements';
 import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -26,6 +26,7 @@ const SignUp = ({navigation}) => {
   const [showRePassword, setShowRePassword] = useState(true);
   const [policyCheck, setPolicyCheck] = useState(false);
   const [policyError, setPolicyError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handlePasswordToggle = () => {
     setShowPassword(!showPassword);
@@ -94,7 +95,7 @@ const SignUp = ({navigation}) => {
       if (!policyCheck) setPolicyError(true);
       return;
     }
-
+    setLoading(true);
     auth()
       .createUserWithEmailAndPassword(email, pswd)
       .then(() => {
@@ -110,6 +111,7 @@ const SignUp = ({navigation}) => {
         }
         console.error(error);
       });
+    setLoading(false);
   };
 
   return (
@@ -133,7 +135,7 @@ const SignUp = ({navigation}) => {
         onChangeText={pswd => pswdChecker(pswd)}
         defaultValue={pswd}
         errorMessage={pswdError}
-        rightIcon={<Icon name='eye' size={30} color={colours.mediumGray} onPress={handlePasswordToggle} />}
+        rightIcon={<Icon name={showPassword ? 'eye-off' : 'eye'} size={30} color={colours.mediumGray} onPress={handlePasswordToggle} />}
         onSubmitEditing={() => rePasswordInput.current.focus()}
         blurOnSubmit={false}
         inputContainerStyle={Spacing.smallHorizontalSpacing}
@@ -146,7 +148,7 @@ const SignUp = ({navigation}) => {
         onChangeText={rePswd => rePswdChecker(rePswd)}
         defaultValue={rePswd}
         errorMessage={rePswdError}
-        rightIcon={<Icon name='eye' size={30} color={colours.mediumGray} onPress={handleRePasswordToggle} />}
+        rightIcon={<Icon name={showRePassword ? 'eye-off' : 'eye'} size={30} color={colours.mediumGray} onPress={handleRePasswordToggle} />}
         inputContainerStyle={Spacing.smallHorizontalSpacing}
       />
       <View style={styles.policyContainer}>
@@ -165,6 +167,7 @@ const SignUp = ({navigation}) => {
         />
       </View>
       <LongRoundButton title='CREATE ACCOUNT' onPress={handleSignUp} />
+      <ActivityIndicator animating={loading} size={50} color='black' style={styles.loading} />
     </View>
   );
 };
@@ -199,6 +202,9 @@ const styles = StyleSheet.create({
   privacyPolicyError: {
     fontWeight: 'bold',
     color: 'red',
+  },
+  loading: {
+    position: 'absolute',
   },
 });
 

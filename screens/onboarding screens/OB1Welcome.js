@@ -13,7 +13,7 @@ const OB1Welcome = ({navigation}) => {
   return (
     <View style={styles.body}>
       <View style={styles.textContainer}>
-        <Text style={TextStyles.h1}>Welcome to Puppers!</Text>
+        <Text style={TextStyles.h1}>Welcome to Fido!</Text>
         <Text style={[TextStyles.h3, styles.desc]}>Are you ready to step into the world of fluffly cute animals? Let’s go!</Text>
       </View>
       <LongRoundButton title='GET STARTED' onPress={handleNext} containerStyle={styles.button} />

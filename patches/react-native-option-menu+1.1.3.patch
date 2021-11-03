@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-option-menu/index.js b/node_modules/react-native-option-menu/index.js
+index 186c5d1..1aee55e 100644
+--- a/node_modules/react-native-option-menu/index.js
++++ b/node_modules/react-native-option-menu/index.js
+@@ -127,7 +127,7 @@ const OptionMenu = (props) =>{
+         );
+     } else {
+         return (
+-        <View>
++        <View style={props.style}>
+             <TouchableOpacity ref={ inputRef } onPress={handlePress}>
+             {component}
+             </TouchableOpacity>

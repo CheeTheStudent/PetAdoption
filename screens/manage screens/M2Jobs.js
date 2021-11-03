@@ -9,6 +9,7 @@ import JobCard from '../components/JobCard';
 import colours from '../../assets/colours';
 import {scale, verticalScale, moderateScale} from '../../assets/dimensions';
 import {Spacing, TextStyles} from '../../assets/styles';
+import NoResults from '../components/NoResults';
 
 const M2Jobs = ({navigation, jobs}) => {
   const jobRef = database().ref('jobs');
@@ -34,17 +35,22 @@ const M2Jobs = ({navigation, jobs}) => {
   return (
     <>
       <View style={styles.body}>
-        <FlatList
-          data={jobs}
-          renderItem={({item, index}) => (
-            <OptionsMenu
-              customButton={<JobCard job={item} />}
-              options={['View', 'Edit Job', 'Delete Job', 'Cancel']}
-              actions={[() => handleViewJob(item), () => handleEditJob(item), () => handleDeleteJob(item)]}
-            />
-          )}
-          contentContainerStyle={styles.listContainer}
-        />
+        {jobs ? (
+          <FlatList
+            data={jobs}
+            keyExtractor={item => item.id}
+            renderItem={({item, index}) => (
+              <OptionsMenu
+                customButton={<JobCard job={item} />}
+                options={['View', 'Edit Job', 'Delete Job', 'Cancel']}
+                actions={[() => handleViewJob(item), () => handleEditJob(item), () => handleDeleteJob(item)]}
+              />
+            )}
+            contentContainerStyle={styles.listContainer}
+          />
+        ) : (
+          <NoResults title='No jobs posted yet!' desc='Add a job to get some volunteers!' />
+        )}
       </View>
       <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('JobForm')}>
         <Icon name='plus' type='material-community' size={30} color='white' />

@@ -73,7 +73,8 @@ const OB4Tags = ({navigation, user}) => {
     if (user) return navigation.goBack();
 
     const onboardUser = await AsyncStorage.getItem('onboardUser');
-    if (JSON.parse(onboardUser).role === 'Shelter') {
+    const role = JSON.parse(onboardUser).role;
+    if (role === 'Shelter' || role === 'Rescuer') {
       navigation.navigate('OB6Shelter');
     } else {
       navigation.navigate('OB5Screening');
@@ -88,13 +89,13 @@ const OB4Tags = ({navigation, user}) => {
         <Text style={[TextStyles.h3, user ? Spacing.superSmallTopSpacing : Spacing.mediumTopSpacing]}>Personality</Text>
         <View style={styles.tagsContainer}>
           {personalities.map(type => {
-            return <Tag title={type} type={selectedPersonalities.indexOf(type) >= 0 && 'black'} onSelected={handleOnSelectedPersonalities} />;
+            return <Tag key={type} title={type} type={selectedPersonalities.indexOf(type) >= 0 && 'black'} onSelected={handleOnSelectedPersonalities} />;
           })}
         </View>
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Appearances</Text>
         <View style={styles.tagsContainer}>
           {appearances.map(type => {
-            return <Tag title={type} type={selectedAppearances.indexOf(type) >= 0 && 'black'} onSelected={handleOnSelectedAppearances} />;
+            return <Tag key={type} title={type} type={selectedAppearances.indexOf(type) >= 0 && 'black'} onSelected={handleOnSelectedAppearances} />;
           })}
         </View>
       </View>

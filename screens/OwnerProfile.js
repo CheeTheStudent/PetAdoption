@@ -1,8 +1,9 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {View, Text, Image, TouchableOpacity, StyleSheet, Linking} from 'react-native';
 import {Avatar, Button, Icon} from 'react-native-elements';
 import {MaterialTabBar} from 'react-native-collapsible-tab-view';
 import createCollapsibleNavigator from './components/create-collapsible-navigator';
+import OptionsMenu from 'react-native-option-menu';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -42,20 +43,21 @@ const OwnerProfile = ({navigation, route}) => {
 
   const Tab = createCollapsibleNavigator();
 
-  useEffect(async () => {
-    userRef.on('value', snapshot => {
+  useEffect(() => {
+    let thisUserRef = userRef.on('value', snapshot => {
       const userData = snapshot.val() ? snapshot.val() : {};
       setUser({id: snapshot.key, ...userData});
     });
 
-    const snapshot = await profileRef.once('value');
-    const profileData = snapshot.val() ? snapshot.val() : {};
-    setProfile({id: snapshot.key, ...profileData});
-    if (profileData.role === 'Shelter' || profileData.role === 'Rescuer') setIsOwner(true);
-    else setIsOwner(false);
-    setLoading(false);
+    let thisProfileRef = profileRef.on('value', snapshot => {
+      const profileData = snapshot.val() ? snapshot.val() : {};
+      setProfile({id: snapshot.key, ...profileData});
+      if (profileData.role === 'Shelter' || profileData.role === 'Rescuer') setIsOwner(true);
+      else setIsOwner(false);
+      setLoading(false);
+    });
 
-    postRef
+    let thisPostRef = postRef
       .orderByChild('user/id')
       .equalTo(profileId)
       .on('value', snapshot => {
@@ -66,48 +68,41 @@ const OwnerProfile = ({navigation, route}) => {
         setPostLoading(false);
       });
 
-    if (profileData.role === 'Shelter' || profileData.role === 'Rescuer') {
-      petRef
-        .orderByChild('ownerId')
-        .equalTo(profileId)
-        .on('value', snapshot => {
+    let thisPetRef = petRef
+      .orderByChild('ownerId')
+      .equalTo(profileId)
+      .on('value', snapshot => {
+        if (!snapshot.exists()) return setPetLoading(false);
+        else {
           const data = snapshot.val() ? snapshot.val() : {};
           let petData = [];
-          Object.entries(data).map(value => petData.push({id: value[0], ...value[1]}));
+          Object.entries(data).map(value => value[1].status.status === 'Available' && petData.push({id: value[0], ...value[1]}));
           setPets(petData);
           setPetLoading(false);
-        });
+        }
+      });
 
-      jobRef
-        .orderByChild('ownerId')
-        .equalTo(profileId)
-        .on('value', snapshot => {
+    let thisJobRef = jobRef
+      .orderByChild('ownerId')
+      .equalTo(profileId)
+      .on('value', snapshot => {
+        if (!snapshot.exists()) return setJobLoading(false);
+        else {
           const data = snapshot.val() ? snapshot.val() : {};
           let jobData = [];
           Object.entries(data).map(value => jobData.push({id: value[0], ...value[1]}));
           setJobs(jobData);
           setJobLoading(false);
-        });
-    } else {
-      setPetLoading(false);
-      setJobLoading(false);
-    }
+        }
+      });
 
     return () => {
-      userRef.off();
-      petRef.off();
-      jobRef.off();
-      postRef.off();
+      profileRef.off('value', thisProfileRef);
+      userRef.off('value', thisUserRef);
+      petRef.off('value', thisPetRef);
+      jobRef.off('value', thisJobRef);
+      postRef.off('value', thisPostRef);
     };
-  }, []);
-
-  useEffect(() => {
-    profileRef.on('value', snapshot => {
-      const profileData = snapshot.val() ? snapshot.val() : {};
-      setProfile({id: snapshot.key, ...profileData});
-    });
-
-    return () => userRef.off();
   }, []);
 
   if (loading || petLoading || jobLoading || postLoading) return <Loading type='paw' />;
@@ -142,8 +137,8 @@ const OwnerProfile = ({navigation, route}) => {
           <Image source={profile.banner ? {uri: profile.banner} : require('../assets/images/banner.png')} style={styles.banner} />
           <Avatar rounded size={moderateScale(75)} source={profile.profilePic ? {uri: profile.profilePic} : require('../assets/images/placeholder.png')} containerStyle={styles.profilePicture} />
           <Button
-            title={ownerId ? 'Message' : 'Edit Profile'}
-            onPress={ownerId ? handleSendMessage : handleEditProfile}
+            title={!ownerId || ownerId === userUID ? 'Edit Profile' : 'Message'}
+            onPress={!ownerId || ownerId === userUID ? handleEditProfile : handleSendMessage}
             buttonStyle={styles.profileButton}
             titleStyle={styles.profileButtonText}
             containerStyle={styles.profileButtonContainer}
@@ -159,7 +154,7 @@ const OwnerProfile = ({navigation, route}) => {
           ) : (
             <Text style={styles.lightText}>{profile.role}</Text>
           )}
-          {profile.description || profile.screening.description ? (
+          {profile.description || profile.screening?.description ? (
             <Text numberOfLines={3} style={[Spacing.superSmallTopSpacing]}>
               {profile.description || profile.screening.description}
             </Text>
@@ -216,6 +211,14 @@ const OwnerProfile = ({navigation, route}) => {
         <TouchableOpacity style={styles.fab} onPress={() => navigation.goBack()}>
           <Icon name='arrow-back' type='ionicon' size={moderateScale(24)} color='white' />
         </TouchableOpacity>
+        {ownerId && ownerId !== userUID ? (
+          <OptionsMenu
+            customButton={<Icon name='ellipsis-vertical' type='ionicon' size={moderateScale(24)} color='white' />}
+            options={['Report', 'Cancel']}
+            actions={[() => navigation.navigate('Report', {issueId: profileId, issueType: 'user'})]}
+            style={[styles.fab, styles.fabLeft]}
+          />
+        ) : null}
       </View>
     );
   };
@@ -269,6 +272,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: verticalScale(16),
     backgroundColor: colours.blackTransparent,
+  },
+  fabLeft: {
+    left: null,
+    right: scale(16),
   },
   profileTop: {
     height: SCREEN.HEIGHT * 0.2 + verticalScale(37.5),

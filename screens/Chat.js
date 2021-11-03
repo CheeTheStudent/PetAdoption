@@ -34,10 +34,15 @@ const Chat = ({navigation, route}) => {
     navigation.setOptions({
       title: '',
       headerTitle: () => (
-        <View style={{flexDirection: 'row', paddingVertical: verticalScale(8), alignItems: 'center', marginLeft: scale(-20)}}>
-          <Avatar rounded size={moderateScale(44)} source={{uri: getFriend().image}} containerStyle={Spacing.superSmallRightSpacing} />
+        <TouchableOpacity onPress={() => navigation.navigate('OwnerProfile', {ownerId: getFriend().id})} style={styles.headerContainer}>
+          <Avatar
+            rounded
+            size={moderateScale(44)}
+            source={getFriend().image ? {uri: getFriend().image} : require('../assets/images/placeholder.png')}
+            containerStyle={Spacing.superSmallRightSpacing}
+          />
           <Text style={TextStyles.h2}>{getFriend().name}</Text>
-        </View>
+        </TouchableOpacity>
       ),
       headerRight: () => (
         <OptionsMenu
@@ -178,6 +183,12 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     backgroundColor: 'white',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    marginLeft: scale(-20),
+    paddingVertical: verticalScale(8),
+    alignItems: 'center',
   },
   interestContainer: {
     width: SCREEN.WIDTH,

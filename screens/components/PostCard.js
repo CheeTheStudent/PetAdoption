@@ -1,20 +1,24 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, Image, Pressable, StyleSheet} from 'react-native';
+import {View, Text, TouchableOpacity, Image, Pressable, StyleSheet, ToastAndroid} from 'react-native';
 import {Avatar} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Video from 'react-native-video';
 import {LinkPreview} from '@flyerhq/react-native-link-preview';
+import OptionsMenu from 'react-native-option-menu';
 import auth from '@react-native-firebase/auth';
 
+import FullWidthImage from './FullWidthImage';
+import * as RootNavigation from '../../utils/RootNavigation';
 import {getTimeFromNow} from '../../utils/utils';
 import {moderateScale, scale, verticalScale} from '../../assets/dimensions';
 import {Spacing, TextStyles} from '../../assets/styles';
 import colours from '../../assets/colours';
 
-const PostCard = ({post, onLike, onOpenPost, onBookmark, disabled, style}) => {
+const PostCard = ({post, onLike, onOpenPost, onBookmark, onDelete, disabled, style}) => {
   const userUID = auth().currentUser.uid;
   const {id: postId, caption, createdAt, location, media, mediaType, user, likes: likesData, comments: commentsData, saves: savesData} = post;
 
+  const ownPost = user?.id === userUID;
   let liked = false;
   let saved = false;
   const likes = [];
@@ -36,16 +40,28 @@ const PostCard = ({post, onLike, onOpenPost, onBookmark, disabled, style}) => {
   return (
     <TouchableOpacity onPress={onOpenPost} disabled={disabled} style={[styles.body, style]}>
       <View style={styles.rowContainer}>
-        <Avatar source={user.profilePic ? {uri: user.profilePic} : require('../../assets/images/placeholder.png')} size={moderateScale(44)} rounded containerStyle={Spacing.superSmallRightSpacing} />
-        <View>
-          <Text style={TextStyles.h4}>{user.name}</Text>
-          {location ? <Text style={TextStyles.desc}>{location.name}</Text> : null}
-        </View>
-        <Icon name='ellipsis-vertical' size={moderateScale(20)} color={colours.darkGray} style={{marginLeft: 'auto'}} />
+        <Pressable onPress={() => RootNavigation.navigate('OwnerProfile', {ownerId: user?.id})} style={styles.rowContainer}>
+          <Avatar
+            source={user?.profilePic ? {uri: user.profilePic} : require('../../assets/images/placeholder.png')}
+            size={moderateScale(44)}
+            rounded
+            containerStyle={Spacing.superSmallRightSpacing}
+          />
+          <View>
+            <Text style={TextStyles.h4}>{user?.name}</Text>
+            {location ? <Text style={TextStyles.desc}>{location.name}</Text> : null}
+          </View>
+        </Pressable>
+        <OptionsMenu
+          customButton={<Icon name='ellipsis-vertical' size={moderateScale(20)} color={colours.darkGray} />}
+          options={[ownPost ? 'Delete' : 'Report', 'Cancel']}
+          actions={[ownPost ? onDelete : () => RootNavigation.navigate('Report', {issueId: postId, issueType: 'post'})]}
+          style={{marginLeft: 'auto'}}
+        />
       </View>
       <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>{caption}</Text>
       {media && mediaType === 'image' ? (
-        <Image source={media ? {uri: media} : require('../../assets/images/placeholder.png')} style={[styles.media, Spacing.smallTopSpacing]} />
+        <FullWidthImage source={media} style={[styles.media, Spacing.smallTopSpacing]} />
       ) : mediaType === 'video' ? (
         <Video source={{uri: media}} muted={true} resizeMode='cover' repeat style={[styles.media, Spacing.smallTopSpacing]} />
       ) : mediaType === 'link' ? (

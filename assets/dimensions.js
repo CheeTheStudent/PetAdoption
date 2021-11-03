@@ -1,19 +1,18 @@
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
 
-const { Dimensions } = require('react-native');
-const { width, height } = Dimensions.get('screen');
+const {Dimensions} = require('react-native');
+const {width, height} = Dimensions.get('window');
 
 const guidelineBaseWidth = 360;
 const guidelineBaseHeight = 640;
-
 
 export const SCREEN = {
   WIDTH: width,
   HEIGHT: height,
 };
 
-export const scale = size => width / guidelineBaseWidth * size;
-export const verticalScale = size => height / guidelineBaseHeight * size;
+export const scale = size => (width / guidelineBaseWidth) * size;
+export const verticalScale = size => (height / guidelineBaseHeight) * size;
 export const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * factor;
 
 export const CARD = {

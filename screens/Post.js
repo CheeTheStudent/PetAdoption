@@ -1,23 +1,24 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, FlatList, StyleSheet} from 'react-native';
+import {View, Text, FlatList, StyleSheet, ToastAndroid} from 'react-native';
 import {Avatar, Icon, Input} from 'react-native-elements';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import PostCard from './components/PostCard';
+import OneSignalNotif from '../utils/OneSignalNotif';
+import Loading from './components/Loading';
 import {getTimeFromNow} from '../utils/utils';
-import colours from '../assets/colours';
 import {verticalScale, moderateScale, scale} from '../assets/dimensions';
 import {Spacing, TextStyles} from '../assets/styles';
-import Loading from './components/Loading';
+import colours from '../assets/colours';
 
 const Post = ({navigation, route}) => {
   const userUID = auth().currentUser.uid;
-  const {post: oriPost} = route.params;
-  const {id: postId} = oriPost;
+  const {postId} = route.params;
   const postRef = database().ref(`/posts/${postId}`);
   const userRef = database().ref(`/users/${userUID}`);
+  const oneSignalNotif = OneSignalNotif();
 
   const [user, setUser] = useState();
   const [post, setPost] = useState();
@@ -30,7 +31,7 @@ const Post = ({navigation, route}) => {
       setUser(user);
     });
 
-    postRef.on('value', snapshot => {
+    let thisPostRef = postRef.on('value', snapshot => {
       const data = snapshot.val() ? snapshot.val() : {};
       setPost({id: snapshot.key, ...data});
 
@@ -40,12 +41,13 @@ const Post = ({navigation, route}) => {
       setComments(retrievedComments);
     });
 
-    return () => postRef.off('value');
+    return () => postRef.off('value', thisPostRef);
   }, []);
 
   const handleOnLike = () => {
     if (post.likes?.hasOwnProperty(userUID)) return postRef.child(`likes/${userUID}`).remove();
     postRef.child(`likes/${userUID}`).set(userUID);
+    oneSignalNotif.sendLikeNotification(post.user.id, post.id, post.caption);
   };
 
   const handleOnComment = () => {
@@ -57,6 +59,7 @@ const Post = ({navigation, route}) => {
       };
       postRef.child('comments').push(newComment);
       setComment('');
+      oneSignalNotif.sendCommentNotification(post.user.id, newComment, post.id);
     }
   };
 
@@ -69,7 +72,13 @@ const Post = ({navigation, route}) => {
     postRef.child(`saves/${userUID}`).set(userUID);
   };
 
-  const renderHeaderComponent = () => <PostCard post={post} disabled onLike={handleOnLike} onBookmark={handleOnBookmark} />;
+  const handleOnDelete = () => {
+    navigation.goBack();
+    postRef.remove();
+    ToastAndroid.show('Post deleted!', ToastAndroid.SHORT);
+  };
+
+  const renderHeaderComponent = () => <PostCard post={post} disabled onLike={handleOnLike} onBookmark={handleOnBookmark} onDelete={handleOnDelete} />;
 
   return (
     <View style={styles.body}>
@@ -77,6 +86,7 @@ const Post = ({navigation, route}) => {
         <>
           <FlatList
             data={comments}
+            keyExtractor={item => item.id}
             ListHeaderComponent={renderHeaderComponent()}
             ListHeaderComponentStyle={styles.horizontalLine}
             renderItem={({item, index}) => (

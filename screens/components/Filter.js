@@ -17,9 +17,9 @@ const locations = ['All', 'Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembil
 
 const Filter = ({navigation, route}) => {
   const {queries} = route.params;
-  console.log(queries);
-  const [dogBreeds, setDogBreeds] = useState();
-  const [catBreeds, setCatBreeds] = useState();
+
+  const [dogBreeds, setDogBreeds] = useState(['All']);
+  const [catBreeds, setCatBreeds] = useState(['All']);
   const [keyword, setKeyword] = useState('');
   const [species, setSpecies] = useState();
   const [breed, setBreed] = useState();
@@ -41,9 +41,7 @@ const Filter = ({navigation, route}) => {
           results.map(breed => extractedBreeds.push(breed.name));
           if (isMounted) setDogBreeds(extractedBreeds);
         },
-        error => {
-          console.log(error);
-        },
+        error => console.log(error),
       );
 
     await fetch('https://api.thecatapi.com/v1/breeds', {
@@ -56,9 +54,7 @@ const Filter = ({navigation, route}) => {
           results.map(breed => extractedBreeds.push(breed.name));
           if (isMounted) setCatBreeds(extractedBreeds);
         },
-        error => {
-          console.log(error);
-        },
+        error => console.log(error),
       );
 
     const breedQuery = queries?.findIndex(query => query.field === 'breed');
@@ -136,7 +132,7 @@ const Filter = ({navigation, route}) => {
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Pet Type</Text>
         <View style={styles.speciesContainer}>
           {animals.map(type => {
-            return <Tag title={type} onSingleSelected={handleSelectedAnimal} type={species === type ? 'black' : ''} />;
+            return <Tag key={type} title={type} onSingleSelected={handleSelectedAnimal} type={species === type ? 'black' : ''} />;
           })}
         </View>
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Breed</Text>

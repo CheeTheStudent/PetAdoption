@@ -31,23 +31,23 @@ const OB5Screening = ({navigation, user, onSave}) => {
   const userRef = database().ref(`/users/${userUID}`);
 
   const [name, setName] = useState(user ? user.name : '');
-  const [ageGroup, setAgeGroup] = useState(user ? user.screening.age : 'lt18');
+  const [ageGroup, setAgeGroup] = useState(user ? user.screening?.age : 'lt18');
   const [selectedlivingConditions, setSelectedLivingConditions] = useState([]);
   const [statuses, setStatuses] = useState([]);
-  const [numOfPets, setNumOfPets] = useState(user ? user.screening.numOfPetsOwned : 0);
-  const [vaccinated, setVaccinated] = useState(user ? user.screening.petsVaccinated : false);
-  const [spayed, setSpayed] = useState(user ? user.screening.petsSpayed : false);
-  const [desc, setDesc] = useState(user ? user.screening.description : '');
+  const [numOfPets, setNumOfPets] = useState(user ? user.screening?.numOfPetsOwned : 0);
+  const [vaccinated, setVaccinated] = useState(user ? user.screening?.petsVaccinated : false);
+  const [spayed, setSpayed] = useState(user ? user.screening?.petsSpayed : false);
+  const [desc, setDesc] = useState(user ? user.screening?.description : '');
 
   useEffect(() => {
     if (user) {
       let prevLivingConditions = [];
       let prevStatuses = [];
 
-      user.screening.livingCondition.map(tag => {
+      user.screening?.livingCondition.map(tag => {
         livingConditions.map(el => (el === tag ? prevLivingConditions.push(tag) : null));
       });
-      user.screening.status.map(tag => {
+      user.screening?.status.map(tag => {
         status.map(el => (el === tag ? prevStatuses.push(tag) : null));
       });
       setSelectedLivingConditions(prevLivingConditions);
@@ -96,6 +96,7 @@ const OB5Screening = ({navigation, user, onSave}) => {
   };
 
   const handleSkip = async () => {
+    if (user) return navigation.goBack();
     const newInfo = {
       name: 'Guest',
     };
@@ -123,21 +124,21 @@ const OB5Screening = ({navigation, user, onSave}) => {
         <View style={styles.pickerContainer}>
           <Picker selectedValue={ageGroup} onValueChange={(value, index) => setAgeGroup(value)}>
             {ageGroups.map(type => {
-              return <Picker.Item label={type.label} value={type.value} style={styles.pickerItem} />;
+              return <Picker.Item key={type.value} label={type.label} value={type.value} style={styles.pickerItem} />;
             })}
           </Picker>
         </View>
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Living Condition</Text>
         <View style={styles.tagsContainer}>
           {livingConditions.map(type => {
-            return <Tag title={type} type={selectedlivingConditions.indexOf(type) >= 0 && 'black'} onSelected={handleLivingCondition} />;
+            return <Tag key={type} title={type} type={selectedlivingConditions.indexOf(type) >= 0 && 'black'} onSelected={handleLivingCondition} />;
           })}
         </View>
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Status</Text>
         <Text style={TextStyles.desc}>Choose the roles relevant to you.</Text>
         <View style={styles.tagsContainer}>
           {status.map(type => {
-            return <Tag title={type} type={statuses.indexOf(type) >= 0 && 'black'} onSelected={handleStatus} />;
+            return <Tag key={type} title={type} type={statuses.indexOf(type) >= 0 && 'black'} onSelected={handleStatus} />;
           })}
         </View>
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Number of Pets</Text>

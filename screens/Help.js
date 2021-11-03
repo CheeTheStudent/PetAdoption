@@ -5,6 +5,7 @@ import {Picker} from '@react-native-picker/picker';
 
 import JobCard from './components/JobCard';
 import Loading from './components/Loading';
+import NoResults from './components/NoResults';
 import {SCREEN, verticalScale, scale} from '../assets/dimensions';
 import {TextStyles, Spacing} from '../assets/styles';
 import colours from '../assets/colours';
@@ -93,11 +94,14 @@ const Help = ({navigation}) => {
       {loading ? (
         <Loading type='paw' />
       ) : jobs.length > 0 ? (
-        <FlatList data={jobs} renderItem={({item, index}) => <JobCard key={item.id} job={item} onPress={() => navigation.navigate('Job', {job: item})} />} style={styles.listContainer} />
+        <FlatList
+          keyExtractor={item => item.id}
+          data={jobs}
+          renderItem={({item, index}) => <JobCard job={item} onPress={() => navigation.navigate('Job', {job: item})} />}
+          style={styles.listContainer}
+        />
       ) : (
-        <View style={styles.noResultsContainer}>
-          <Text style={{alignSelf: 'center'}}>There are no jobs for now!</Text>
-        </View>
+        <NoResults title='No Jobs Available' desc='Try a different search.' />
       )}
     </View>
   );

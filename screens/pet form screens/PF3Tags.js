@@ -1,12 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, ToastAndroid} from 'react-native';
+import {View, Text, StyleSheet, ToastAndroid, ActivityIndicator} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 
 import Tag from '../components/Tag';
 import LongRoundButton from '../components/LongRoundButton';
-import {scale, verticalScale, moderateScale} from '../../assets/dimensions';
+import {scale, verticalScale, moderateScale, SCREEN} from '../../assets/dimensions';
 import {TextStyles, Spacing} from '../../assets/styles';
 import colours from '../../assets/colours';
 
@@ -22,6 +22,7 @@ const PF3Tags = ({navigation, route, rootNavigation, pet}) => {
 
   const [selectedPersonalities, setSelectedPersonalities] = useState([]);
   const [selectedAppearances, setSelectedAppearances] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (pet) {
@@ -56,6 +57,7 @@ const PF3Tags = ({navigation, route, rootNavigation, pet}) => {
   };
 
   const handleNext = async () => {
+    setLoading(true);
     const {media, ...otherPetInfo} = petInfo;
     const fullPetInfo = {
       ...otherPetInfo,
@@ -99,8 +101,8 @@ const PF3Tags = ({navigation, route, rootNavigation, pet}) => {
       media: mediaUrls,
     });
 
+    setLoading(false);
     ToastAndroid.show(pet ? 'Pet Edited!' : 'Pet Added!', ToastAndroid.SHORT);
-
     rootNavigation.navigate('Pets');
   };
 
@@ -110,17 +112,23 @@ const PF3Tags = ({navigation, route, rootNavigation, pet}) => {
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Personality</Text>
         <View style={styles.tagsContainer}>
           {personalities.map(type => {
-            return <Tag title={type} type={selectedPersonalities.indexOf(type) >= 0 && 'black'} onSelected={handleOnSelectedPersonalities} />;
+            return <Tag key={type} title={type} type={selectedPersonalities.indexOf(type) >= 0 && 'black'} onSelected={handleOnSelectedPersonalities} />;
           })}
         </View>
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Appearances</Text>
         <View style={styles.tagsContainer}>
           {appearances.map(type => {
-            return <Tag title={type} type={selectedAppearances.indexOf(type) >= 0 && 'black'} onSelected={handleOnSelectedAppearances} />;
+            return <Tag key={type} title={type} type={selectedAppearances.indexOf(type) >= 0 && 'black'} onSelected={handleOnSelectedAppearances} />;
           })}
         </View>
       </View>
-      <LongRoundButton title='SUBMIT' onPress={handleNext} containerStyle={styles.button} />
+      <View style={styles.bottomContainer}>
+        <Text onPress={() => navigation.goBack()} style={styles.skipText}>
+          {'BACK'}
+        </Text>
+        <LongRoundButton title={'SUBMIT'} onPress={handleNext} />
+      </View>
+      <ActivityIndicator animating={loading} size={50} color='black' style={styles.loading} />
     </View>
   );
 };
@@ -137,11 +145,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-
-  button: {
+  bottomContainer: {
     position: 'absolute',
     bottom: verticalScale(32),
+    flexDirection: 'row',
     alignSelf: 'center',
+    alignItems: 'center',
+  },
+  skipText: {
+    marginHorizontal: scale(8),
+    fontSize: moderateScale(12),
+    textDecorationLine: 'underline',
+  },
+  loading: {
+    position: 'absolute',
+    top: SCREEN.HEIGHT / 2 - 25 - 50,
+    left: SCREEN.WIDTH / 2 - 25,
   },
 });
 

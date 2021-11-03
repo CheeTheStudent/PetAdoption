@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {ScrollView, View, Text, TouchableOpacity, Image, ImageBackground, FlatList, StyleSheet} from 'react-native';
+import {ScrollView, View, Text, TouchableOpacity, Image, ImageBackground, FlatList, StyleSheet, Alert, BackHandler} from 'react-native';
 import {Icon} from 'react-native-elements';
 import {Picker} from '@react-native-picker/picker';
 import NumericInput from 'react-native-numeric-input';
@@ -68,6 +68,20 @@ const PF1Basic = ({navigation, pet}) => {
   const [desc, setDesc] = useState(pet ? pet.desc : '');
   const [chosenMedia, setChosenMedia] = useState(pet ? pet.media : []);
 
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (!navigation.isFocused()) return false;
+      Alert.alert('Discard Changes?', 'Are you sure you want to leave? Your progress will be lost.', [{text: 'Cancel'}, {text: "Yes, I'm sure", onPress: () => navigation.goBack()}], {
+        cancelable: true,
+      });
+      return true;
+    });
+
+    return () => {
+      backHandler.remove();
+    };
+  }, []);
+
   useEffect(async () => {
     fetch('https://api.thedogapi.com/v1/breeds', {
       headers: {'x-api-key': dogAPIkey},
@@ -75,7 +89,7 @@ const PF1Basic = ({navigation, pet}) => {
       .then(res => res.json())
       .then(
         results => {
-          let extractedBreeds = [];
+          let extractedBreeds = ['Unknown', 'Mixed'];
           results.map(breed => extractedBreeds.push(breed.name));
           setDogBreeds(extractedBreeds);
           if (pet) setBreed(pet.breed);
@@ -91,7 +105,7 @@ const PF1Basic = ({navigation, pet}) => {
       .then(res => res.json())
       .then(
         results => {
-          let extractedBreeds = [];
+          let extractedBreeds = ['Unknown', 'Mixed'];
           results.map(breed => extractedBreeds.push(breed.name));
           setCatBreeds(extractedBreeds);
           if (pet) setBreed(pet.breed);
@@ -135,18 +149,16 @@ const PF1Basic = ({navigation, pet}) => {
   };
 
   const handleSubmit = () => {
-    if (!name || (ageYear == 0 && ageMonth == 0) || !species) return;
-
     const petBasicInfo = {
       name,
       ageYear,
       ageMonth,
       gender,
       species,
-      breed,
+      breed: breed === 'Unknown' ? '' : breed,
       location,
       desc,
-      media: chosenMedia || [],
+      media: chosenMedia,
     };
 
     navigation.navigate('Medical', {petInfo: petBasicInfo});
@@ -156,10 +168,14 @@ const PF1Basic = ({navigation, pet}) => {
     <View style={styles.body}>
       <ScrollView>
         <View style={styles.container}>
-          <Text style={[TextStyles.h3, Spacing.mediumTopSpacing]}>Name</Text>
+          <Text style={[TextStyles.h3, Spacing.mediumTopSpacing]}>
+            Name <Text style={{color: 'red'}}>*</Text>
+          </Text>
           <Text style={TextStyles.desc}>Write your pet's name here.</Text>
           <Textinput placeholder='Eg. Rex' defaultValue={name} onChangeText={name => setName(name)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
-          <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Age</Text>
+          <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>
+            Age <Text style={{color: 'red'}}>*</Text>
+          </Text>
           <View style={[styles.rowContainer, {justifyContent: 'space-between'}]}>
             <View style={styles.ageRowContainer}>
               <Text style={[TextStyles.h4, Spacing.smallRightSpacing]}>Years</Text>
@@ -170,7 +186,9 @@ const PF1Basic = ({navigation, pet}) => {
               <NumericInput value={ageMonth} onChange={value => setAgeMonth(value)} maxValue={99} minValue={0} rounded totalWidth={scale(100)} totalHeight={verticalScale(35)} />
             </View>
           </View>
-          <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Gender</Text>
+          <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>
+            Gender <Text style={{color: 'red'}}>*</Text>
+          </Text>
           <View style={styles.rowContainer}>
             <SquareButton
               title='Female'
@@ -187,7 +205,9 @@ const PF1Basic = ({navigation, pet}) => {
               onPress={() => setGender(false)}
             />
           </View>
-          <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Species</Text>
+          <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>
+            Species <Text style={{color: 'red'}}>*</Text>
+          </Text>
           <View style={[Spacing.superSmallTopSpacing, {flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap'}]}>
             {animals.map((animal, index) => renderBox(animals[index], index))}
           </View>
@@ -220,13 +240,15 @@ const PF1Basic = ({navigation, pet}) => {
           <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Short Description</Text>
           <Text style={TextStyles.desc}>Tell us about your pet! You can put in additional information here.</Text>
           <MultiLineInput numberOfLines={5} defaultValue={desc} onChangeText={desc => setDesc(desc)} containerStyle={Spacing.smallTopSpacing} />
-          <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Media</Text>
+          <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>
+            Media <Text style={{color: 'red'}}>*</Text>
+          </Text>
           <Text style={TextStyles.desc}>Attach images and videos to better showcase your pet’s qualities! Adopters are more likely to be interested if more photos are available.</Text>
           {chosenMedia && chosenMedia.length > 0 && (
             <FlatList
               horizontal
               data={chosenMedia}
-              keyExtractor={(item, index) => index}
+              keyExtractor={index => index}
               style={Spacing.smallTopSpacing}
               renderItem={({item, index}) => {
                 return (
@@ -241,7 +263,7 @@ const PF1Basic = ({navigation, pet}) => {
           )}
           {chosenMedia && chosenMedia.length > 0 ? <MediaPicker setChosenMedia={setChosenMedia} buttons /> : <MediaPicker setChosenMedia={setChosenMedia} />}
         </View>
-        <LongRoundButton title='CONTINUE' onPress={handleSubmit} containerStyle={styles.button} />
+        <LongRoundButton title='CONTINUE' disabled={!name || (ageYear == 0 && ageMonth == 0) || !species || chosenMedia.length < 1} onPress={handleSubmit} containerStyle={styles.button} />
       </ScrollView>
     </View>
   );

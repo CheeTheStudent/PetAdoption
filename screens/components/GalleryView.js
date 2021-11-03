@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
-import {View, FlatList, Image, ActivityIndicator, TouchableOpacity, StyleSheet} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Text, FlatList, Image, ActivityIndicator, TouchableOpacity, StyleSheet} from 'react-native';
 import {Icon} from 'react-native-elements';
 import Video from 'react-native-video';
+import ImageColors from 'react-native-image-colors';
 
 import {SCREEN, scale, verticalScale} from '../../assets/dimensions';
 import colours from '../../assets/colours';
@@ -10,6 +11,26 @@ const GalleryView = ({navigation, route}) => {
   const {media} = route.params;
 
   const [loading, setLoading] = useState(false);
+  const [bgColours, setBgColours] = useState([]);
+  const [colourLoading, setColourLoading] = useState(true);
+
+  useEffect(async () => {
+    let fetchColours = [];
+    await Promise.all(
+      media.map(async (item, i) => {
+        if (!isVideo(item)) {
+          const bg = await ImageColors.getColors(item, {
+            pixelSpacing: 100,
+            cache: true,
+            key: item,
+          });
+          fetchColours.push(bg.average);
+        } else fetchColours.push('#ffffff');
+      }),
+    );
+    setBgColours(fetchColours);
+    setColourLoading(false);
+  }, []);
 
   const isVideo = url => {
     let n = url.lastIndexOf('?');
@@ -18,36 +39,40 @@ const GalleryView = ({navigation, route}) => {
   };
 
   const goBack = () => {
+    setLoading(false);
     navigation.goBack();
   };
 
   return (
     <View style={styles.body}>
-      {!loading && <ActivityIndicator color={colours.black} style={styles.absoluteCenter} />}
-      <FlatList
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        data={media}
-        keyExtractor={index => index}
-        renderItem={({item, index}) => (
-          <View key={index} style={styles.item}>
-            {isVideo(item) ? (
-              <Video
-                source={{uri: item}}
-                resizeMode='cover'
-                controls
-                muted={true}
-                onLoadStart={() => setLoading(true)}
-                onLoad={() => setLoading(false)}
-                style={{flex: 1, backgroundColor: colours.darkGray}}
-              />
-            ) : (
-              <Image source={{uri: item}} style={{flex: 1}} />
-            )}
-          </View>
-        )}
-      />
+      {loading || colourLoading ? (
+        <ActivityIndicator color={colours.black} style={styles.absoluteCenter} />
+      ) : (
+        <FlatList
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          data={media}
+          keyExtractor={index => index}
+          renderItem={({item, index}) => (
+            <View key={index} style={[styles.item, {backgroundColor: bgColours[index]}]}>
+              {isVideo(item) ? (
+                <Video
+                  source={{uri: item}}
+                  resizeMode='cover'
+                  controls
+                  muted={true}
+                  onLoadStart={() => setLoading(true)}
+                  onLoad={() => setLoading(false)}
+                  style={{flex: 1, backgroundColor: colours.darkGray}}
+                />
+              ) : (
+                <Image source={{uri: item}} resizeMode='contain' style={{flex: 1}} />
+              )}
+            </View>
+          )}
+        />
+      )}
       <TouchableOpacity onPress={goBack} style={styles.fab}>
         <Icon name='arrow-back' type='ionicon' size={24} color='white' />
       </TouchableOpacity>

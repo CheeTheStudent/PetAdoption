@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, FlatList, Text, TouchableOpacity, StyleSheet, ScrollView, SectionList, ToastAndroid} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import {Icon, Button, Image} from 'react-native-elements';
@@ -8,10 +8,11 @@ import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 
 import LongRoundButton from '../components/LongRoundButton';
+import NoResults from '../components/NoResults';
+import {calcPetAge} from '../../utils/utils';
 import {scale, verticalScale, moderateScale, SCREEN} from '../../assets/dimensions';
 import {Spacing, TextStyles} from '../../assets/styles';
 import colours from '../../assets/colours';
-import {useEffect} from 'react';
 
 const M1Pets = ({navigation, setManageScreenNavigationOptions, pets}) => {
   const userUID = auth().currentUser.uid;
@@ -79,20 +80,6 @@ const M1Pets = ({navigation, setManageScreenNavigationOptions, pets}) => {
       return () => handleCancelSelection();
     }, []),
   );
-
-  const calcPetAge = (ageYear, ageMonth) => {
-    let ageLabel = '';
-    if (ageYear == 0) {
-      ageLabel = ageMonth + ' months';
-    } else if (ageMonth == 0) {
-      ageLabel = ageYear + ' years';
-    } else if (ageYear > 0 && ageMonth > 0) {
-      ageLabel = ageYear + ' years ' + ageMonth + ' months';
-    } else {
-      ageLabel = 'Age Unspecified';
-    }
-    return ageLabel;
-  };
 
   const handleShowModal = pet => {
     setModalPet(pet);
@@ -184,30 +171,36 @@ const M1Pets = ({navigation, setManageScreenNavigationOptions, pets}) => {
 
   return (
     <View style={styles.body}>
-      <FlatList
-        numColumns={2}
-        data={pets.filter(pet => pet.status.status === 'Available')}
-        renderItem={({item, index}) => renderPetItem(item, index)}
-        columnWrapperStyle={styles.rowContainer}
-        contentContainerStyle={styles.listContainer}
-        ListFooterComponent={
-          <>
-            {pets.filter(pet => pet.status.status === 'Adopted').length > 0 ? (
-              <>
-                {pets.filter(pet => pet.status.status === 'Available').length > 0 ? <View style={styles.horizontalLine} /> : null}
-                <Text style={[TextStyles.h3, Spacing.superSmallTopSpacing]}>Adopted</Text>
-              </>
-            ) : null}
-            <FlatList
-              numColumns={2}
-              data={pets.filter(pet => pet.status.status === 'Adopted')}
-              renderItem={({item, index}) => renderPetItem(item, index)}
-              columnWrapperStyle={styles.rowContainer}
-              contentContainerStyle={styles.listContainer}
-            />
-          </>
-        }
-      />
+      {pets ? (
+        <FlatList
+          numColumns={2}
+          keyExtractor={item => item.id}
+          data={pets.filter(pet => pet.status.status === 'Available')}
+          renderItem={({item, index}) => renderPetItem(item, index)}
+          columnWrapperStyle={styles.rowContainer}
+          contentContainerStyle={styles.listContainer}
+          ListFooterComponent={
+            <>
+              {pets.filter(pet => pet.status.status === 'Adopted').length > 0 ? (
+                <>
+                  {pets.filter(pet => pet.status.status === 'Available').length > 0 ? <View style={styles.horizontalLine} /> : null}
+                  <Text style={[TextStyles.h3, Spacing.superSmallTopSpacing]}>Adopted</Text>
+                </>
+              ) : null}
+              <FlatList
+                numColumns={2}
+                keyExtractor={item => item.id}
+                data={pets.filter(pet => pet.status.status === 'Adopted')}
+                renderItem={({item, index}) => renderPetItem(item, index)}
+                columnWrapperStyle={styles.rowContainer}
+                contentContainerStyle={styles.listContainer}
+              />
+            </>
+          }
+        />
+      ) : (
+        <NoResults title='No pets posted yet!' desc='Add a pet for adoption!' />
+      )}
       <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('PetForm', {root: navigation})}>
         <Icon name='plus' type='material-community' size={30} color='white' />
       </TouchableOpacity>

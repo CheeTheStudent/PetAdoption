@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, TouchableOpacity, ScrollView, StyleSheet, Linking} from 'react-native';
+import {View, Text, TouchableOpacity, ScrollView, StyleSheet, Linking, ActivityIndicator} from 'react-native';
 import {Image, Icon} from 'react-native-elements';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
@@ -22,6 +22,7 @@ const Job = ({navigation, route}) => {
 
   const [owner, setOwner] = useState();
   const [user, setUser] = useState();
+  const [loading, setLoading] = useState(false);
 
   useEffect(async () => {
     const userData = await AsyncStorage.getItem('user');
@@ -46,6 +47,7 @@ const Job = ({navigation, route}) => {
   };
 
   const handleSendMessage = async () => {
+    setLoading(true);
     const convoInfo = {
       sender: {id: userUID, name: user.name, image: user.profilePic},
       receiver: {id: ownerId, name: owner.name, image: owner.profilePic},
@@ -54,6 +56,7 @@ const Job = ({navigation, route}) => {
       requestAccepted: owner.private ? false : true,
     };
     const convoId = await firebaseMessage.createConvo(convoInfo);
+    setLoading(false);
     navigation.navigate('Chat', {convo: {id: convoId, ...convoInfo}});
   };
 
@@ -83,56 +86,26 @@ const Job = ({navigation, route}) => {
               </Text>
             </>
           ) : null}
-
-          {owner ? (
-            <>
-              {location ? (
-                <>
-                  <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Location</Text>
-                  <Text style={[TextStyles.desc, Spacing.superSmallTopSpacing]}>{location.address}</Text>
-                  <MapView
-                    initialRegion={{
-                      latitude: location.latitude,
-                      longitude: location.longitude,
-                      latitudeDelta: 0.0922,
-                      longitudeDelta: 0.0421,
-                    }}
-                    pitchEnabled={false}
-                    rotateEnabled={false}
-                    zoomEnabled={false}
-                    scrollEnabled={false}
-                    onPress={openMaps}
-                    style={styles.map}>
-                    <Marker
-                      coordinate={{
-                        latitude: location.latitude,
-                        longitude: location.longitude,
-                      }}
-                    />
-                  </MapView>
-                </>
-              ) : null}
-              <View style={[styles.rowContainer, Spacing.smallTopSpacing]}>
-                <Image source={require('../assets/images/dog.png')} style={[styles.ownerImage, Spacing.smallRightSpacing]} />
-                <View style={[styles.shelterInfoContainer, Spacing.superSmallRightSpacing]}>
-                  <Text style={[TextStyles.h3]} numberOfLines={1}>
-                    {owner.name}
-                  </Text>
-                  <Text style={TextStyles.desc}>{owner.role}</Text>
-                </View>
-                <SquareButton
-                  title='VIEW'
-                  onPress={() => navigation.navigate('OwnerProfile', {ownerId, ownerName: owner.name})}
-                  titleStyle={styles.buttonText}
-                  buttonStyle={styles.viewOwnerButton}
-                  containerStyle={styles.viewOwnerButtonCon}
-                />
-              </View>
-            </>
-          ) : null}
+          <View style={[styles.rowContainer, Spacing.smallTopSpacing]}>
+            <Image source={owner?.profilePic ? {uri: owner.profilePic} : require('../assets/images/placeholder.png')} style={[styles.ownerImage, Spacing.smallRightSpacing]} />
+            <View style={[styles.shelterInfoContainer, Spacing.superSmallRightSpacing]}>
+              <Text style={[TextStyles.h3]} numberOfLines={1}>
+                {owner?.name}
+              </Text>
+              <Text style={TextStyles.desc}>{owner?.role}</Text>
+            </View>
+            <SquareButton
+              title='VIEW'
+              onPress={() => navigation.navigate('OwnerProfile', {ownerId})}
+              titleStyle={styles.buttonText}
+              buttonStyle={styles.viewOwnerButton}
+              containerStyle={styles.viewOwnerButtonCon}
+            />
+          </View>
         </View>
         <LongRoundButton title='APPLY' onPress={handleSendMessage} containerStyle={styles.button} />
       </ScrollView>
+      <ActivityIndicator animating={loading} size={50} color='black' style={styles.loading} />
     </View>
   );
 };
@@ -198,6 +171,11 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(8),
     marginBottom: verticalScale(32),
     alignSelf: 'center',
+  },
+  loading: {
+    position: 'absolute',
+    top: SCREEN.HEIGHT / 2 - 25,
+    left: SCREEN.WIDTH / 2 - 25,
   },
 });
 

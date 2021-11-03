@@ -83,7 +83,9 @@ const AppNavigation = ({navigation, user}) => {
       <Tab.Screen name='Home' children={props => <HomeScreen user={user} {...props} />} options={{tabBarLabel: 'Adoption'}} />
       <Tab.Screen name='Help' component={HelpScreen} options={{tabBarLabel: 'Help'}} />
       <Tab.Screen name='Community' component={CommunityScreen} options={{tabBarLabel: 'Community'}} />
-      <Tab.Screen name='Manage' children={props => <ManageScreen defaultHeader={defaultHeader} {...props} />} options={{tabBarLabel: 'Manage'}} />
+      {user.role === 'Shelter' || user.role === 'Rescuer' ? (
+        <Tab.Screen name='Manage' children={props => <ManageScreen defaultHeader={defaultHeader} {...props} />} options={{tabBarLabel: 'Manage'}} />
+      ) : null}
       <Tab.Screen name='Messages' component={MessagesScreen} options={{tabBarLabel: 'Messages'}} />
     </Tab.Navigator>
   );

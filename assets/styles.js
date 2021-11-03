@@ -79,4 +79,7 @@ export const Spacing = StyleSheet.create({
   bigTopSpacing: {
     marginTop: verticalScale(32),
   },
+  bigBottomSpacing: {
+    marginBottom: verticalScale(32),
+  },
 });

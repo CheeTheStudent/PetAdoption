@@ -80,30 +80,21 @@ const chartConfig = {
   barPercentage: 0.5,
 };
 
-const MOverview = () => {
+const MOverview = ({pets}) => {
   const userUID = auth().currentUser.uid;
   const petDataRef = database().ref(`petData/${userUID}`);
   const petRef = database().ref(`pets`).orderByChild('ownerId').equalTo(userUID);
   const [period, setPeriod] = useState('Day');
   const [selectedTime, setSelectedTime] = useState(moment());
-  const [pets, setPets] = useState();
-  const [petsData, setPetsData] = useState();
-  const [petsAdopted, setPetsAdopted] = useState();
+  const [petsData, setPetsData] = useState([]);
+  const [petsAdopted, setPetsAdopted] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    petRef.on('value', snapshot => {
-      const data = snapshot.val() ? snapshot.val() : {};
-      let retrievedData = [];
-      Object.entries(data).filter(value => retrievedData.push({id: value[0], ...value[1]}));
-      const adoptedData = retrievedData.filter(pet => pet.status.status === 'Adopted');
-      setPets(retrievedData);
-      setPetsAdopted(adoptedData);
-    });
-
-    return () => petRef.off('value');
-  }, []);
+    const adoptedData = pets.filter(pet => pet.status.status === 'Adopted');
+    setPetsAdopted(adoptedData);
+  }, [pets]);
 
   useEffect(() => {
     let queryRef = petDataRef;
@@ -139,9 +130,9 @@ const MOverview = () => {
   };
 
   const getLabels = () => {
-    let selectedLabels;
-    let searchBy;
-    let timeUnit;
+    let selectedLabels; // Set labels corresponding to time frame chosen
+    let searchBy; // To retrieve date's relative time value eg. Month of specific date
+    let timeUnit; // Time unit to search by
     switch (period) {
       case 'Day':
         selectedLabels = timeLabels;
@@ -183,6 +174,8 @@ const MOverview = () => {
             }
             return true;
           } else {
+            // Moment.js does not provide a default "week of the month" get function
+            // getWeekOfMonth() is a custom function for this purpose
             if (getWeekOfMonth(moment(item.createdAt)) == i + 1) {
               arr[i] += 1;
               return false;
@@ -224,6 +217,7 @@ const MOverview = () => {
 
   const getAdoptionRate = () => {
     if (!petsAdopted) return;
+    let noAdoptions = true;
     const lengthOfValues = getLabels().values.length;
     const numOfAdoptions = Array(lengthOfValues).fill(0);
 
@@ -232,17 +226,21 @@ const MOverview = () => {
         const createdAt = pet.status.createdAt;
         numOfAdoptions.forEach((el, i, arr) => {
           if (period !== 'Month') {
-            if (moment(createdAt).isSame(moment(selectedTime)[getLabels().searchBy](getLabels().values[i]), getLabels().timeUnit)) arr[i] += 1;
+            if (moment(createdAt).isSame(moment(selectedTime)[getLabels().searchBy](getLabels().values[i]), getLabels().timeUnit)) {
+              arr[i] += 1;
+              noAdoptions = false;
+            }
           } else {
             if (getWeekOfMonth(moment(createdAt)) == i + 1) {
               arr[i] += 1;
+              noAdoptions = false;
             }
           }
         });
       });
     }
 
-    return {labels: getLabels().labels, datasets: [{data: numOfAdoptions}]};
+    return {labels: getLabels().labels, datasets: [{data: numOfAdoptions}], noData: noAdoptions};
   };
 
   const getAnimalDistribution = () => {
@@ -312,7 +310,6 @@ const MOverview = () => {
           />
         </View>
         <View style={styles.card}>
-          <ActivityIndicator animating={loading} color={colours.darkGray} size={moderateScale(24)} style={styles.chartLoader} />
           {petsData?.length <= 0 ? <Text style={styles.noDataMessage}>No data</Text> : null}
           <Text style={TextStyles.h3}>Views Distribution</Text>
           <BarChart
@@ -324,9 +321,9 @@ const MOverview = () => {
             chartConfig={chartConfig}
             style={[styles.chart, styles.barChart]}
           />
+          <ActivityIndicator animating={loading} color={colours.darkGray} size={moderateScale(24)} style={styles.chartLoader} />
         </View>
         <View style={styles.card}>
-          <ActivityIndicator animating={loading} color={colours.darkGray} size={moderateScale(24)} style={styles.chartLoader} />
           {petsData?.length <= 0 ? <Text style={styles.noDataMessage}>No data</Text> : null}
           <Text style={TextStyles.h3}>Interactions Distribution</Text>
           <LineChart
@@ -339,11 +336,11 @@ const MOverview = () => {
             chartConfig={chartConfig}
             style={[styles.chart, styles.lineChart]}
           />
+          <ActivityIndicator animating={loading} color={colours.darkGray} size={moderateScale(24)} style={styles.chartLoader} />
         </View>
         {period !== 'Day' ? (
           <View style={styles.card}>
-            <ActivityIndicator animating={loading} color={colours.darkGray} size={moderateScale(24)} style={styles.chartLoader} />
-            {petsData?.length <= 0 ? <Text style={styles.noDataMessage}>No data</Text> : null}
+            {getAdoptionRate().noData ? <Text style={styles.noDataMessage}>No data</Text> : null}
             <Text style={TextStyles.h3}>Adoption Rate</Text>
             <LineChart
               data={getAdoptionRate()}
@@ -355,6 +352,7 @@ const MOverview = () => {
               chartConfig={chartConfig}
               style={[styles.chart, styles.lineChart]}
             />
+            <ActivityIndicator animating={loading} color={colours.darkGray} size={moderateScale(24)} style={styles.chartLoader} />
           </View>
         ) : null}
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>General Statistics</Text>

@@ -46,7 +46,7 @@ const Permissions = ({navigation}) => {
 
   const renderBox = (permission, index) => {
     return (
-      <TouchableOpacity style={[styles.box, selected[index] && styles.boxPressed]} onPress={() => handleSelection(index)}>
+      <TouchableOpacity key={index} style={[styles.box, selected[index] && styles.boxPressed]} onPress={() => handleSelection(index)}>
         <Icon name='checkmark-circle' size={moderateScale(16)} color={selected[index] ? colours.black : colours.lightGray} style={styles.checkedIcon} />
         <Icon name={permission.icon} size={moderateScale(48)} style={Spacing.superSmallBottomSpacing} />
         <Text style={[TextStyles.text, styles.text]}>{permission.title}</Text>

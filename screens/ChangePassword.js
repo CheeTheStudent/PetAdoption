@@ -1,12 +1,12 @@
 import React, {useState, useRef, useEffect, useLayoutEffect} from 'react';
-import {View, Text, ToastAndroid, StyleSheet} from 'react-native';
+import {View, Text, ToastAndroid, StyleSheet, ActivityIndicator} from 'react-native';
 import {Icon} from 'react-native-elements';
 import auth from '@react-native-firebase/auth';
 
 import TextInput from './components/TextInput';
 import LongRoundButton from './components/LongRoundButton';
 import {TextStyles, Spacing} from '../assets/styles';
-import {moderateScale, scale, verticalScale} from '../assets/dimensions';
+import {moderateScale, scale, verticalScale, SCREEN} from '../assets/dimensions';
 import colours from '../assets/colours';
 
 const ChangePassword = ({navigation}) => {
@@ -22,6 +22,7 @@ const ChangePassword = ({navigation}) => {
   const [showCurrPassword, setShowCurrPassword] = useState(true);
   const [showNewPswd, setShowNewPswd] = useState(true);
   const [showRePswd, setShowRePswd] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -67,7 +68,7 @@ const ChangePassword = ({navigation}) => {
 
   const handleChangePassword = () => {
     if (!(currPassword && pswdChecker(newPswd) && rePswdChecker(rePswd))) return;
-
+    setLoading(true);
     const credentials = auth.EmailAuthProvider.credential(auth().currentUser.email, currPassword);
 
     auth()
@@ -81,6 +82,7 @@ const ChangePassword = ({navigation}) => {
         ToastAndroid.show('Password change failed, try again.', ToastAndroid.SHORT);
         console.error(error);
       });
+    setLoading(false);
   };
 
   return (
@@ -124,6 +126,7 @@ const ChangePassword = ({navigation}) => {
         />
       </View>
       <LongRoundButton title='SAVE CHANGES' onPress={handleChangePassword} containerStyle={styles.button} />
+      <ActivityIndicator animating={loading} size={50} color='black' style={styles.loading} />
     </View>
   );
 };
@@ -148,6 +151,11 @@ const styles = StyleSheet.create({
   },
   button: {
     alignSelf: 'center',
+  },
+  loading: {
+    position: 'absolute',
+    top: SCREEN.HEIGHT / 2 - 25 - 50,
+    left: SCREEN.WIDTH / 2 - 25,
   },
 });
 

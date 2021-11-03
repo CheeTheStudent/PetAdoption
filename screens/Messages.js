@@ -49,8 +49,8 @@ const Messages = ({navigation, route, defaultHeader}) => {
           tabBarIndicatorStyle: {backgroundColor: 'black', width: SCREEN.WIDTH / 2 / 3, left: SCREEN.WIDTH / 2 / 3},
           tabBarStyle: {elevation: 0, borderBottomWidth: 1, borderBottomColor: colours.lightGray},
         }}>
-        <Tab.Screen name='Chats' children={props => <ConvoScreen chats={chats} onConvoPress={navigateToChat} />} />
-        <Tab.Screen name='Requests' children={props => <ConvoScreen chats={requests} onConvoPress={navigateToChat} />} />
+        <Tab.Screen name='Chats' children={props => <ConvoScreen chats={chats} onConvoPress={navigateToChat} {...props} />} />
+        <Tab.Screen name='Requests' children={props => <ConvoScreen chats={requests} onConvoPress={navigateToChat} {...props} />} />
       </Tab.Navigator>
     </View>
   );

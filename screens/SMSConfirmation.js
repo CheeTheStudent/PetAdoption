@@ -41,7 +41,8 @@ const SMSConfirmation = ({navigation, route}) => {
       handleNavigate();
     } catch (error) {
       setLoading(false);
-      ToastAndroid.show('An error occured. Please try again later.', ToastAndroid.SHORT);
+      if (error.code === 'auth/credential-already-in-use') ToastAndroid.show('Phone Number is already associated with another account!', ToastAndroid.SHORT);
+      else ToastAndroid.show('An error occured. Please try again later.', ToastAndroid.SHORT);
     }
   };
 

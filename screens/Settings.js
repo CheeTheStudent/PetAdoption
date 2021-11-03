@@ -1,18 +1,19 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, ScrollView, StyleSheet, ToastAndroid, Linking} from 'react-native';
+import {View, Text, TouchableOpacity, ScrollView, StyleSheet, ToastAndroid, Alert, Linking} from 'react-native';
 import {Switch} from 'react-native-elements';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 
+import OneSignalNotif from '../utils/OneSignalNotif';
 import LongRoundButton from './components/LongRoundButton';
 import colours from '../assets/colours';
 import {scale, verticalScale} from '../assets/dimensions';
 import {Spacing, TextStyles} from '../assets/styles';
 
 const Settings = ({navigation, user}) => {
+  const {settings} = user;
   const userUID = auth().currentUser.uid;
   const userRef = database().ref(`users/${userUID}`);
-  const {settings} = user;
 
   const [isPrivate, setIsPrivate] = useState(user ? user.private : false);
   const [showLiked, setShowLiked] = useState(settings ? settings.showLiked : false);
@@ -40,8 +41,23 @@ const Settings = ({navigation, user}) => {
   };
 
   const onLogout = () => {
-    OneSignalNotif().removeUserNotificationId();
-    auth().signOut();
+    Alert.alert(
+      'Log Out',
+      'Are you sure you want to log out?',
+      [
+        {text: 'Cancel'},
+        {
+          text: 'Yes',
+          onPress: () => {
+            OneSignalNotif().removeUserNotificationId();
+            auth().signOut();
+          },
+        },
+      ],
+      {
+        cancelable: true,
+      },
+    );
   };
 
   return (
@@ -107,51 +123,10 @@ const Settings = ({navigation, user}) => {
           />
         </View>
         <Text style={styles.category}>Notifications</Text>
-        <View style={styles.rowContainer}>
-          <View style={styles.textContainer}>
-            <Text style={styles.label}>Messages</Text>
-            <Text style={styles.desc}>Receiving new messages.</Text>
-          </View>
-          <Switch
-            value={messagesNotif}
-            onValueChange={() => {
-              setMessagesNotif(!messagesNotif);
-              updateSettings('messagesNotif', !messagesNotif);
-            }}
-            trackColor={{false: colours.mediumGray, true: colours.darkGray}}
-            thumbColor={messagesNotif ? colours.black : colours.lightGray}
-          />
-        </View>
-        <View style={styles.rowContainer}>
-          <View style={styles.textContainer}>
-            <Text style={styles.label}>Message Requests</Text>
-            <Text style={styles.desc}>Receiving new message requests.</Text>
-          </View>
-          <Switch
-            value={requestsNotif}
-            onValueChange={() => {
-              setRequestsNotif(!requestsNotif);
-              updateSettings('requestsNotif', !requestsNotif);
-            }}
-            trackColor={{false: colours.mediumGray, true: colours.darkGray}}
-            thumbColor={requestsNotif ? colours.black : colours.lightGray}
-          />
-        </View>
-        <View style={styles.rowContainer}>
-          <View style={styles.textContainer}>
-            <Text style={styles.label}>Posts</Text>
-            <Text style={styles.desc}>Receiving likes and comments on posts.</Text>
-          </View>
-          <Switch
-            value={postsNotif}
-            onValueChange={() => {
-              setPostsNotif(!postsNotif);
-              updateSettings('postsNotif', !postsNotif);
-            }}
-            trackColor={{false: colours.mediumGray, true: colours.darkGray}}
-            thumbColor={postsNotif ? colours.black : colours.lightGray}
-          />
-        </View>
+        <TouchableOpacity onPress={() => Linking.openSettings()}>
+          <Text style={[styles.label, Spacing.smallTopSpacing]}>Manage Notifications</Text>
+          <Text style={styles.desc}>Decide what we notify you about.</Text>
+        </TouchableOpacity>
         <Text style={styles.category}>About</Text>
         <TouchableOpacity onPress={handlePolicyLink}>
           <Text style={[styles.label, Spacing.smallTopSpacing]}>Terms and Policy</Text>

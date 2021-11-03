@@ -1,9 +1,10 @@
 import React from 'react';
-import {View, FlatList, StyleSheet} from 'react-native';
+import {View, FlatList, StyleSheet, ToastAndroid} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 
 import PostCard from '../components/PostCard';
+import NoResults from '../components/NoResults';
 import {scale} from '../../assets/dimensions';
 import {Spacing} from '../../assets/styles';
 import colours from '../../assets/colours';
@@ -28,14 +29,23 @@ const O1Home = ({navigation, posts}) => {
   };
 
   const handleOpenPost = post => {
-    navigation.navigate('Post', {post: post});
+    navigation.navigate('Post', {postId: post.id});
   };
+
+  const handleOnDelete = post => {
+    postRef.child(post.id).remove();
+    ToastAndroid.show('Post deleted!', ToastAndroid.SHORT);
+  };
+
+  if (!posts) return <NoResults title='No posts yet!' desc='Create new posts in the Community!' />;
 
   return (
     <FlatList
       keyExtractor={item => item.id}
       data={posts}
-      renderItem={({item, index}) => <PostCard post={item} onLike={() => handleOnLike(item)} onOpenPost={() => handleOpenPost(item)} onBookmark={() => handleOnBookmark(item)} />}
+      renderItem={({item, index}) => (
+        <PostCard post={item} onLike={() => handleOnLike(item)} onOpenPost={() => handleOpenPost(item)} onBookmark={() => handleOnBookmark(item)} onDelete={() => handleOnDelete(item)} />
+      )}
       ItemSeparatorComponent={() => (
         <View
           style={{

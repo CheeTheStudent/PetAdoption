@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, Pressable} from 'react-native';
+import {View, Text, StyleSheet, Pressable, Alert} from 'react-native';
 import {Avatar, Icon} from 'react-native-elements';
 import {createDrawerNavigator, DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
 import auth from '@react-native-firebase/auth';
@@ -15,7 +15,7 @@ import ChangePassword from './ChangePassword';
 import Loading from './components/Loading';
 import OneSignalNotif from '../utils/OneSignalNotif';
 import {Spacing, TextStyles} from '../assets/styles';
-import {moderateScale, verticalScale, scale} from '../assets/dimensions';
+import {moderateScale, verticalScale, scale, SCREEN} from '../assets/dimensions';
 import colours from '../assets/colours';
 
 const DrawerNavigation = () => {
@@ -26,12 +26,12 @@ const DrawerNavigation = () => {
   const [user, setUser] = useState();
 
   useEffect(() => {
-    userRef.on('value', snapshot => {
+    let thisUserRef = userRef.on('value', snapshot => {
       const userData = snapshot.val() ? snapshot.val() : {};
       setUser({id: snapshot.key, ...userData});
     });
 
-    return () => userRef.off();
+    return () => userRef.off('value', thisUserRef);
   }, []);
 
   const navigateTo = screen => {
@@ -39,8 +39,23 @@ const DrawerNavigation = () => {
   };
 
   const onLogout = () => {
-    OneSignalNotif().removeUserNotificationId();
-    auth().signOut();
+    Alert.alert(
+      'Log Out',
+      'Are you sure you want to log out?',
+      [
+        {text: 'Cancel'},
+        {
+          text: 'Yes',
+          onPress: () => {
+            OneSignalNotif().removeUserNotificationId();
+            auth().signOut();
+          },
+        },
+      ],
+      {
+        cancelable: true,
+      },
+    );
   };
 
   if (!user) return <Loading />;
@@ -49,11 +64,11 @@ const DrawerNavigation = () => {
     const {navigation} = props;
     return (
       <DrawerContentScrollView {...props}>
-        <Pressable onPress={() => navigation.jumpTo('Profile')} style={styles.header}>
-          <View style={styles.rowContainer}>
+        <Pressable onPress={() => navigation.navigate('Profile')} style={styles.header}>
+          <View style={[styles.rowContainer, Spacing.smallTopSpacing]}>
             <Avatar
               rounded
-              size={moderateScale(44)}
+              size={moderateScale(70)}
               source={
                 user.profilePic
                   ? {
@@ -62,17 +77,16 @@ const DrawerNavigation = () => {
                   : require('../assets/images/placeholder.png')
               }
             />
-            <Icon name='exit-outline' type='ionicon' onPress={onLogout} />
           </View>
-          <Text style={TextStyles.h2}>{user.name}</Text>
+          <Text style={[TextStyles.h2, Spacing.superSmallTopSpacing]}>{user.name}</Text>
           <Text style={TextStyles.h4}>{user.role}</Text>
         </Pressable>
         <DrawerItem label='Profile' icon={() => <Icon name='person' type='ionicon' />} onPress={() => navigation.navigate('Profile')} />
-        <DrawerItem label='Liked Pets' icon={() => <Icon name='heart' type='ionicon' />} onPress={() => navigation.jumpTo('LikedPets')} />
-        <DrawerItem label='Tags' icon={() => <Icon name='pricetag' type='ionicon' />} onPress={() => navigation.jumpTo('Tags')} />
-        <DrawerItem label='Bookmarks' icon={() => <Icon name='bookmark' type='ionicon' />} onPress={() => navigation.jumpTo('Bookmarks')} />
+        <DrawerItem label='Liked Pets' icon={() => <Icon name='heart' type='ionicon' />} onPress={() => navigation.navigate('LikedPets')} />
+        <DrawerItem label='Tags' icon={() => <Icon name='pricetag' type='ionicon' />} onPress={() => navigation.navigate('Tags')} />
+        <DrawerItem label='Bookmarks' icon={() => <Icon name='bookmark' type='ionicon' />} onPress={() => navigation.navigate('Bookmarks')} />
         <DrawerItem label='Settings' icon={() => <Icon name='settings-sharp' type='ionicon' />} onPress={() => navigation.navigate('Settings')} />
-        <DrawerItem label='About' icon={() => <Icon name='info' type='foundation' />} onPress={() => navigateTo('Tags')} />
+        <DrawerItem label='Log out' icon={() => <Icon name='exit' type='ionicon' />} onPress={onLogout} />
       </DrawerContentScrollView>
     );
   };
@@ -86,6 +100,9 @@ const DrawerNavigation = () => {
             <Icon name='arrow-left' type='material-community' size={moderateScale(24)} onPress={() => navigation.goBack()} />
           </View>
         ),
+        drawerStyle: {
+          width: SCREEN.WIDTH * 0.7,
+        },
       })}
       drawerContent={props => <CustomDrawerContent {...props} />}>
       <Drawer.Screen name='AppNavigation' children={props => <AppNavigation user={user} {...props} />} options={{unmountOnBlur: false}} />
@@ -104,6 +121,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: verticalScale(16),
     paddingHorizontal: scale(24),
+    marginBottom: verticalScale(16),
     borderBottomWidth: 1,
     borderBottomColor: colours.mediumGray,
   },

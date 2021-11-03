@@ -32,10 +32,6 @@ const Home = ({navigation, route, user}) => {
       headerTitleStyle: TextStyles.h2,
       headerRight: () => (
         <View style={styles.headerStyle}>
-          <TouchableOpacity onPress={handleOpenNotifications} style={Spacing.superSmallRightSpacing}>
-            <Icon name='notifications' type='Ioniconss' />
-            <Badge badgeStyle={{backgroundColor: 'red'}} containerStyle={{position: 'absolute', right: 0}} />
-          </TouchableOpacity>
           <TouchableOpacity onPress={handleOpenFilter}>
             <Icon name='options' type='ionicon' size={24} color={colours.black} />
             {queries && queries.length > 0 ? <Badge value={queries.length} badgeStyle={{backgroundColor: 'black'}} containerStyle={{position: 'absolute', right: -4, top: -4}} /> : null}
@@ -46,26 +42,24 @@ const Home = ({navigation, route, user}) => {
   }, [navigation, queries]);
 
   useEffect(() => {
-    let petQuery = petRef;
     setLoading(true);
-    if (queries && queries.length > 0) {
-      const query = queries[0];
-      if (query.field === 'age') {
-        petQuery = petRef.orderByChild('ageYear').startAt(query.startAge).endAt(query.endAge);
-      } else if (query.field === 'name') {
-        petQuery = petRef.orderByChild(query.field).startAt(query.property).endAt(`${query.property}\uf8ff`);
-      } else {
-        petQuery = petRef.orderByChild(query.field).equalTo(query.property);
-      }
-    }
-    petQuery.limitToFirst(20).on('value', snapshot => {
-      const data = snapshot.val() ? snapshot.val() : {};
-      let pets = [];
-      Object.entries(data).map(value => pets.push({id: value[0], ...value[1]}));
-      if (queries && queries.length > 1) pets = filterResults(pets);
-      filterSeen(pets);
-    });
-    return () => petRef.off();
+    // Retrieve and listen the values
+    let homePetRef = petRef
+      .orderByChild('status/status')
+      .equalTo('Available')
+      .limitToFirst(20)
+      .on('value', snapshot => {
+        const data = snapshot.val() ? snapshot.val() : {};
+        let pets = [];
+        // Map the id and data into an array
+        Object.entries(data).map(value => pets.push({id: value[0], ...value[1]}));
+        // Conduct additional filtering
+        if (queries && queries.length > 0) pets = filterResults(pets);
+        filterSeen(pets);
+      });
+
+    // Unsubscribe from listener when screen unmounts
+    return () => petRef.off('value', homePetRef);
   }, [queries, user]);
 
   useEffect(() => {
@@ -85,14 +79,12 @@ const Home = ({navigation, route, user}) => {
     let filteredPets = data;
     queries.map((query, index) => {
       const {field, property, startAge, endAge} = query;
-      if (index != 0) {
-        if (field === 'age') {
-          if (index == 1) filteredPets = filteredPets.filter(el => el.ageYear >= startAge && el.ageYear <= endAge);
-          else filteredPets = filteredPets.filter(el => el.ageYear >= startAge && el.ageYear <= endAge);
-        } else {
-          if (index == 1) filteredPets = filteredPets.filter(el => el[field] === property);
-          else filteredPets = filteredPets.filter(el => el[field] === property);
-        }
+      if (field === 'age') {
+        filteredPets = filteredPets.filter(el => el.ageYear >= startAge && el.ageYear <= endAge);
+      } else if (field === 'name') {
+        filteredPets = filteredPets.filter(el => el.name.toLowerCase().startsWith(property.toLowerCase()));
+      } else {
+        filteredPets = filteredPets.filter(el => el[field] === property);
       }
     });
     return filteredPets;
@@ -100,18 +92,27 @@ const Home = ({navigation, route, user}) => {
 
   const filterSeen = async pets => {
     let filteredData = pets;
-
-    if (!settings.showLiked) {
-      const snapshot = await userDataRef.orderByChild('liked').equalTo(true).once('value');
-      const likedPets = snapshot.val() ? snapshot.val() : {};
-      Object.entries(likedPets).map(value => (filteredData = filteredData.filter(e => e.id !== value[0])));
+    if (settings) {
+      if (!settings.showLiked) {
+        // Retrieve liked pets and filter them out
+        const snapshot = await userDataRef.orderByChild('liked').equalTo(true).once('value');
+        const likedPets = snapshot.val() ? snapshot.val() : {};
+        Object.entries(likedPets).map(value => (filteredData = filteredData.filter(e => e.id !== value[0])));
+      }
+      if (!settings.showDisliked) {
+        // Retrieve disliked pets and filter them out
+        const snapshot = await userDataRef.orderByChild('liked').equalTo(false).once('value');
+        const dislikedPets = snapshot.val() ? snapshot.val() : {};
+        Object.entries(dislikedPets).map(value => (filteredData = filteredData.filter(e => e.id !== value[0])));
+      }
     }
-    if (!settings.showDisliked) {
-      const snapshot = await userDataRef.orderByChild('liked').equalTo(false).once('value');
-      const dislikedPets = snapshot.val() ? snapshot.val() : {};
-      Object.entries(dislikedPets).map(value => (filteredData = filteredData.filter(e => e.id !== value[0])));
-    }
-    setPets(filteredData);
+    // Randomize position
+    let shuffled = filteredData
+      .map(value => ({value, sort: Math.random()}))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({value}) => value);
+    // Set to state
+    setPets(shuffled);
     setLoading(false);
   };
 
@@ -173,10 +174,6 @@ const Home = ({navigation, route, user}) => {
 
   const handleOpenFilter = () => {
     navigation.navigate('FilterModal', {queries});
-  };
-
-  const handleOpenNotifications = () => {
-    // navigation.navigate('Convo');
   };
 
   const handleOpenProfile = () => {

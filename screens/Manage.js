@@ -30,10 +30,11 @@ const Manage = ({navigation, route, defaultHeader}) => {
   }, [navigation, manageScreenNavigationOptions]);
 
   useEffect(() => {
-    petRef
+    let thisPetRref = petRef
       .orderByChild('ownerId')
       .equalTo(userUID)
       .on('value', snapshot => {
+        console.log('Manage listening');
         const data = snapshot.val() ? snapshot.val() : {};
         let petData = [];
         Object.entries(data).map(value => petData.push({id: value[0], ...value[1]}));
@@ -41,7 +42,7 @@ const Manage = ({navigation, route, defaultHeader}) => {
         setPetLoading(false);
       });
 
-    jobRef
+    let thisJobRef = jobRef
       .orderByChild('ownerId')
       .equalTo(userUID)
       .on('value', snapshot => {
@@ -53,8 +54,8 @@ const Manage = ({navigation, route, defaultHeader}) => {
       });
 
     return () => {
-      petRef.off();
-      jobRef.off();
+      petRef.off('value', thisPetRref);
+      jobRef.off('value', thisJobRef);
     };
   }, []);
 
@@ -68,7 +69,7 @@ const Manage = ({navigation, route, defaultHeader}) => {
             tabBarIndicatorStyle: {backgroundColor: 'black', width: (SCREEN.WIDTH / 3) * 0.7, left: (SCREEN.WIDTH / 3) * 0.15},
             tabBarStyle: {elevation: 0, borderBottomWidth: 1, borderBottomColor: colours.lightGray},
           }}>
-          <Tab.Screen name='Overview' children={props => <MOverview {...props} />} />
+          <Tab.Screen name='Overview' children={props => <MOverview pets={pets} {...props} />} />
           <Tab.Screen name='Pets' children={props => <M1Pets pets={pets} setManageScreenNavigationOptions={setManageScreenNavigationOptions} {...props} />} />
           <Tab.Screen name='Jobs' children={props => <M2Jobs jobs={jobs} {...props} />} />
         </Tab.Navigator>

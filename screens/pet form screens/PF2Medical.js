@@ -5,7 +5,7 @@ import TextInput from '../components/TextInput';
 import SquareButton from '../components/SquareButton';
 import LongRoundButton from '../components/LongRoundButton';
 import MultiLineInput from '../components/MultiLineInput';
-import {verticalScale, scale} from '../../assets/dimensions';
+import {verticalScale, scale, moderateScale} from '../../assets/dimensions';
 import {TextStyles, Spacing} from '../../assets/styles';
 import colours from '../../assets/colours';
 
@@ -110,7 +110,12 @@ const PF2Medical = ({navigation, route, pet}) => {
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Health Issues</Text>
         <Text style={TextStyles.desc}>If your pet has any illnesses or allergies, write them down here!</Text>
         <MultiLineInput numberOfLines={5} defaultValue={desc} onChangeText={desc => setDesc(desc)} containerStyle={Spacing.smallTopSpacing} />
-        <LongRoundButton title='CONTINUE' onPress={handleSubmit} containerStyle={styles.button} />
+        <View style={styles.bottomContainer}>
+          <Text onPress={() => navigation.goBack()} style={styles.skipText}>
+            {'BACK'}
+          </Text>
+          <LongRoundButton title={'CONTINUE'} onPress={handleSubmit} />
+        </View>
       </ScrollView>
     </View>
   );
@@ -143,10 +148,17 @@ const styles = StyleSheet.create({
   squareButtonTextPressed: {
     color: colours.white,
   },
-  button: {
+  bottomContainer: {
     marginTop: verticalScale(24),
     marginBottom: verticalScale(32),
+    flexDirection: 'row',
     alignSelf: 'center',
+    alignItems: 'center',
+  },
+  skipText: {
+    marginHorizontal: scale(8),
+    fontSize: moderateScale(12),
+    textDecorationLine: 'underline',
   },
 });
 

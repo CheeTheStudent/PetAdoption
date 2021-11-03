@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {View, Text, StatusBar, Image, ActivityIndicator, ToastAndroid, StyleSheet} from 'react-native';
 import {Button, SocialIcon} from 'react-native-elements';
 import AppIntroSlider from 'react-native-app-intro-slider';
-import {AccessToken, LoginManager} from 'react-native-fbsdk-next';
 import {GoogleSignin, statusCodes} from 'react-native-google-signin';
 import auth from '@react-native-firebase/auth';
 import LottieView from 'lottie-react-native';
@@ -19,17 +18,17 @@ import Walk from '../assets/images/auth3.svg';
 const data = [
   {
     title: 'Save A Life',
-    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vitae ultricies pulvinar in turpis.',
+    text: 'Browse through adoptable pets of all breeds, personalities and sizes. Save a life by adopting one!',
     image: <LottieView source={require('../assets/images/onboard1.json')} autoPlay loop style={{width: moderateScale(300), marginTop: verticalScale(2)}} />,
   },
   {
     title: 'Help A Cause',
-    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vitae ultricies pulvinar in turpis.',
+    text: "Can't adopt but looking for a way to help? We've got plenty of opportunities for volunteering!",
     image: <LottieView source={require('../assets/images/onboard2.json')} autoPlay loop style={{height: moderateScale(300)}} />,
   },
   {
     title: 'Throw A Ball',
-    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vitae ultricies pulvinar in turpis.',
+    text: "You take care of the pets, we'll take care of the rest. Put pets up for adoption here and find the perfect adopters!",
     image: <LottieView source={require('../assets/images/onboard3.json')} autoPlay loop style={{width: moderateScale(290), marginTop: verticalScale(-4)}} />,
   },
 ];
@@ -52,7 +51,7 @@ const Auth = ({navigation}) => {
     return (
       <View style={styles.slide}>
         {item.image}
-        <View style={{position: 'absolute', bottom: verticalScale(50)}}>
+        <View style={{position: 'absolute', bottom: verticalScale(70)}}>
           <Text style={styles.title}>{item.title}</Text>
           <Text style={[TextStyles.text, styles.text]}>{item.text}</Text>
         </View>
@@ -70,29 +69,6 @@ const Auth = ({navigation}) => {
     navigation.navigate('SignUp');
   };
 
-  const handleFacebookLogin = () => {
-    setLoading(true);
-
-    LoginManager.logInWithPermissions(['public_profile'])
-      .then(result => {
-        if (result.isCancelled) {
-          setLoading(false);
-        } else {
-          AccessToken.getCurrentAccessToken().then(data => {
-            if (!data) {
-              throw 'Something went wrong obtaining access token';
-            }
-            const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
-            return auth().signInWithCredential(facebookCredential);
-          });
-        }
-      })
-      .catch(error => {
-        ToastAndroid.show('Sign in failed, please try again.', ToastAndroid.SHORT);
-        setLoading(false);
-      });
-  };
-
   const handleGoogleLogin = () => {
     setLoading(true);
 
@@ -103,11 +79,11 @@ const Auth = ({navigation}) => {
       })
       .catch(error => {
         if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-          console.log('Login Cancelled.');
+          ToastAndroid.show('Login Cancelled.', ToastAndroid.SHORT);
         } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-          console.log('Play Services are not available or outdated.');
+          ToastAndroid.show('Play Services are not available or outdated.', ToastAndroid.SHORT);
         } else {
-          console.log('Login fail with error: ' + error);
+          ToastAndroid.show('Login failed, please try again later.', ToastAndroid.SHORT);
         }
       });
     setLoading(false);
@@ -115,13 +91,12 @@ const Auth = ({navigation}) => {
 
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
-      <ActivityIndicator animating={loading} size={50} color='blue' style={styles.loading} />
-      <View style={{flex: 2}}>
+      <ActivityIndicator animating={loading} size={50} color='black' style={styles.loading} />
+      <View style={{flex: 3}}>
         <AppIntroSlider keyExtractor={keyExtractor} renderItem={renderItem} showNextButton={false} dotStyle={styles.dotStyle} activeDotStyle={styles.activeDotStyle} data={data} />
       </View>
       <View style={{flex: 1}}>
         <LongRoundButton title='LOGIN WITH EMAIL' onPress={handleEmailLogin} containerStyle={styles.emailButton} />
-        <SocialIcon title='LOGIN WITH FACEBOOOK' button type='facebook' iconSize={moderateScale(20)} onPress={handleFacebookLogin} style={styles.socialButton} fontStyle={styles.buttonText} />
         <SocialIcon title='LOGIN WITH GOOGLE' button type='google' iconSize={moderateScale(20)} onPress={handleGoogleLogin} style={styles.socialButton} fontStyle={styles.buttonText} />
         <Text style={styles.text}>
           Don't have an account?{' '}
@@ -138,10 +113,8 @@ const styles = StyleSheet.create({
   slide: {
     flex: 1,
     alignItems: 'center',
-    // justifyContent: 'center',
   },
   title: {
-    // marginTop: verticalScale(56),
     textAlign: 'center',
     fontSize: moderateScale(24),
     fontFamily: 'Roboto-Regular',

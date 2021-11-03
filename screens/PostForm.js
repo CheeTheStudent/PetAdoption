@@ -1,5 +1,5 @@
 import React, {useState, useLayoutEffect, useEffect} from 'react';
-import {View, Text, Image, TouchableOpacity, ScrollView, StyleSheet, ToastAndroid} from 'react-native';
+import {View, Text, Image, TouchableOpacity, ScrollView, StyleSheet, ToastAndroid, Alert, ActivityIndicator} from 'react-native';
 import {Avatar, Input} from 'react-native-elements';
 import Video from 'react-native-video';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -10,7 +10,8 @@ import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 
 import MediaPicker from './components/MediaPicker';
-import {moderateScale, scale, verticalScale} from '../assets/dimensions';
+import FullWidthImage from './components/FullWidthImage';
+import {moderateScale, scale, verticalScale, SCREEN} from '../assets/dimensions';
 import {TextStyles, Spacing} from '../assets/styles';
 import colours from '../assets/colours';
 import Loading from './components/Loading';
@@ -26,13 +27,16 @@ const PostForm = ({navigation}) => {
   const [link, setLink] = useState();
   const [linkEnabled, setLinkEnabled] = useState(true);
   const [removedLink, setRemovedLink] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       title: 'Create Post',
       headerTitleAlign: 'center',
-      headerLeft: () => <Icon name='close' type='Ionicons' size={moderateScale(24)} style={Spacing.smallLeftSpacing} onPress={() => navigation.goBack()} />,
-      headerRight: () => <Icon name='paper-plane' size={moderateScale(24)} style={Spacing.smallRightSpacing} onPress={handleSubmitPost} />,
+      headerLeft: () => <Icon name='close' type='ionicon' size={moderateScale(24)} style={Spacing.smallLeftSpacing} onPress={handleBackButton} />,
+      headerRight: () => (
+        <Icon name='paper-plane' size={moderateScale(24)} color={!(caption || media || link) ? colours.mediumGray : colours.black} style={Spacing.smallRightSpacing} onPress={handleSubmitPost} />
+      ),
     });
   }, [user, caption, location, media, link]);
 
@@ -41,6 +45,13 @@ const PostForm = ({navigation}) => {
     const user = JSON.parse(userData);
     setUser(user);
   }, []);
+
+  const handleBackButton = () => {
+    if (!(caption || media || link)) return navigation.goBack();
+    Alert.alert('Unsaved Changes', 'Are you sure you want to discard the post? Your post will be lost.', [{text: 'Cancel'}, {text: "Yes, I'm sure", onPress: () => navigation.goBack()}], {
+      cancelable: true,
+    });
+  };
 
   const handleOnChangeCaption = text => {
     if (!text.includes(removedLink)) {
@@ -71,6 +82,9 @@ const PostForm = ({navigation}) => {
   };
 
   const handleSubmitPost = async () => {
+    if (!(caption || media || link)) return;
+    setLoading(true);
+
     let editedCaption = caption;
     if (link) {
       if (caption.endsWith(link.link)) editedCaption = caption.replace(link.link, '');
@@ -97,6 +111,7 @@ const PostForm = ({navigation}) => {
       await postRef.child(postKey.key).update({media: url});
     }
 
+    setLoading(false);
     ToastAndroid.show('Successfully Posted!', ToastAndroid.SHORT);
     navigation.goBack();
   };
@@ -141,7 +156,7 @@ const PostForm = ({navigation}) => {
             </View>
             {media ? (
               <View style={styles.mediaContainer}>
-                {isVideo(media[0]) ? <Video source={{uri: media[0]}} muted={true} resizeMode='cover' controls style={styles.media} /> : <Image source={{uri: media[0]}} style={styles.media} />}
+                {isVideo(media[0]) ? <Video source={{uri: media[0]}} muted={true} resizeMode='cover' controls style={styles.media} /> : <FullWidthImage source={media[0]} style={styles.media} />}
 
                 <Icon name='close-circle-outline' size={moderateScale(30)} color='white' style={styles.closeIcon} />
                 <Icon name='close-circle' size={moderateScale(30)} style={styles.closeIcon} onPress={handleRemoveMedia} />
@@ -153,6 +168,7 @@ const PostForm = ({navigation}) => {
       ) : (
         <Loading type='paw' />
       )}
+      <ActivityIndicator animating={loading} size={50} color='black' style={styles.loading} />
     </View>
   );
 };
@@ -176,7 +192,10 @@ const styles = StyleSheet.create({
     color: colours.darkGray,
   },
   mediaContainer: {
-    height: verticalScale(212),
+    // height: verticalScale(212),
+    // aspectRatio: 3 / 2,
+    // height: undefined,
+    // width: '100%',
   },
   media: {
     flex: 1,
@@ -197,6 +216,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: verticalScale(8),
     right: scale(8),
+  },
+  loading: {
+    position: 'absolute',
+    top: SCREEN.HEIGHT / 2 - 25 - 50,
+    left: SCREEN.WIDTH / 2 - 25,
   },
 });
 

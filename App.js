@@ -32,6 +32,7 @@ import SMSConfirmationScreen from './screens/SMSConfirmation';
 import GalleryViewModal from './screens/components/GalleryView';
 import FilterModal from './screens/components/Filter';
 import GooglePlacesInputModal from './screens/components/GooglePlacesInput';
+import ReportScreen from './screens/Report';
 import Loading from './screens/components/Loading';
 import Testing from './screens/Testing';
 
@@ -64,7 +65,6 @@ const App = () => {
 
   const onAuthStateChanged = user => {
     setUser(user);
-    if (!user) setShowOnboard(true);
     handleIsNewUser();
     if (initializing) setInitializing(false);
   };
@@ -111,6 +111,7 @@ const App = () => {
                   <Stack.Screen name='Verify' component={VerifyScreen} />
                   <Stack.Screen name='SMSConfirmation' component={SMSConfirmationScreen} />
                 </Stack.Group>
+                <Stack.Screen name='Report' component={ReportScreen} />
                 <Stack.Screen name='Testing' component={Testing} />
               </>
             )}

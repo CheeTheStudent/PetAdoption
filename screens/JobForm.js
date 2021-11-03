@@ -1,5 +1,5 @@
-import React, {useState, useLayoutEffect} from 'react';
-import {ScrollView, View, Text, Image, ToastAndroid, StyleSheet} from 'react-native';
+import React, {useState, useLayoutEffect, useEffect} from 'react';
+import {ScrollView, View, Text, Image, ToastAndroid, StyleSheet, Alert, BackHandler, ActivityIndicator} from 'react-native';
 import {Icon, CheckBox} from 'react-native-elements';
 import {Picker} from '@react-native-picker/picker';
 import auth from '@react-native-firebase/auth';
@@ -11,7 +11,7 @@ import SquareButton from './components/SquareButton';
 import TextInput from './components/TextInput';
 import MultiLineInput from './components/MultiLineInput';
 import MediaPicker from './components/MediaPicker';
-import {scale, verticalScale, moderateScale} from '../assets/dimensions';
+import {scale, verticalScale, moderateScale, SCREEN} from '../assets/dimensions';
 import {TextStyles, Spacing} from '../assets/styles';
 import colours from '../assets/colours';
 
@@ -29,14 +29,34 @@ const JobForm = ({navigation, route}) => {
   const [salaryType, setSalaryType] = useState(job ? job.salaryType : '/hour');
   const [desc, setDesc] = useState(job ? job.desc : '');
   const [image, setImage] = useState(job && job.image ? [job.image] : '');
+  const [loading, setLoading] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       title: job ? 'Edit Job' : 'Add Job',
+      headerLeft: () => (
+        <View style={Spacing.smallLeftSpacing}>
+          <Icon name='close' type='ionicon' size={moderateScale(24)} onPress={handleBackButton} />
+        </View>
+      ),
     });
   }, [navigation]);
 
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+
+    return () => backHandler.remove();
+  }, []);
+
+  const handleBackButton = () => {
+    Alert.alert('Discard Changes?', 'Are you sure you want to leave? Your progress will be lost.', [{text: 'Cancel'}, {text: "Yes, I'm sure", onPress: () => navigation.goBack()}], {
+      cancelable: true,
+    });
+    return true;
+  };
+
   const handleSubmit = async () => {
+    setLoading(true);
     const snapshot = await userRef.once('value');
     const ownerData = snapshot.val() ? snapshot.val() : null;
 
@@ -79,7 +99,7 @@ const JobForm = ({navigation, route}) => {
         });
       }
     }
-
+    setLoading(false);
     ToastAndroid.show(job ? 'Job Edited!' : 'Job Added!', ToastAndroid.SHORT);
     navigation.goBack();
   };
@@ -88,10 +108,14 @@ const JobForm = ({navigation, route}) => {
     <View style={styles.body}>
       <ScrollView>
         <View style={styles.container}>
-          <Text style={[TextStyles.h3, Spacing.mediumTopSpacing]}>Title</Text>
+          <Text style={[TextStyles.h3, Spacing.mediumTopSpacing]}>
+            Title <Text style={{color: 'red'}}>*</Text>
+          </Text>
           <Text style={TextStyles.desc}>Write your job title here.</Text>
           <TextInput placeholder='Eg. Volunteer, Dog Walker..' defaultValue={title} onChangeText={value => setTitle(value)} containerStyle={Spacing.superSmallTopSpacing} renderErrorMessage={false} />
-          <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Job Type</Text>
+          <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>
+            Job Type <Text style={{color: 'red'}}>*</Text>
+          </Text>
           <View style={styles.rowContainer}>
             <SquareButton
               title='Full-time'
@@ -148,8 +172,9 @@ const JobForm = ({navigation, route}) => {
             <MediaPicker singleMedia imageOnly setChosenMedia={setImage} />
           )}
         </View>
-        <LongRoundButton title='CONTINUE' onPress={handleSubmit} containerStyle={styles.button} />
+        <LongRoundButton title='CONTINUE' disabled={!title} onPress={handleSubmit} containerStyle={styles.button} />
       </ScrollView>
+      <ActivityIndicator animating={loading} size={50} color='black' style={styles.loading} />
     </View>
   );
 };
@@ -214,6 +239,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: verticalScale(4),
     right: scale(4),
+  },
+  loading: {
+    position: 'absolute',
+    top: SCREEN.HEIGHT / 2 - 25 - 50,
+    left: SCREEN.WIDTH / 2 - 25,
   },
 });
 

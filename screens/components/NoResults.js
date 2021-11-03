@@ -8,7 +8,7 @@ import colours from '../../assets/colours';
 
 const NoResults = ({title, desc, style}) => {
   return (
-    <View style={[{flex: 1, alignItems: 'center', justifyContent: 'center'}, style]}>
+    <View style={[{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colours.white}, style]}>
       <LottieView source={require('../../assets/images/empty.json')} autoPlay loop={false} style={{width: scale(300)}} />
       <Text style={[TextStyles.h2, Spacing.superSmallTopSpacing, {color: colours.mediumGray}]}>{title}</Text>
       <Text style={[TextStyles.desc, {color: colours.mediumGray}]}>{desc}</Text>

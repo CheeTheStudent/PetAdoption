@@ -80,7 +80,6 @@ const ChangePassword = ({navigation}) => {
       })
       .catch(error => {
         ToastAndroid.show('Password change failed, try again.', ToastAndroid.SHORT);
-        console.error(error);
       });
     setLoading(false);
   };

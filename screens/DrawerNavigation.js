@@ -34,10 +34,6 @@ const DrawerNavigation = () => {
     return () => userRef.off('value', thisUserRef);
   }, []);
 
-  const navigateTo = screen => {
-    console.log(screen);
-  };
-
   const onLogout = () => {
     Alert.alert(
       'Log Out',
@@ -58,7 +54,19 @@ const DrawerNavigation = () => {
     );
   };
 
-  if (!user) return <Loading />;
+  if (!user) return <Loading type='paw' />;
+
+  const screenOptions = ({navigation}) => ({
+    headerShown: false,
+    headerLeft: () => (
+      <View style={Spacing.smallLeftSpacing}>
+        <Icon name='arrow-left' type='material-community' size={moderateScale(24)} onPress={() => navigation.goBack()} />
+      </View>
+    ),
+    drawerStyle: {
+      width: SCREEN.WIDTH * 0.7,
+    },
+  });
 
   const CustomDrawerContent = props => {
     const {navigation} = props;
@@ -95,19 +103,7 @@ const DrawerNavigation = () => {
   };
 
   return (
-    <Drawer.Navigator
-      screenOptions={({navigation}) => ({
-        headerShown: false,
-        headerLeft: () => (
-          <View style={Spacing.smallLeftSpacing}>
-            <Icon name='arrow-left' type='material-community' size={moderateScale(24)} onPress={() => navigation.goBack()} />
-          </View>
-        ),
-        drawerStyle: {
-          width: SCREEN.WIDTH * 0.7,
-        },
-      })}
-      drawerContent={props => <CustomDrawerContent {...props} />}>
+    <Drawer.Navigator screenOptions={screenOptions} drawerContent={CustomDrawerContent}>
       <Drawer.Screen name='AppNavigation' children={props => <AppNavigation user={user} {...props} />} options={{unmountOnBlur: false}} />
       <Drawer.Screen name='Profile' component={OwnerProfile} options={{unmountOnBlur: true}} />
       <Drawer.Screen name='LikedPets' component={LikedPets} options={{headerShown: true, title: 'Liked Pets', unmountOnBlur: true}} />

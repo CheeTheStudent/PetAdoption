@@ -88,8 +88,7 @@ const styles = StyleSheet.create({
     right: CARD.HEIGHT * 0.02,
   },
   image: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
     borderRadius: CARD.BORDER_RADIUS,
   },
   backgroundVideo: {

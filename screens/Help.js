@@ -73,6 +73,8 @@ const Help = ({navigation}) => {
     setJobs(filteredJobs);
   };
 
+  const renderJob = ({item}) => <JobCard job={item} onPress={() => navigation.navigate('Job', {job: item})} />;
+
   return (
     <View style={styles.body}>
       <View style={styles.rowContainer}>
@@ -94,12 +96,7 @@ const Help = ({navigation}) => {
       {loading ? (
         <Loading type='paw' />
       ) : jobs.length > 0 ? (
-        <FlatList
-          keyExtractor={item => item.id}
-          data={jobs}
-          renderItem={({item, index}) => <JobCard job={item} onPress={() => navigation.navigate('Job', {job: item})} />}
-          style={styles.listContainer}
-        />
+        <FlatList keyExtractor={item => item.id} data={jobs} renderItem={renderJob} style={styles.listContainer} />
       ) : (
         <NoResults title='No Jobs Available' desc='Try a different search.' />
       )}

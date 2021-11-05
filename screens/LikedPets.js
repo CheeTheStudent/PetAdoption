@@ -32,6 +32,14 @@ const LikedPets = ({navigation}) => {
     setRefresh(false);
   }, [refresh]);
 
+  const renderItem = ({item}) => (
+    <TouchableOpacity onPress={() => navigation.navigate('PetProfile', {pet: item})}>
+      <Image source={item.media ? {uri: item.media[0]} : require('../assets/images/placeholder.png')} style={styles.image} />
+      <Text style={[TextStyles.h4, Spacing.superSmallLeftSpacing, {marginTop: verticalScale(4)}]}>{item.name}</Text>
+      <Text style={[TextStyles.desc, Spacing.superSmallLeftSpacing]}>{calcPetAge(item.ageYear, item.ageMonth)}</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.body}>
       {pets ? (
@@ -42,13 +50,7 @@ const LikedPets = ({navigation}) => {
             data={pets}
             onRefresh={() => setRefresh(true)}
             refreshing={refresh}
-            renderItem={({item, index}) => (
-              <TouchableOpacity onPress={() => navigation.navigate('PetProfile', {pet: item})}>
-                <Image source={item.media ? {uri: item.media[0]} : require('../assets/images/placeholder.png')} style={styles.image} />
-                <Text style={[TextStyles.h4, Spacing.superSmallLeftSpacing, {marginTop: verticalScale(4)}]}>{item.name}</Text>
-                <Text style={[TextStyles.desc, Spacing.superSmallLeftSpacing]}>{calcPetAge(item.ageYear, item.ageMonth)}</Text>
-              </TouchableOpacity>
-            )}
+            renderItem={renderItem}
             contentContainerStyle={styles.listContainer}
             columnWrapperStyle={styles.rowContainer}
           />

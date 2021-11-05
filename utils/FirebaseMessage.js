@@ -90,6 +90,8 @@ const FirebaseMessage = convoId => {
           {cancelable: true},
         );
       }
+    } else {
+      await convosRef.child(convoId).update(data);
     }
     return convoId;
   };

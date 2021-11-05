@@ -74,7 +74,7 @@ const Login = ({navigation}) => {
         if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
           setEmailError('Incorrect email or password');
         }
-        console.error(error);
+        ToastAndroid.show('Incorrect email or password', ToastAndroid.SHORT);
       });
     setLoading(false);
   };

@@ -48,7 +48,7 @@ const AppNavigation = ({navigation, user}) => {
     <Tab.Navigator
       screenOptions={({route}) => ({
         ...defaultHeader,
-        headerStyle: {backgroundColor: 'white', elevation: 0},
+        headerStyle: styles.header,
         tabBarIcon: ({focused, color, size}) => {
           let iconName;
           let iconType = 'ionicon';
@@ -92,15 +92,14 @@ const AppNavigation = ({navigation, user}) => {
 };
 
 const styles = StyleSheet.create({
-  body: {
-    flex: 1,
-    justifyContent: 'center',
+  header: {
+    backgroundColor: 'white',
+    elevation: 0,
   },
   bottomTab: {
     height: 56,
     padding: 0,
   },
-  tabContainer: {},
   tabTitle: {
     fontSize: 8,
   },

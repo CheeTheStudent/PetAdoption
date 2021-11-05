@@ -36,12 +36,10 @@ const MediaPicker = ({singleMedia, imageOnly, profilePicture, profilePictureSize
       CameraRoll.getPhotos({
         first: 10,
         assetType: imageOnly ? 'Photos' : 'All',
-      })
-        .then(results => {
-          let images = ['first', ...results.edges, 'last'];
-          setRecentPics(images);
-        })
-        .catch(err => console.log(err));
+      }).then(results => {
+        let images = ['first', ...results.edges, 'last'];
+        setRecentPics(images);
+      });
     }
 
     // ImagePicker.clean()

@@ -90,7 +90,7 @@ const Auth = ({navigation}) => {
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: '#fff'}}>
+    <View style={styles.body}>
       <ActivityIndicator animating={loading} size={50} color='black' style={styles.loading} />
       <View style={{flex: 3}}>
         <AppIntroSlider keyExtractor={keyExtractor} renderItem={renderItem} showNextButton={false} dotStyle={styles.dotStyle} activeDotStyle={styles.activeDotStyle} data={data} />
@@ -110,6 +110,10 @@ const Auth = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
+  body: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   slide: {
     flex: 1,
     alignItems: 'center',
@@ -127,7 +131,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colours.darkGray,
   },
-
   dotStyle: {
     backgroundColor: colours.white,
     borderColor: colours.mediumGray,

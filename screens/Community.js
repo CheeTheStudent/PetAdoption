@@ -41,6 +41,8 @@ const Community = ({navigation}) => {
     return () => postRef.off('child_changed', thisPostRef);
   }, []);
 
+  const onRefresh = () => setRefresh(true);
+
   const handleOnLike = post => {
     if (post.likes?.hasOwnProperty(userUID)) return postRef.child(`${post.id}/likes/${userUID}`).remove();
     postRef.child(`${post.id}/likes/${userUID}`).set(userUID);
@@ -65,34 +67,26 @@ const Community = ({navigation}) => {
     ToastAndroid.show('Post deleted!', ToastAndroid.SHORT);
   };
 
+  const handleCreatePost = () => navigation.navigate('PostForm');
+
+  const renderPost = ({item}) => (
+    <PostCard post={item} onLike={() => handleOnLike(item)} onOpenPost={() => handleOpenPost(item)} onBookmark={() => handleOnBookmark(item)} onDelete={() => handleOnDelete(item)} />
+  );
+
+  const renderSeparator = () => <View style={styles.lineSeparator} />;
+
   return (
     <View style={styles.body}>
       {posts ? (
         posts.length > 0 ? (
-          <FlatList
-            keyExtractor={item => item.id}
-            data={posts}
-            renderItem={({item, index}) => (
-              <PostCard post={item} onLike={() => handleOnLike(item)} onOpenPost={() => handleOpenPost(item)} onBookmark={() => handleOnBookmark(item)} onDelete={() => handleOnDelete(item)} />
-            )}
-            onRefresh={() => setRefresh(true)}
-            refreshing={refresh}
-            ItemSeparatorComponent={() => (
-              <View
-                style={{
-                  borderBottomColor: colours.lightGray,
-                  borderBottomWidth: StyleSheet.hairlineWidth,
-                }}
-              />
-            )}
-          />
+          <FlatList keyExtractor={item => item.id} data={posts} renderItem={renderPost} onRefresh={onRefresh} refreshing={refresh} ItemSeparatorComponent={renderSeparator} />
         ) : (
           <NoResults title='No post available now!' desc='Create a post to start the party!' />
         )
       ) : (
         <Loading type='paw' />
       )}
-      <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('PostForm')}>
+      <TouchableOpacity style={styles.fab} onPress={handleCreatePost}>
         <Icon name='plus' type='material-community' size={30} color='white' />
       </TouchableOpacity>
     </View>
@@ -114,6 +108,10 @@ const styles = StyleSheet.create({
     bottom: verticalScale(16),
     right: scale(16),
     elevation: 10,
+  },
+  lineSeparator: {
+    borderBottomColor: colours.lightGray,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
 });
 

@@ -165,7 +165,7 @@ const OwnerProfile = ({navigation, route}) => {
           {isOwner ? (
             <View style={[styles.rowContainer, Spacing.superSmallTopSpacing]}>
               <Text style={styles.lightText}>
-                <Text style={styles.darkText}>{pets.length - profile.petsAdopted || 0}</Text> For Adoption
+                <Text style={styles.darkText}>{pets?.length - profile.petsAdopted || 0}</Text> For Adoption
               </Text>
               <Text style={[styles.lightText, Spacing.smallLeftSpacing, {flex: 1}]}>
                 <Text style={styles.darkText}>{profile.petsAdopted || 0}</Text> Successfully Adopted
@@ -236,34 +236,32 @@ const OwnerProfile = ({navigation, route}) => {
   };
 
   return (
-    <>
-      <Tab.Navigator
-        collapsibleOptions={{
-          headerHeight: isOwner ? SCREEN.HEIGHT * 0.45 : SCREEN.HEIGHT * 0.4,
-          headerContainerStyle: {elevation: 0},
-          renderTabBar: props => {
-            const numOfTabs = isOwner ? 3 : 2;
-            return (
-              <MaterialTabBar
-                indicatorStyle={{backgroundColor: 'black', width: (SCREEN.WIDTH / numOfTabs) * 0.7, left: (SCREEN.WIDTH / numOfTabs) * 0.15}}
-                tabStyle={{elevation: 0, borderBottomWidth: 1, borderBottomColor: colours.lightGray}}
-                {...props}
-              />
-            );
-          },
-          renderHeader,
-        }}>
-        <Tab.Screen name='ProHome' children={props => <O1HomeScreen posts={posts} {...props} />} options={{title: 'HOME'}} />
-        {isOwner ? (
-          <>
-            <Tab.Screen name='ProPets' children={props => <O2PetsScreen pets={pets} {...props} />} options={{title: 'PETS'}} />
-            <Tab.Screen name='ProJobs' children={props => <O3JobsScreen jobs={jobs} {...props} />} options={{title: 'JOBS'}} />
-          </>
-        ) : (
-          <Tab.Screen name='ProScreening' children={props => <O4Screening user={profile} {...props} />} options={{title: 'SCREENING'}} />
-        )}
-      </Tab.Navigator>
-    </>
+    <Tab.Navigator
+      collapsibleOptions={{
+        headerHeight: isOwner ? SCREEN.HEIGHT * 0.45 : SCREEN.HEIGHT * 0.4,
+        headerContainerStyle: {elevation: 0},
+        renderTabBar: props => {
+          const numOfTabs = isOwner ? 3 : 2;
+          return (
+            <MaterialTabBar
+              indicatorStyle={{backgroundColor: 'black', width: (SCREEN.WIDTH / numOfTabs) * 0.7, left: (SCREEN.WIDTH / numOfTabs) * 0.15}}
+              tabStyle={{elevation: 0, borderBottomWidth: 1, borderBottomColor: colours.lightGray}}
+              {...props}
+            />
+          );
+        },
+        renderHeader,
+      }}>
+      <Tab.Screen name='ProHome' children={props => <O1HomeScreen posts={posts} {...props} />} options={{title: 'HOME'}} />
+      {isOwner ? (
+        <>
+          <Tab.Screen name='ProPets' children={props => <O2PetsScreen pets={pets} {...props} />} options={{title: 'PETS'}} />
+          <Tab.Screen name='ProJobs' children={props => <O3JobsScreen jobs={jobs} {...props} />} options={{title: 'JOBS'}} />
+        </>
+      ) : (
+        <Tab.Screen name='ProScreening' children={props => <O4Screening user={profile} {...props} />} options={{title: 'SCREENING'}} />
+      )}
+    </Tab.Navigator>
   );
 };
 

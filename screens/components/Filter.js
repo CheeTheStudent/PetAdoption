@@ -35,27 +35,21 @@ const Filter = ({navigation, route}) => {
       headers: {'x-api-key': dogAPIkey},
     })
       .then(res => res.json())
-      .then(
-        results => {
-          let extractedBreeds = ['All'];
-          results.map(breed => extractedBreeds.push(breed.name));
-          if (isMounted) setDogBreeds(extractedBreeds);
-        },
-        error => console.log(error),
-      );
+      .then(results => {
+        let extractedBreeds = ['All'];
+        results.map(breed => extractedBreeds.push(breed.name));
+        if (isMounted) setDogBreeds(extractedBreeds);
+      });
 
     await fetch('https://api.thecatapi.com/v1/breeds', {
       headers: {'x-api-key': catAPIkey},
     })
       .then(res => res.json())
-      .then(
-        results => {
-          let extractedBreeds = ['All'];
-          results.map(breed => extractedBreeds.push(breed.name));
-          if (isMounted) setCatBreeds(extractedBreeds);
-        },
-        error => console.log(error),
-      );
+      .then(results => {
+        let extractedBreeds = ['All'];
+        results.map(breed => extractedBreeds.push(breed.name));
+        if (isMounted) setCatBreeds(extractedBreeds);
+      });
 
     const breedQuery = queries?.findIndex(query => query.field === 'breed');
     if (breedQuery >= 0) setBreed(queries[breedQuery].property);

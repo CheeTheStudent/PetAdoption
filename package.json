@@ -35,6 +35,7 @@
     "react": "17.0.1",
     "react-native": "0.64.2",
     "react-native-app-intro-slider": "^4.0.4",
+    "react-native-bootsplash": "^3.2.6",
     "react-native-chart-kit": "^6.11.0",
     "react-native-collapsible-tab-view": "^4.3.0",
     "react-native-deck-swiper": "^2.0.5",

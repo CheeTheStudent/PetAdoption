@@ -1,5 +1,5 @@
 import React, {useState, useRef} from 'react';
-import {View, Text, StyleSheet, Dimensions, Linking, ActivityIndicator} from 'react-native';
+import {View, Text, StyleSheet, Dimensions, Linking, ActivityIndicator, ToastAndroid} from 'react-native';
 import {Input, Button, CheckBox} from 'react-native-elements';
 import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -99,7 +99,7 @@ const SignUp = ({navigation}) => {
     auth()
       .createUserWithEmailAndPassword(email, pswd)
       .then(() => {
-        console.log('User account created & signed in!');
+        ToastAndroid.show('User account created!', ToastAndroid.LONG);
       })
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {
@@ -109,7 +109,6 @@ const SignUp = ({navigation}) => {
         if (error.code === 'auth/invalid-email') {
           setEmailError('That email address is invalid');
         }
-        console.error(error);
       });
     setLoading(false);
   };

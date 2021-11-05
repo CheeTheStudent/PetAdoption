@@ -87,33 +87,23 @@ const PF1Basic = ({navigation, pet}) => {
       headers: {'x-api-key': dogAPIkey},
     })
       .then(res => res.json())
-      .then(
-        results => {
-          let extractedBreeds = ['Unknown', 'Mixed'];
-          results.map(breed => extractedBreeds.push(breed.name));
-          setDogBreeds(extractedBreeds);
-          if (pet) setBreed(pet.breed);
-        },
-        error => {
-          console.log(error);
-        },
-      );
+      .then(results => {
+        let extractedBreeds = ['Unknown', 'Mixed'];
+        results.map(breed => extractedBreeds.push(breed.name));
+        setDogBreeds(extractedBreeds);
+        if (pet) setBreed(pet.breed);
+      });
 
     fetch('https://api.thecatapi.com/v1/breeds', {
       headers: {'x-api-key': catAPIkey},
     })
       .then(res => res.json())
-      .then(
-        results => {
-          let extractedBreeds = ['Unknown', 'Mixed'];
-          results.map(breed => extractedBreeds.push(breed.name));
-          setCatBreeds(extractedBreeds);
-          if (pet) setBreed(pet.breed);
-        },
-        error => {
-          console.log(error);
-        },
-      );
+      .then(results => {
+        let extractedBreeds = ['Unknown', 'Mixed'];
+        results.map(breed => extractedBreeds.push(breed.name));
+        setCatBreeds(extractedBreeds);
+        if (pet) setBreed(pet.breed);
+      });
   }, []);
 
   const handleLivingCondition = (value, include) => {

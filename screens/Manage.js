@@ -34,7 +34,6 @@ const Manage = ({navigation, route, defaultHeader}) => {
       .orderByChild('ownerId')
       .equalTo(userUID)
       .on('value', snapshot => {
-        console.log('Manage listening');
         const data = snapshot.val() ? snapshot.val() : {};
         let petData = [];
         Object.entries(data).map(value => petData.push({id: value[0], ...value[1]}));

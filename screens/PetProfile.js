@@ -105,6 +105,12 @@ const PetProfile = ({navigation, route}) => {
     navigation.navigate('Chat', {convo: {id: convoId, ...convoInfo}});
   };
 
+  const renderItem = ({item}) => (
+    <TouchableOpacity style={styles.cameraPics} onPress={toggleModal}>
+      {isVideo(item) ? <Video source={{uri: item}} resizeMode='cover' muted={true} style={{flex: 1, backgroundColor: colours.darkGray}} /> : <Image source={{uri: item}} style={{flex: 1}} />}
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.body}>
       {pet && user ? (
@@ -152,21 +158,7 @@ const PetProfile = ({navigation, route}) => {
             {media && (
               <>
                 <Text style={[TextStyles.h3, Spacing.superSmallTopSpacing]}>Gallery</Text>
-                <FlatList
-                  horizontal
-                  data={media}
-                  keyExtractor={index => index}
-                  style={Spacing.smallTopSpacing}
-                  renderItem={({item, index}) => (
-                    <TouchableOpacity style={styles.cameraPics} onPress={toggleModal}>
-                      {isVideo(item) ? (
-                        <Video source={{uri: item}} resizeMode='cover' muted={true} style={{flex: 1, backgroundColor: colours.darkGray}} />
-                      ) : (
-                        <Image source={{uri: item}} style={{flex: 1}} />
-                      )}
-                    </TouchableOpacity>
-                  )}
-                />
+                <FlatList horizontal data={media} keyExtractor={index => index} style={Spacing.smallTopSpacing} renderItem={renderItem} />
               </>
             )}
             <View style={[styles.ownerContainer, Spacing.smallTopSpacing, Spacing.superSmallBottomSpacing]}>

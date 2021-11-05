@@ -42,7 +42,6 @@ const ResetPassword = ({navigation}) => {
       })
       .catch(error => {
         ToastAndroid.show('Email failed to send, try again.', ToastAndroid.SHORT);
-        console.error(error);
       });
   };
 

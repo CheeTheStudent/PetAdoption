@@ -35,17 +35,6 @@ const Job = ({navigation, route}) => {
     });
   }, []);
 
-  const openMaps = () => {
-    const url = 'geo: 5.437694608336231, 100.30948629999854';
-    Linking.canOpenURL(url).then(supported => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        console.log("Don't know how to open URI: " + url);
-      }
-    });
-  };
-
   const handleSendMessage = async () => {
     setLoading(true);
     const convoInfo = {
@@ -140,10 +129,6 @@ const styles = StyleSheet.create({
   rowContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  map: {
-    height: SCREEN.HEIGHT * 0.2,
-    marginTop: verticalScale(8),
   },
   ownerImage: {
     width: SCREEN.WIDTH / 6,

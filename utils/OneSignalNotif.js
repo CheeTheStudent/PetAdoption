@@ -23,7 +23,6 @@ const OneSignalNotif = () => {
     OneSignal.setNotificationWillShowInForegroundHandler(notificationReceivedEvent => {
       let notification = notificationReceivedEvent.getNotification();
       const data = notification.additionalData;
-      console.log(data);
       if (data.type === 'chat') notificationReceivedEvent.complete(null);
       else notificationReceivedEvent.complete(notification);
     });
@@ -63,9 +62,7 @@ const OneSignalNotif = () => {
         data: data.data,
       }),
     };
-    fetch(endpoint, params)
-      .then(response => console.log('sent success: ', response))
-      .catch(err => console.log('error: ', err));
+    fetch(endpoint, params);
   };
 
   const sendChatNotification = (receiverId, message, threadId, convoData) => {

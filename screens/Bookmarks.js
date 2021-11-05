@@ -41,6 +41,8 @@ const Bookmarks = ({navigation}) => {
     return () => postRef.off('child_changed', thisPostRef);
   }, []);
 
+  const onRefresh = () => setRefresh(true);
+
   const handleOnLike = post => {
     if (post.likes?.hasOwnProperty(userUID)) return postRef.child(`${post.id}/likes/${userUID}`).remove();
     postRef.child(`${post.id}/likes/${userUID}`).set(userUID);
@@ -64,27 +66,17 @@ const Bookmarks = ({navigation}) => {
     ToastAndroid.show('Post deleted!', ToastAndroid.SHORT);
   };
 
+  const renderItemSeparator = () => <View style={styles.lineSeparator} />;
+
+  const renderPost = ({item}) => (
+    <PostCard post={item} onLike={() => handleOnLike(item)} onOpenPost={() => handleOpenPost(item)} onBookmark={() => handleOnBookmark(item)} onDelete={() => handleOnDelete(item)} />
+  );
+
   return (
     <View style={styles.body}>
       {posts ? (
         posts.length > 0 ? (
-          <FlatList
-            keyExtractor={item => item.id}
-            data={posts}
-            renderItem={({item, index}) => (
-              <PostCard post={item} onLike={() => handleOnLike(item)} onOpenPost={() => handleOpenPost(item)} onBookmark={() => handleOnBookmark(item)} onDelete={() => handleOnDelete(item)} />
-            )}
-            onRefresh={() => setRefresh(true)}
-            refreshing={refresh}
-            ItemSeparatorComponent={() => (
-              <View
-                style={{
-                  borderBottomColor: colours.lightGray,
-                  borderBottomWidth: StyleSheet.hairlineWidth,
-                }}
-              />
-            )}
-          />
+          <FlatList keyExtractor={item => item.id} data={posts} renderItem={renderPost} onRefresh={onRefresh} refreshing={refresh} ItemSeparatorComponent={renderItemSeparator} />
         ) : (
           <NoResults title='No Saved Bookmarks' desc='Head over to Community to discover new posts!' />
         )
@@ -99,6 +91,10 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     backgroundColor: 'white',
+  },
+  lineSeparator: {
+    borderBottomColor: colours.lightGray,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
 });
 

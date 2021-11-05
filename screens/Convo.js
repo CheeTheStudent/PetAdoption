@@ -55,27 +55,25 @@ const Convo = ({navigation, route, chats, onConvoPress}) => {
     return false;
   };
 
+  const renderItem = ({item, index}) => (
+    <TouchableOpacity onPress={() => onConvoPress(item)} style={styles.card}>
+      <Image source={getFriend(item).image ? {uri: getFriend(item).image} : require('../assets/images/placeholder.png')} style={styles.profilePic} />
+      <View style={[Spacing.smallHorizontalSpacing, {flex: 1}]}>
+        <Text style={TextStyles.h3}>{getFriend(item).name}</Text>
+        <Text ellipsizeMode='tail' numberOfLines={1} style={[TextStyles.h4, newMessage(item) ? {fontWeight: 'bold'} : null]}>
+          {item.lastMessage ? item.lastMessage.text : 'This is the start of the conversation'}
+        </Text>
+      </View>
+      <Text style={[TextStyles.desc, {position: 'absolute', right: 0, top: 0}]}>{item.lastMessage ? getTimeConvo(item.lastMessage.timestamp) : ''}</Text>
+      {newMessage(item) ? <Icon name='circle-medium' type='material-community' size={moderateScale(24)} /> : null}
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.body}>
       {chats ? (
         chats.length > 0 ? (
-          <FlatList
-            data={chats}
-            keyExtractor={item => item.id}
-            renderItem={({item, index}) => (
-              <TouchableOpacity onPress={() => onConvoPress(item)} style={styles.card}>
-                <Image source={getFriend(item).image ? {uri: getFriend(item).image} : require('../assets/images/placeholder.png')} style={styles.profilePic} />
-                <View style={[Spacing.smallHorizontalSpacing, {flex: 1}]}>
-                  <Text style={TextStyles.h3}>{getFriend(item).name}</Text>
-                  <Text ellipsizeMode='tail' numberOfLines={1} style={[TextStyles.h4, newMessage(item) ? {fontWeight: 'bold'} : null]}>
-                    {item.lastMessage ? item.lastMessage.text : 'This is the start of the conversation'}
-                  </Text>
-                </View>
-                <Text style={[TextStyles.desc, {position: 'absolute', right: 0, top: 0}]}>{item.lastMessage ? getTimeConvo(item.lastMessage.timestamp) : ''}</Text>
-                {newMessage(item) ? <Icon name='circle-medium' type='material-community' size={moderateScale(24)} /> : null}
-              </TouchableOpacity>
-            )}
-          />
+          <FlatList data={chats} keyExtractor={item => item.id} renderItem={renderItem} />
         ) : (
           <NoResults title='No conversations yet!' desc='Start chatting to create conversations.' />
         )

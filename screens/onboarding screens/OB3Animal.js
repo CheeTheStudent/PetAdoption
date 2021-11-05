@@ -81,12 +81,7 @@ const OB3Animal = ({navigation}) => {
     });
     const user = {preferredAnimals: preferredAnimals};
 
-    try {
-      await AsyncStorage.mergeItem('onboardUser', JSON.stringify(user));
-    } catch (error) {
-      console.log(error);
-    }
-
+    await AsyncStorage.mergeItem('onboardUser', JSON.stringify(user));
     navigation.navigate('OB4Tags');
   };
 

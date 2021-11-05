@@ -10,6 +10,7 @@ import {Spacing, TextStyles} from '../assets/styles';
 
 import GirlWithPhone from '../assets/images/verification.svg';
 import MYFlag from '../assets/images/myFlag.svg';
+import colours from '../assets/colours';
 
 const Verify = ({navigation}) => {
   const userUID = auth().currentUser.uid;
@@ -94,8 +95,9 @@ const styles = StyleSheet.create({
     marginRight: scale(8),
     paddingHorizontal: scale(15),
     paddingVertical: verticalScale(10),
-    elevation: 1,
     borderRadius: moderateScale(5),
+    borderWidth: 1,
+    borderColor: colours.mediumGray,
   },
   bottomContainer: {
     marginTop: verticalScale(56),

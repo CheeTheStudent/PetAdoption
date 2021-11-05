@@ -68,8 +68,8 @@ const Post = ({navigation, route}) => {
       userRef.child(`savedPosts/${postId}`).remove();
       return postRef.child(`saves/${userUID}`).remove();
     }
-    userRef.child(`savedPosts/${postId}`).set(postId);
-    postRef.child(`saves/${userUID}`).set(userUID);
+    userRef.child(`savedPosts/${postId}`).set(database.ServerValue.TIMESTAMP);
+    postRef.child(`saves/${userUID}`).set(database.ServerValue.TIMESTAMP);
   };
 
   const handleOnDelete = () => {

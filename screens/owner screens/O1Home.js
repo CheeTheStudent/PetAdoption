@@ -24,8 +24,8 @@ const O1Home = ({navigation, posts}) => {
       userRef.child(`savedPosts/${post.id}`).remove();
       return postRef.child(`${post.id}/saves/${userUID}`).remove();
     }
-    userRef.child(`savedPosts/${post.id}`).set(post.id);
-    postRef.child(`${post.id}/saves/${userUID}`).set(userUID);
+    userRef.child(`savedPosts/${post.id}`).set(database.ServerValue.TIMESTAMP);
+    postRef.child(`${post.id}/saves/${userUID}`).set(database.ServerValue.TIMESTAMP);
   };
 
   const handleOpenPost = post => {
@@ -37,32 +37,25 @@ const O1Home = ({navigation, posts}) => {
     ToastAndroid.show('Post deleted!', ToastAndroid.SHORT);
   };
 
-  if (!posts) return <NoResults title='No posts yet!' desc='Create new posts in the Community!' />;
+  if (posts.length <= 0) return <NoResults title='No posts yet!' desc='Create new posts in the Community!' />;
 
-  return (
-    <FlatList
-      keyExtractor={item => item.id}
-      data={posts}
-      renderItem={({item, index}) => (
-        <PostCard post={item} onLike={() => handleOnLike(item)} onOpenPost={() => handleOpenPost(item)} onBookmark={() => handleOnBookmark(item)} onDelete={() => handleOnDelete(item)} />
-      )}
-      ItemSeparatorComponent={() => (
-        <View
-          style={{
-            borderBottomColor: colours.lightGray,
-            borderBottomWidth: StyleSheet.hairlineWidth,
-          }}
-        />
-      )}
-      contentContainerStyle={styles.body}
-    />
+  const renderItem = ({item}) => (
+    <PostCard post={item} onLike={() => handleOnLike(item)} onOpenPost={() => handleOpenPost(item)} onBookmark={() => handleOnBookmark(item)} onDelete={() => handleOnDelete(item)} />
   );
+
+  const renderSeparator = () => <View style={styles.lineSeparator} />;
+
+  return <FlatList keyExtractor={item => item.id} data={posts} renderItem={renderItem} ItemSeparatorComponent={renderSeparator} contentContainerStyle={styles.body} />;
 };
 
 const styles = StyleSheet.create({
   body: {
     flex: 1,
     backgroundColor: 'white',
+  },
+  lineSeparator: {
+    borderBottomColor: colours.lightGray,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
 });
 

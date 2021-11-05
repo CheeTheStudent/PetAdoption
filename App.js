@@ -3,6 +3,7 @@ import {Text} from 'react-native';
 import {NavigationContainer, DefaultTheme, useNavigation} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
+import RNBootSplash from 'react-native-bootsplash';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -34,7 +35,6 @@ import FilterModal from './screens/components/Filter';
 import GooglePlacesInputModal from './screens/components/GooglePlacesInput';
 import ReportScreen from './screens/Report';
 import Loading from './screens/components/Loading';
-import Testing from './screens/Testing';
 
 const App = () => {
   const oneSignalNotif = OneSignalNotif();
@@ -57,7 +57,7 @@ const App = () => {
       const data = snapshot.val() ? snapshot.val() : null;
       if (!data) setShowOnboard(true);
       else {
-        AsyncStorage.setItem('user', JSON.stringify(data)).catch(err => console.log(err));
+        AsyncStorage.setItem('user', JSON.stringify(data));
         setShowOnboard(false);
       }
     });
@@ -77,7 +77,7 @@ const App = () => {
   if (initializing) return null;
 
   return (
-    <NavigationContainer ref={navigationRef}>
+    <NavigationContainer ref={navigationRef} onReady={() => RNBootSplash.hide()}>
       <Stack.Navigator screenOptions={{headerShown: false}}>
         {!user ? (
           <>
@@ -93,7 +93,6 @@ const App = () => {
             ) : (
               <>
                 <Stack.Screen name='DrawerNavigation' component={DrawerNavigation} />
-                {/* <Stack.Screen name='AppNavigation' component={AppNavigation} /> */}
                 <Stack.Screen name='PetProfile' component={PetProfileScreen} />
                 <Stack.Screen name='Job' component={JobScreen} />
                 <Stack.Screen name='OwnerProfile' component={OwnerProfileScreen} />
@@ -112,7 +111,6 @@ const App = () => {
                   <Stack.Screen name='SMSConfirmation' component={SMSConfirmationScreen} />
                 </Stack.Group>
                 <Stack.Screen name='Report' component={ReportScreen} />
-                <Stack.Screen name='Testing' component={Testing} />
               </>
             )}
           </>

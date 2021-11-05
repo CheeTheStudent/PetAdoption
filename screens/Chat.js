@@ -34,7 +34,7 @@ const Chat = ({navigation, route}) => {
     navigation.setOptions({
       title: '',
       headerTitle: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('OwnerProfile', {ownerId: getFriend().id})} style={styles.headerContainer}>
+        <TouchableOpacity onPress={navigateToProfile} style={styles.headerContainer}>
           <Avatar
             rounded
             size={moderateScale(44)}
@@ -48,8 +48,8 @@ const Chat = ({navigation, route}) => {
         <OptionsMenu
           customButton={<Icon name='dots-vertical' type='material-community' size={moderateScale(24)} style={Spacing.superSmallRightSpacing} />}
           destructiveIndex={1}
-          options={['View Profile', 'Block', 'Cancel']}
-          // actions={[editPost, deletePost]}
+          options={['Report User', 'Cancel']}
+          actions={[reportUser]}
         />
       ),
     });
@@ -64,7 +64,7 @@ const Chat = ({navigation, route}) => {
     } else if (interestType === 'jobs') {
       const snapshot = await database().ref(`jobs/${interestId}`).once('value');
       const jobData = snapshot.val() ? snapshot.val() : {};
-      setInterest({item: jobData, title: jobData.title, image: jobData.image});
+      if (Object.keys(jobData).length > 0) setInterest({item: jobData, title: jobData.title, image: jobData.image});
     }
   }, []);
 
@@ -84,6 +84,15 @@ const Chat = ({navigation, route}) => {
       firebaseMessage.messageChangesListenerOff();
     };
   }, []);
+
+  const navigateToProfile = () => navigation.navigate('OwnerProfile', {ownerId: getFriend().id});
+
+  const navigateToInterest = () => {
+    if (interestType === 'pets') navigation.navigate('PetProfile', {pet: interest.item});
+    else if (interestType === 'jobs') navigation.navigate('Job', {job: interest.item});
+  };
+
+  const reportUser = () => navigation.navigate('Report', {issueId: getFriend().id, issueType: 'user'});
 
   const renderBubble = props => {
     const {currentMessage: current, nextMessage: next} = props;
@@ -131,10 +140,15 @@ const Chat = ({navigation, route}) => {
     );
   };
 
-  const navigateToInterest = () => {
-    if (interestType === 'pets') navigation.navigate('PetProfile', {pet: interest.item});
-    else if (interestType === 'jobs') navigation.navigate('Job', {job: interest.item});
-  };
+  const renderSend = props => (
+    <Send {...props} containerStyle={styles.sendContainer}>
+      <Icon name='send' type='material-community' size={moderateScale(30)} />
+    </Send>
+  );
+
+  const renderInputToolbar = props => <InputToolbar {...props} containerStyle={styles.inputToolbarContainer} />;
+
+  const renderComposer = props => <Composer {...props} textInputStyle={styles.composerText} />;
 
   return (
     <View style={styles.body}>
@@ -153,15 +167,11 @@ const Chat = ({navigation, route}) => {
           renderBubble={renderBubble}
           renderTicks={() => null}
           renderTime={() => null}
-          renderInputToolbar={props => <InputToolbar {...props} containerStyle={styles.inputToolbarContainer} />}
-          renderSend={props => (
-            <Send {...props} containerStyle={styles.sendContainer}>
-              <Icon name='send' type='material-community' size={moderateScale(30)} />
-            </Send>
-          )}
+          renderInputToolbar={renderInputToolbar}
+          renderSend={renderSend}
           minComposerHeight={verticalScale(45)}
           minInputToolbarHeight={verticalScale(50)}
-          renderComposer={props => <Composer {...props} textInputStyle={styles.composerText} />}
+          renderComposer={renderComposer}
         />
       ) : (
         <Loading type='paw' />
@@ -241,7 +251,7 @@ const styles = StyleSheet.create({
   inputToolbarContainer: {
     minHeight: verticalScale(50),
     borderTopWidth: 0,
-    marginVertical: verticalScale(8),
+    paddingVertical: verticalScale(8),
   },
   sendContainer: {
     height: verticalScale(50),

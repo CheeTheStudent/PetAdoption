@@ -59,11 +59,7 @@ const OB4Tags = ({navigation, user}) => {
     if (user) {
       userRef.update(userTags);
     } else {
-      try {
-        await AsyncStorage.mergeItem('onboardUser', JSON.stringify(userTags));
-      } catch (error) {
-        console.log(error);
-      }
+      await AsyncStorage.mergeItem('onboardUser', JSON.stringify(userTags));
     }
 
     handleNavigate();

@@ -1,5 +1,5 @@
 import React, {useState, useLayoutEffect, useEffect} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, ToastAndroid} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 
@@ -42,7 +42,7 @@ const GooglePlacesInput = ({navigation, route}) => {
         language: 'en',
         components: 'country:my',
       }}
-      onFail={err => console.log(err)}
+      onFail={() => ToastAndroid.show('Cannot retrieve suggestions now.', ToastAndroid.SHORT)}
       onPress={handleOnPress}
       renderRow={props => (
         <View>

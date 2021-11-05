@@ -40,11 +40,8 @@ const OB2Introduce = ({navigation}) => {
 
   const handleNext = async () => {
     const user = {role: selected};
-    try {
-      await AsyncStorage.setItem('onboardUser', JSON.stringify(user));
-    } catch (error) {
-      console.log(error);
-    }
+
+    await AsyncStorage.setItem('onboardUser', JSON.stringify(user));
     navigation.navigate('OB3Animal');
   };
 

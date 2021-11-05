@@ -10,9 +10,9 @@ import {scale, verticalScale, moderateScale, SCREEN} from '../../assets/dimensio
 import {TextStyles, Spacing} from '../../assets/styles';
 import colours from '../../assets/colours';
 
-const personalities = ['Playful', 'Curious', 'Obedient', 'Active', 'Sociable', 'Loving', 'Alert', 'Lazy', 'Gentle'];
+const personalities = ['Playful', 'Curious', 'Obedient', 'Active', 'Sociable', 'Loving', 'Alert', 'Lazy', 'Gentle', 'Quiet', 'Manja', 'Smart', 'Protective'];
 
-const appearances = ['Cute', 'Elegant', 'Handsome', 'Pretty', 'Beautiful', 'Colourful', 'Big', 'Medium', 'Small'];
+const appearances = ['Cute', 'Elegant', 'Handsome', 'Pretty', 'Beautiful', 'Colourful', 'Short-haired', 'Long-haired', 'Fluffy', 'Big', 'Medium', 'Small'];
 
 const PF3Tags = ({navigation, route, rootNavigation, pet}) => {
   const {petInfo} = route.params;

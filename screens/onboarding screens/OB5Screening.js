@@ -37,6 +37,8 @@ const OB5Screening = ({navigation, user, onSave}) => {
   const [numOfPets, setNumOfPets] = useState(user ? user.screening?.numOfPetsOwned : 0);
   const [vaccinated, setVaccinated] = useState(user ? user.screening?.petsVaccinated : false);
   const [spayed, setSpayed] = useState(user ? user.screening?.petsSpayed : false);
+  const [willVaccinate, setWillVaccinate] = useState(user ? user.screening?.willVaccinate : false);
+  const [willSpay, setWillSpay] = useState(user ? user.screening?.willSpay : false);
   const [desc, setDesc] = useState(user ? user.screening?.description : '');
 
   useEffect(() => {
@@ -81,6 +83,8 @@ const OB5Screening = ({navigation, user, onSave}) => {
       numOfPetsOwned: numOfPets,
       petsVaccinated: vaccinated,
       petsSpayed: spayed,
+      willVaccinate,
+      willSpay,
       description: desc,
     };
     const newInfo = {
@@ -141,44 +145,83 @@ const OB5Screening = ({navigation, user, onSave}) => {
             return <Tag key={type} title={type} type={statuses.indexOf(type) >= 0 && 'black'} onSelected={handleStatus} />;
           })}
         </View>
-        <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Number of Pets</Text>
+        <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Pets Owned</Text>
         <Text style={TextStyles.desc}>How many pets do you currently own?</Text>
         <View style={styles.rowContainer}>
           <Slider value={numOfPets} onValueChange={value => setNumOfPets(value)} minimumValue={0} maximumValue={6} step={1} thumbStyle={styles.sliderThumb} style={{flex: 9}} />
           <Text style={styles.counterContainer}>{numOfPets < 6 ? numOfPets : '> 5'}</Text>
         </View>
-        <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Are your pets vaccinated?</Text>
+        {numOfPets > 0 ? (
+          <>
+            <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>Are your pets vaccinated?</Text>
+            <View style={styles.rowContainer}>
+              <SquareButton
+                title='Yes'
+                containerStyle={styles.squareYesButton}
+                buttonStyle={vaccinated && styles.squareButtonPressed}
+                titleStyle={vaccinated && styles.squareButtonTextPressed}
+                onPress={() => setVaccinated(true)}
+              />
+              <SquareButton
+                title='No'
+                containerStyle={styles.squareNoButton}
+                buttonStyle={!vaccinated && styles.squareButtonPressed}
+                titleStyle={!vaccinated && styles.squareButtonTextPressed}
+                onPress={() => setVaccinated(false)}
+              />
+            </View>
+            <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>Are your pets neutered/spayed?</Text>
+            <View style={styles.rowContainer}>
+              <SquareButton
+                title='Yes'
+                containerStyle={styles.squareYesButton}
+                buttonStyle={spayed && styles.squareButtonPressed}
+                titleStyle={spayed && styles.squareButtonTextPressed}
+                onPress={() => setSpayed(true)}
+              />
+              <SquareButton
+                title='No'
+                containerStyle={styles.squareNoButton}
+                buttonStyle={!spayed && styles.squareButtonPressed}
+                titleStyle={!spayed && styles.squareButtonTextPressed}
+                onPress={() => setSpayed(false)}
+              />
+            </View>
+          </>
+        ) : null}
+        <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>If you choose to adopt a pet here,</Text>
+        <Text style={[TextStyles.h4]}>Are you willing to vaccinate it?</Text>
         <View style={styles.rowContainer}>
           <SquareButton
             title='Yes'
             containerStyle={styles.squareYesButton}
-            buttonStyle={vaccinated && styles.squareButtonPressed}
-            titleStyle={vaccinated && styles.squareButtonTextPressed}
-            onPress={() => setVaccinated(true)}
+            buttonStyle={willVaccinate && styles.squareButtonPressed}
+            titleStyle={willVaccinate && styles.squareButtonTextPressed}
+            onPress={() => setWillVaccinate(true)}
           />
           <SquareButton
             title='No'
             containerStyle={styles.squareNoButton}
-            buttonStyle={!vaccinated && styles.squareButtonPressed}
-            titleStyle={!vaccinated && styles.squareButtonTextPressed}
-            onPress={() => setVaccinated(false)}
+            buttonStyle={!willVaccinate && styles.squareButtonPressed}
+            titleStyle={!willVaccinate && styles.squareButtonTextPressed}
+            onPress={() => setWillVaccinate(false)}
           />
         </View>
-        <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Are your pets neutered/spayed?</Text>
+        <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>Are you willing to neuter/spay it?</Text>
         <View style={styles.rowContainer}>
           <SquareButton
             title='Yes'
             containerStyle={styles.squareYesButton}
-            buttonStyle={spayed && styles.squareButtonPressed}
-            titleStyle={spayed && styles.squareButtonTextPressed}
-            onPress={() => setSpayed(true)}
+            buttonStyle={willSpay && styles.squareButtonPressed}
+            titleStyle={willSpay && styles.squareButtonTextPressed}
+            onPress={() => setWillSpay(true)}
           />
           <SquareButton
             title='No'
             containerStyle={styles.squareNoButton}
-            buttonStyle={!spayed && styles.squareButtonPressed}
-            titleStyle={!spayed && styles.squareButtonTextPressed}
-            onPress={() => setSpayed(false)}
+            buttonStyle={!willSpay && styles.squareButtonPressed}
+            titleStyle={!willSpay && styles.squareButtonTextPressed}
+            onPress={() => setWillSpay(false)}
           />
         </View>
         <Text style={[TextStyles.h3, Spacing.smallTopSpacing]}>Short Description</Text>

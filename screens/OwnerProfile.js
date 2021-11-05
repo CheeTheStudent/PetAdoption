@@ -13,6 +13,7 @@ import O1HomeScreen from './owner screens/O1Home';
 import O2PetsScreen from './owner screens/O2Pets';
 import O3JobsScreen from './owner screens/O3Jobs';
 import O4Screening from './owner screens/O4Screening';
+import Tag from './components/Tag';
 import Loading from './components/Loading';
 import {SCREEN, verticalScale, scale, moderateScale} from '../assets/dimensions';
 import {TextStyles, Spacing} from '../assets/styles';
@@ -134,7 +135,7 @@ const OwnerProfile = ({navigation, route}) => {
     return (
       <View style={styles.header}>
         <View style={styles.profileTop}>
-          <Image source={profile.banner ? {uri: profile.banner} : require('../assets/images/banner.png')} style={styles.banner} />
+          <Image source={profile.banner ? {uri: profile.banner} : require('../assets/images/placeholder.png')} style={styles.banner} />
           <Avatar rounded size={moderateScale(75)} source={profile.profilePic ? {uri: profile.profilePic} : require('../assets/images/placeholder.png')} containerStyle={styles.profilePicture} />
           <Button
             title={!ownerId || ownerId === userUID ? 'Edit Profile' : 'Message'}
@@ -145,15 +146,17 @@ const OwnerProfile = ({navigation, route}) => {
           />
         </View>
         <View style={styles.profileInfo}>
-          <Text style={[TextStyles.h2, Spacing.superSmallTopSpacing]}>{profile.name}</Text>
+          <Text style={[TextStyles.h2, Spacing.superSmallTopSpacing]}>
+            {profile.name}
+            {profile.verified && <Icon name='paw' type='ionicon' size={moderateScale(12)} style={Spacing.superSmallLeftSpacing} />}
+          </Text>
+          <Text style={styles.lightText}>{profile.role}</Text>
           {profile.location ? (
             <Text numberOfLines={1} onPress={() => openMaps(profile.location.latitude, profile.location.longitude)} style={TextStyles.desc}>
-              <Icon name='location-sharp' type='ionicon' size={moderateScale(12)} />
-              {profile.location.address}
+              <Icon name='location-sharp' type='ionicon' size={moderateScale(12)} style={{marginRight: scale(4)}} />
+              {profile.location.name}
             </Text>
-          ) : (
-            <Text style={styles.lightText}>{profile.role}</Text>
-          )}
+          ) : null}
           {profile.description || profile.screening?.description ? (
             <Text numberOfLines={3} style={[Spacing.superSmallTopSpacing]}>
               {profile.description || profile.screening.description}
@@ -171,7 +174,16 @@ const OwnerProfile = ({navigation, route}) => {
                 <Icon name={showContact ? 'chevron-up' : 'chevron-down'} type='ionicon' size={moderateScale(16)} onPress={() => setShowContact(prev => !prev)} />
               ) : null}
             </View>
-          ) : null}
+          ) : (
+            <View style={styles.rowContainer}>
+              {profile.screening?.willVaccinate ? (
+                <Tag title='Pro-vaccine' icon={<Icon name='injection-syringe' type='fontisto' size={moderateScale(16)} style={{marginRight: scale(4)}} />} type='white-outline' />
+              ) : null}
+              {profile.screening?.willSpay ? (
+                <Tag title='Will spay/neuter' icon={<Icon name='md-male-female' type='ionicon' size={moderateScale(16)} style={{marginRight: scale(4)}} />} type='white-outline' />
+              ) : null}
+            </View>
+          )}
           {showContact ? (
             <>
               <Text style={[TextStyles.h4, Spacing.superSmallTopSpacing]}>Contact Us</Text>
@@ -227,7 +239,7 @@ const OwnerProfile = ({navigation, route}) => {
     <>
       <Tab.Navigator
         collapsibleOptions={{
-          headerHeight: SCREEN.HEIGHT * 0.42,
+          headerHeight: isOwner ? SCREEN.HEIGHT * 0.45 : SCREEN.HEIGHT * 0.4,
           headerContainerStyle: {elevation: 0},
           renderTabBar: props => {
             const numOfTabs = isOwner ? 3 : 2;

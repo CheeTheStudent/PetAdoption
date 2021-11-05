@@ -60,7 +60,7 @@ const Chat = ({navigation, route}) => {
     if (interestType === 'pets') {
       const snapshot = await database().ref(`pets/${interestId}`).once('value');
       const petData = snapshot.val() ? snapshot.val() : {};
-      setInterest({item: petData, title: petData.name, image: petData.media[0], desc: `${petData.gender ? 'Female' : 'Male'}, ${petData.breed}`});
+      setInterest({item: petData, title: petData.name, image: petData.media[0], desc: `${petData.gender ? 'Female' : 'Male'} ${petData.breed ? ', ' + petData.breed : ''}`});
     } else if (interestType === 'jobs') {
       const snapshot = await database().ref(`jobs/${interestId}`).once('value');
       const jobData = snapshot.val() ? snapshot.val() : {};

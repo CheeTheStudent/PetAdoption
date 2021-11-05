@@ -88,7 +88,7 @@ const ProfileForm = ({navigation, route}) => {
       <ScrollView style={styles.body}>
         <View style={styles.header}>
           <View style={styles.profileTop}>
-            <Image source={banner ? {uri: banner[0]} : require('../assets/images/banner.png')} style={styles.banner} />
+            <Image source={banner ? {uri: banner[0]} : require('../assets/images/placeholder.png')} style={styles.banner} />
             <View style={[styles.banner, styles.bannerOverlay]}>
               <MediaPicker profilePicture profilePictureSize={moderateScale(32)} setChosenMedia={setBanner} />
             </View>

@@ -158,7 +158,7 @@ const M1Pets = ({navigation, setManageScreenNavigationOptions, pets}) => {
     );
   };
 
-  const renderPetItem = (item, index) => {
+  const renderPetItem = ({item, index}) => {
     return (
       <TouchableOpacity onLongPress={() => handleLongPress(index)} onPress={() => (isLongPress ? handleSwitchToggle(index) : handleShowModal(item))}>
         <Image source={item.media ? {uri: item.media[0]} : require('../../assets/images/placeholder.png')} style={styles.image} />
@@ -176,7 +176,7 @@ const M1Pets = ({navigation, setManageScreenNavigationOptions, pets}) => {
           numColumns={2}
           keyExtractor={item => item.id}
           data={pets.filter(pet => pet.status.status === 'Available')}
-          renderItem={({item, index}) => renderPetItem(item, index)}
+          renderItem={renderPetItem}
           columnWrapperStyle={styles.rowContainer}
           contentContainerStyle={styles.listContainer}
           ListFooterComponent={
@@ -191,7 +191,7 @@ const M1Pets = ({navigation, setManageScreenNavigationOptions, pets}) => {
                 numColumns={2}
                 keyExtractor={item => item.id}
                 data={pets.filter(pet => pet.status.status === 'Adopted')}
-                renderItem={({item, index}) => renderPetItem(item, index)}
+                renderItem={renderPetItem}
                 columnWrapperStyle={styles.rowContainer}
                 contentContainerStyle={styles.listContainer}
               />

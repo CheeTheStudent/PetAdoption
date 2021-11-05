@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {View, Text, FlatList, Image, ActivityIndicator, TouchableOpacity, StyleSheet} from 'react-native';
 import {Icon} from 'react-native-elements';
 import Video from 'react-native-video';
+import VideoPlayer from 'react-native-video-player';
 import ImageColors from 'react-native-image-colors';
 
 import {SCREEN, scale, verticalScale} from '../../assets/dimensions';
@@ -15,7 +16,7 @@ const GalleryView = ({navigation, route}) => {
   const [colourLoading, setColourLoading] = useState(true);
 
   useEffect(async () => {
-    let fetchColours = [];
+    let fetchColours = Array(media.length).fill(colours.darkGray);
     await Promise.all(
       media.map(async (item, i) => {
         if (!isVideo(item)) {
@@ -24,8 +25,8 @@ const GalleryView = ({navigation, route}) => {
             cache: true,
             key: item,
           });
-          fetchColours.push(bg.average);
-        } else fetchColours.push('#ffffff');
+          fetchColours[i] = bg.average;
+        }
       }),
     );
     setBgColours(fetchColours);
@@ -45,7 +46,7 @@ const GalleryView = ({navigation, route}) => {
 
   return (
     <View style={styles.body}>
-      {loading || colourLoading ? (
+      {colourLoading ? (
         <ActivityIndicator color={colours.black} style={styles.absoluteCenter} />
       ) : (
         <FlatList
@@ -57,15 +58,18 @@ const GalleryView = ({navigation, route}) => {
           renderItem={({item, index}) => (
             <View key={index} style={[styles.item, {backgroundColor: bgColours[index]}]}>
               {isVideo(item) ? (
-                <Video
-                  source={{uri: item}}
-                  resizeMode='cover'
-                  controls
-                  muted={true}
-                  onLoadStart={() => setLoading(true)}
-                  onLoad={() => setLoading(false)}
-                  style={{flex: 1, backgroundColor: colours.darkGray}}
-                />
+                <View style={{flex: 1, justifyContent: 'center'}}>
+                  <VideoPlayer
+                    video={{uri: item}}
+                    videoWidth={SCREEN.WIDTH}
+                    videoHeight={SCREEN.HEIGHT * 0.9}
+                    resizeMode='contain'
+                    onLoadStart={() => setLoading(true)}
+                    onLoad={() => setLoading(false)}
+                    style={{backgroundColor: colours.darkGray}}
+                  />
+                  <ActivityIndicator animating={loading} color={colours.black} style={styles.absoluteCenter} />
+                </View>
               ) : (
                 <Image source={{uri: item}} resizeMode='contain' style={{flex: 1}} />
               )}

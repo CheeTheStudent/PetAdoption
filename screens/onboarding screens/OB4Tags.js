@@ -10,9 +10,9 @@ import {scale, verticalScale, moderateScale, SCREEN} from '../../assets/dimensio
 import {TextStyles, Spacing} from '../../assets/styles';
 import colours from '../../assets/colours';
 
-const personalities = ['Playful', 'Curious', 'Obedient', 'Active', 'Sociable', 'Loving', 'Alert', 'Lazy', 'Gentle'];
+const personalities = ['Playful', 'Curious', 'Obedient', 'Active', 'Sociable', 'Loving', 'Alert', 'Lazy', 'Gentle', 'Quiet', 'Manja', 'Smart', 'Protective'];
 
-const appearances = ['Cute', 'Elegant', 'Handsome', 'Pretty', 'Beautiful', 'Colourful', 'Big', 'Medium', 'Small'];
+const appearances = ['Cute', 'Elegant', 'Handsome', 'Pretty', 'Beautiful', 'Colourful', 'Short-haired', 'Long-haired', 'Fluffy', 'Big', 'Medium', 'Small'];
 
 const OB4Tags = ({navigation, user}) => {
   const userUID = auth().currentUser.uid;
@@ -85,7 +85,7 @@ const OB4Tags = ({navigation, user}) => {
     <View style={styles.body}>
       <View style={[styles.container, user ? Spacing.smallTopSpacing : Spacing.bigTopSpacing]}>
         {!user ? <Text style={TextStyles.h1}>Specifics, specifics..</Text> : null}
-        <Text style={TextStyles.h3}>Choose the tags that describe the pet you would like to adopt</Text>
+        <Text style={TextStyles.h3}>Choose the tags that describe the pet you would like to adopt.</Text>
         <Text style={[TextStyles.h3, user ? Spacing.superSmallTopSpacing : Spacing.mediumTopSpacing]}>Personality</Text>
         <View style={styles.tagsContainer}>
           {personalities.map(type => {

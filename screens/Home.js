@@ -39,7 +39,7 @@ const Home = ({navigation, route, user}) => {
         </View>
       ),
     });
-  }, [navigation, queries]);
+  }, [queries]);
 
   useEffect(() => {
     setLoading(true);

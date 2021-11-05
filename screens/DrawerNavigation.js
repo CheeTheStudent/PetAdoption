@@ -78,7 +78,10 @@ const DrawerNavigation = () => {
               }
             />
           </View>
-          <Text style={[TextStyles.h2, Spacing.superSmallTopSpacing]}>{user.name}</Text>
+          <Text style={[TextStyles.h2, Spacing.superSmallTopSpacing]}>
+            {user.name}
+            {user.verified && <Icon name='paw' type='ionicon' size={moderateScale(12)} style={Spacing.superSmallLeftSpacing} />}
+          </Text>
           <Text style={TextStyles.h4}>{user.role}</Text>
         </Pressable>
         <DrawerItem label='Profile' icon={() => <Icon name='person' type='ionicon' />} onPress={() => navigation.navigate('Profile')} />
